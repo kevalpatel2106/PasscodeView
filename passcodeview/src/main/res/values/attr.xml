@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PinView">
+        <attr name="keyTextSize" format="dimension"/>
+        <attr name="keyBackground" format="reference"/>
+        <attr name="keyBackgroundColor" format="color"/>
+        <attr name="keyTextColor" format="color"/>
+        <attr name="indicatorStrokeColor" format="color"/>
+        <attr name="indicatorSolidColor" format="color"/>
+        <attr name="dividerColor" format="color"/>
+        <attr name="titleText" format="string"/>
+        <attr name="titleTextColor" format="color"/>
+        <attr name="pinLength" format="integer"/>
+    </declare-styleable>
+</resources>

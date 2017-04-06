@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.kevalpatel.passcodeview.PinChangeListener;
-import com.kevalpatel.passcodeview.pinview.PINView;
+import com.kevalpatel.passcodeview.pinview.PinView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        PINView pinView = (PINView) findViewById(R.id.pin_view);
+        PinView pinView = (PinView) findViewById(R.id.pin_view);
         pinView.setPinToCheck("1234");
         pinView.setPinChangeListener(new PinChangeListener() {
             @Override

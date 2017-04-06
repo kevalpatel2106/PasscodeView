@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context="com.securelockview.sample.MainActivity">
 
-    <com.kevalpatel.passcodeview.pinview.PINView
+    <com.kevalpatel.passcodeview.pinview.PinView
         android:layout_width="match_parent"
         android:id="@+id/pin_view"
         android:layout_height="match_parent"/>

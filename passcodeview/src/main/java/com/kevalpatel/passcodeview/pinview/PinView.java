@@ -1,11 +1,12 @@
 package com.kevalpatel.passcodeview.pinview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Build;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
  * Created by Keval on 06-Apr-17.
  */
 
-public class PINView extends View {
+public class PinView extends View {
     private Context mContext;
     private float mDownKeyX;                        //X coordinate of the ACTION_DOWN point
     private float mDownKeyY;                        //Y coordinate of the ACTION_DOWN point
@@ -41,10 +42,24 @@ public class PINView extends View {
     private Rect mRootViewBound = new Rect();
 
     //Theme attributes
-    private int mPinCodeLength = Defults.DEF_PIN_LENGTH;    //PIN code length
+    private int mPinCodeLength;                             //PIN code length
     private float mKeyPadding;                              //Surround padding to each single key
     private float mKeyTextSize;                             //Surround padding to each single key
     private boolean mIsOneHandOperation = false;            //Bool to set true if you want to display one hand key board.
+    @ColorInt
+    private int mKeyBackgroundColor;
+    @ColorInt
+    private int mKeyTextColor;
+    @ColorInt
+    private int mIndicatorStrokeColor;
+    @ColorInt
+    private int mIndicatorFilledColor;
+    @ColorInt
+    private int mDividerColor;
+    @ColorInt
+    private int mTitleColor;
+    private String mTitle;
+
 
     //Paints
     private TextPaint mKeyTextPaint;
@@ -57,35 +72,60 @@ public class PINView extends View {
     //                  CONSTRUCTORS
     ///////////////////////////////////////////////////////////////
 
-    public PINView(Context context) {
+    public PinView(Context context) {
         super(context);
-        init(context);
+        init(context, null);
     }
 
-    public PINView(Context context, @Nullable AttributeSet attrs) {
+    public PinView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init(context, attrs);
     }
 
-    public PINView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public PinView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init(context, attrs);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public PINView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public PinView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init(context);
+        init(context, attrs);
     }
 
     ///////////////////////////////////////////////////////////////
     //                  SET THEME PARAMS
     ///////////////////////////////////////////////////////////////
 
-    private void init(@NonNull Context context) {
+    private void init(@NonNull Context context, AttributeSet attrs) {
         mContext = context;
 
-        mKeyTextSize = mContext.getResources().getDimension(R.dimen.key_text_size);
+        if (attrs != null) {
+            TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.PinView, 0, 0);
+            try {
+                mTitle = a.hasValue(R.styleable.PinView_titleText) ? a.getString(R.styleable.PinView_titleText) : Defults.DEF_TITLE_TEXT;
+                mDividerColor = a.getColor(R.styleable.PinView_dividerColor, Defults.DEF_DIVIDER_COLOR);
+                mIndicatorFilledColor = a.getColor(R.styleable.PinView_indicatorSolidColor, Defults.DEF_INDICATOR_FILLED_COLOR);
+                mIndicatorStrokeColor = a.getColor(R.styleable.PinView_indicatorStrokeColor, Defults.DEF_INDICATOR_STROKE_COLOR);
+                mKeyTextColor = a.getColor(R.styleable.PinView_keyTextColor, Defults.DEF_KEY_TEXT_COLOR);
+                mKeyBackgroundColor = a.getColor(R.styleable.PinView_keyBackground, Defults.DEF_KEY_BACKGROUND_COLOR);
+                mKeyTextSize = a.getDimensionPixelSize(R.styleable.PinView_keyTextSize, (int) mContext.getResources().getDimension(R.dimen.key_text_size));
+                mTitleColor = a.getColor(R.styleable.PinView_titleTextColor, Defults.DEF_TITLE_TEXT_COLOR);
+                mPinCodeLength = a.getInteger(R.styleable.PinView_pinLength, Defults.DEF_PIN_LENGTH);
+            } finally {
+                a.recycle();
+            }
+        } else {
+            mTitle = Defults.DEF_TITLE_TEXT;
+            mDividerColor = Defults.DEF_DIVIDER_COLOR;
+            mIndicatorFilledColor = Defults.DEF_INDICATOR_FILLED_COLOR;
+            mIndicatorStrokeColor = Defults.DEF_INDICATOR_STROKE_COLOR;
+            mKeyTextColor = Defults.DEF_KEY_TEXT_COLOR;
+            mKeyBackgroundColor = Defults.DEF_KEY_BACKGROUND_COLOR;
+            mKeyTextSize = mContext.getResources().getDimension(R.dimen.key_text_size);
+            mTitleColor = Defults.DEF_TITLE_TEXT_COLOR;
+            mPinCodeLength = Defults.DEF_PIN_LENGTH;
+        }
         mKeyPadding = mContext.getResources().getDimension(R.dimen.key_padding);
 
         prepareKeyTextPaint();
@@ -98,30 +138,38 @@ public class PINView extends View {
         //Set empty dot paint
         mEmptyIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mEmptyIndicatorPaint.setStyle(Paint.Style.STROKE);
-        mEmptyIndicatorPaint.setColor(Color.BLUE);
+        mEmptyIndicatorPaint.setColor(mIndicatorStrokeColor);
         mEmptyIndicatorPaint.setStrokeWidth(mContext.getResources().getDimension(R.dimen.indicator_stroke_width));
 
         //Set filled dot paint
         mSolidIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mSolidIndicatorPaint.setColor(Color.RED);
+        mSolidIndicatorPaint.setColor(mIndicatorFilledColor);
+
+        invalidate();
     }
 
     private void prepareDividerPaint() {
         mDividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mDividerPaint.setColor(Color.RED);
+        mDividerPaint.setColor(mDividerColor);
+
+        invalidate();
     }
 
     private void prepareKeyBgPaint() {
         mKeyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mKeyPaint.setColor(Color.RED);
+        mKeyPaint.setColor(mKeyBackgroundColor);
         mKeyPaint.setTextSize(mKeyTextSize);
+
+        invalidate();
     }
 
     private void prepareKeyTextPaint() {
         mKeyTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        mKeyTextPaint.setColor(Color.BLACK);
+        mKeyTextPaint.setColor(mKeyTextColor);
         mKeyTextPaint.setTextSize(mKeyTextSize);
         mKeyTextPaint.setTextAlign(Paint.Align.CENTER);
+
+        invalidate();
     }
 
     ///////////////////////////////////////////////////////////////
@@ -357,6 +405,7 @@ public class PINView extends View {
 
     public void setKeyPadding(float keyPadding) {
         mKeyPadding = keyPadding;
+        invalidate();
     }
 
     public int getPinCodeLength() {
@@ -365,6 +414,7 @@ public class PINView extends View {
 
     public void setPinCodeLength(int pinCodeLength) {
         mPinCodeLength = pinCodeLength;
+        invalidate();
     }
 
     public float getKeyTextSize() {
@@ -373,6 +423,7 @@ public class PINView extends View {
 
     public void setKeyTextSize(float keyTextSize) {
         mKeyTextSize = keyTextSize;
+        prepareKeyTextPaint();
     }
 
     public boolean isOneHandOperationEnabled() {
@@ -381,6 +432,8 @@ public class PINView extends View {
 
     public void enableOneHandOperation(boolean isEnable) {
         mIsOneHandOperation = isEnable;
+
+        invalidate();
     }
 
     @Nullable
@@ -399,5 +452,67 @@ public class PINView extends View {
 
     public void setPinChangeListener(PinChangeListener pinChangeListener) {
         mPinChangeListener = pinChangeListener;
+    }
+
+    public int getKeyBackgroundColor() {
+        return mKeyBackgroundColor;
+    }
+
+    public void setKeyBackgroundColor(int keyBackgroundColor) {
+        mKeyBackgroundColor = keyBackgroundColor;
+        prepareKeyBgPaint();
+    }
+
+    public int getKeyTextColor() {
+        return mKeyTextColor;
+    }
+
+    public void setKeyTextColor(int keyTextColor) {
+        mKeyTextColor = keyTextColor;
+        prepareKeyTextPaint();
+    }
+
+    public int getIndicatorStrokeColor() {
+        return mIndicatorStrokeColor;
+    }
+
+    public void setIndicatorStrokeColor(int indicatorStrokeColor) {
+        mIndicatorStrokeColor = indicatorStrokeColor;
+        prepareIndicatorPaint();
+    }
+
+    public int getIndicatorFilledColor() {
+        return mIndicatorFilledColor;
+    }
+
+    public void setIndicatorFilledColor(int indicatorFilledColor) {
+        mIndicatorFilledColor = indicatorFilledColor;
+        prepareIndicatorPaint();
+    }
+
+    public int getDividerColor() {
+        return mDividerColor;
+    }
+
+    public void setDividerColor(int dividerColor) {
+        mDividerColor = dividerColor;
+        prepareDividerPaint();
+    }
+
+    public int getTitleColor() {
+        return mTitleColor;
+    }
+
+    public void setTitleColor(int titleColor) {
+        mTitleColor = titleColor;
+    }
+
+    public String getTitle() {
+        return mTitle;
+    }
+
+    public void setTitle(String title) {
+        mTitle = title;
+        invalidate();
     }
 }
