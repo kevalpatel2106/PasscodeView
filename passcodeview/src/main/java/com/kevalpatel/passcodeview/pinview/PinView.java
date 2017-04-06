@@ -97,6 +97,12 @@ public class PinView extends View {
     //                  SET THEME PARAMS
     ///////////////////////////////////////////////////////////////
 
+    /**
+     * Initialize view.
+     *
+     * @param context instance of the caller.
+     * @param attrs   Typed attributes or null.
+     */
     private void init(@NonNull Context context, AttributeSet attrs) {
         mContext = context;
 
@@ -352,6 +358,14 @@ public class PinView extends View {
         return true;
     }
 
+    /**
+     * Find which key is pressed based on the ACTION_DOWN and ACTION_UP coordinates.
+     *
+     * @param downEventX ACTION_DOWN event X coordinate
+     * @param downEventY ACTION_DOWN event Y coordinate
+     * @param upEventX   ACTION_UP event X coordinate
+     * @param upEventY   ACTION_UP event Y coordinate
+     */
     private void findKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY) {
         Key downKey = null;
         Key upKey = null;
@@ -399,6 +413,14 @@ public class PinView extends View {
     ///////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////
 
+    /**
+     * Handle the newly added key digit. Append the digit to {@link #mPinTyped}.
+     * If the new digit is {@link Defaults#BACKSPACE_TITLE}, remove the last digit of the {@link #mPinTyped}.
+     * If the {@link #mPinTyped} has length of {@link #mPinCodeLength} and equals to {@link #mPinToCheck}
+     * notify application as authenticated.
+     *
+     * @param newDigit newly pressed digit
+     */
     private void onKeyPressed(String newDigit) {
         //Check for the state
         if (mPinChangeListener == null) {
@@ -430,6 +452,9 @@ public class PinView extends View {
         }
     }
 
+    /**
+     * Reset the pin code and view state.
+     */
     public void reset() {
         mPinTyped = "";
         invalidate();
@@ -450,6 +475,7 @@ public class PinView extends View {
 
     public void setPinCodeLength(int pinCodeLength) {
         mPinCodeLength = pinCodeLength;
+        requestLayout();
         invalidate();
     }
 
@@ -459,7 +485,7 @@ public class PinView extends View {
 
     public void enableOneHandOperation(boolean isEnable) {
         mIsOneHandOperation = isEnable;
-
+        requestLayout();
         invalidate();
     }
 
@@ -468,7 +494,7 @@ public class PinView extends View {
         return mPinToCheck;
     }
 
-    public void setPinToCheck(String pinToCheck) {
+    public void setPinToCheck(@NonNull String pinToCheck) {
         mPinToCheck = pinToCheck;
     }
 
@@ -477,7 +503,7 @@ public class PinView extends View {
         return mPinChangeListener;
     }
 
-    public void setPinChangeListener(PinChangeListener pinChangeListener) {
+    public void setPinChangeListener(@NonNull PinChangeListener pinChangeListener) {
         mPinChangeListener = pinChangeListener;
     }
 
@@ -485,7 +511,7 @@ public class PinView extends View {
         return mKeyStrokeColor;
     }
 
-    public void setKeyBackgroundColor(int keyBackgroundColor) {
+    public void setKeyBackgroundColor(@ColorInt int keyBackgroundColor) {
         mKeyStrokeColor = keyBackgroundColor;
         prepareKeyBgPaint();
     }
@@ -494,7 +520,7 @@ public class PinView extends View {
         return mKeyTextColor;
     }
 
-    public void setKeyTextColor(int keyTextColor) {
+    public void setKeyTextColor(@ColorInt int keyTextColor) {
         mKeyTextColor = keyTextColor;
         prepareKeyTextPaint();
     }
@@ -503,7 +529,7 @@ public class PinView extends View {
         return mIndicatorStrokeColor;
     }
 
-    public void setIndicatorStrokeColor(int indicatorStrokeColor) {
+    public void setIndicatorStrokeColor(@ColorInt int indicatorStrokeColor) {
         mIndicatorStrokeColor = indicatorStrokeColor;
         prepareIndicatorPaint();
     }
@@ -512,7 +538,7 @@ public class PinView extends View {
         return mIndicatorFilledColor;
     }
 
-    public void setIndicatorFilledColor(int indicatorFilledColor) {
+    public void setIndicatorFilledColor(@ColorInt int indicatorFilledColor) {
         mIndicatorFilledColor = indicatorFilledColor;
         prepareIndicatorPaint();
     }
@@ -521,7 +547,7 @@ public class PinView extends View {
         return mDividerColor;
     }
 
-    public void setDividerColor(int dividerColor) {
+    public void setDividerColor(@ColorInt int dividerColor) {
         mDividerColor = dividerColor;
         prepareDividerPaint();
     }
@@ -530,16 +556,25 @@ public class PinView extends View {
         return mTitleColor;
     }
 
-    public void setTitleColor(int titleColor) {
+    public void setTitleColor(@ColorInt int titleColor) {
         mTitleColor = titleColor;
     }
 
+    /**
+     * @return Current title of the view.
+     */
     public String getTitle() {
         return mTitle;
     }
 
-    public void setTitle(String title) {
+    /**
+     * Set the title at the top of view.
+     *
+     * @param title title string
+     */
+    public void setTitle(@NonNull String title) {
         mTitle = title;
+        requestLayout();
         invalidate();
     }
 }

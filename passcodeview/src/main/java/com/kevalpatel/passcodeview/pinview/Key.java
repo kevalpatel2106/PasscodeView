@@ -7,6 +7,7 @@ import android.view.View;
 
 /**
  * Created by Keval on 06-Apr-17.
+ * This class represents single key.
  *
  * @author 'https://github.com/kevalpatel2106'
  */
@@ -15,10 +16,10 @@ class Key {
     private static final int MAX_RIPPLE_ALPHA = 180;
     private static final int RIPPLE_DURATION = 350;
 
-    private final String mDigit;
-    private final Rect mBounds;
-    private final View mView;
-    private final float mKeyRadius;
+    private final String mDigit;                        //Key title.
+    private final Rect mBounds;                         //Key bound.
+    private final View mView;                           //Pin view
+    private final float mKeyRadius;                     //Radius of the key background.
 
     private ValueAnimator mRippleValueAnimator;
     private boolean isRippleEffectRunning = false;
@@ -149,8 +150,14 @@ class Key {
         mRippleValueAnimator.start();
     }
 
+    /**
+     * Calculate the circle radius.
+     *
+     * @param bounds  rectangle bound.
+     * @param padding surround padding to the key.
+     * @return radius.
+     */
     private float calculateKeyRadius(Rect bounds, float padding) {
         return Math.min(bounds.height(), bounds.width()) / 2 - padding;       //radius = height or width - padding for single key
-
     }
 }
