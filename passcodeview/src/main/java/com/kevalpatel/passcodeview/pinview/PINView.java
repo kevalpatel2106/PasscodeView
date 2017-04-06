@@ -36,6 +36,8 @@ public class PINView extends View {
     private ArrayList<Key> mKeys;   //List of al the keys
     private String mPinTyped = "";  //PIN typed.
 
+    private Rect mKeyBound = new Rect();
+
     //Theme attributes
     private int mPinCodeLength = DEF_PIN_LENGTH;    //PIN code length
     private float mKeyPadding = DEF_KEY_PADDING;    //Surround padding to each single key
@@ -120,30 +122,29 @@ public class PINView extends View {
         mViewHeight = MeasureSpec.getSize(heightMeasureSpec);
         mViewWidth = MeasureSpec.getSize(widthMeasureSpec);
 
-        measureKeys(mIsOneHandOperation ? (float) (mViewWidth * 0.3) : 0,
-                mViewWidth,
-                mViewHeight - (mViewHeight * KEY_BOARD_PROPOTION),
-                mViewHeight);
-
+        measureKeys();
         setMeasuredDimension(mViewWidth, mViewHeight);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
-    private void measureKeys(float keyboardLeft,
-                             float keyboardRight,
-                             float keyboardTop,
-                             float keyboardBottom) {
-        float singleKeyHeight = (keyboardBottom - keyboardTop) / NO_OF_ROWS;
-        float singleKeyWidth = (keyboardRight - keyboardLeft) / NO_OF_COLUMNS;
+    private void measureKeys() {
+        mKeyBound.left = mIsOneHandOperation ? (int) (mViewWidth * 0.3) : 0;
+        mKeyBound.right = mViewWidth;
+        mKeyBound.top = (int) (mViewHeight - (mViewHeight * KEY_BOARD_PROPOTION));
+        mKeyBound.bottom = mViewHeight;
+
+
+        float singleKeyHeight = mKeyBound.height() / NO_OF_ROWS;
+        float singleKeyWidth = mKeyBound.width() / NO_OF_COLUMNS;
 
         mKeys = new ArrayList<>();
         for (int colNo = 0; colNo < NO_OF_COLUMNS; colNo++) {
 
             for (int rowNo = 0; rowNo < NO_OF_ROWS; rowNo++) {
                 Rect rect = new Rect();
-                rect.left = (int) ((colNo * singleKeyWidth) + keyboardLeft);
+                rect.left = (int) ((colNo * singleKeyWidth) + mKeyBound.left);
                 rect.right = (int) (rect.left + singleKeyWidth);
-                rect.top = (int) ((rowNo * singleKeyHeight) + keyboardTop);
+                rect.top = (int) ((rowNo * singleKeyHeight) + mKeyBound.top);
                 rect.bottom = (int) (rect.top + singleKeyHeight);
 
                 Key key = new Key(KEY_VALUES[mKeys.size()], rect);
