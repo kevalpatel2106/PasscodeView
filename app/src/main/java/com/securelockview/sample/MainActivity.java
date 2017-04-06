@@ -2,6 +2,10 @@ package com.securelockview.sample;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
+
+import com.kevalpatel.passcodeview.PinChangeListener;
+import com.kevalpatel.passcodeview.pinview.PINView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -9,5 +13,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        PINView pinView = (PINView) findViewById(R.id.pin_view);
+        pinView.setPinToCheck("1234");
+        pinView.setPinChangeListener(new PinChangeListener() {
+            @Override
+            public void onAuthenticationSuccessful() {
+                Toast.makeText(MainActivity.this, "Auth successful.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                Toast.makeText(MainActivity.this, "Auth failed.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

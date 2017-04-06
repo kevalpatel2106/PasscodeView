@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="indicator_padding">5dp</dimen>
+    <dimen name="indicator_radius">15dp</dimen>
+    <dimen name="indicator_stroke_width">4dp</dimen>
+    <dimen name="key_text_size">24sp</dimen>
+    <dimen name="key_padding">10dp</dimen>
+</resources>
