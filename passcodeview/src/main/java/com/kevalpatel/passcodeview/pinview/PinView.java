@@ -437,18 +437,23 @@ public class PinView extends View {
         invalidate();
 
         if (mPinTyped.length() == mPinCodeLength) {
+
+            if (mPinToCheck.equals(mPinTyped)) {
+                mPinChangeListener.onAuthenticationSuccessful();
+            } else {
+                mPinChangeListener.onAuthenticationFailed();
+
+                //Vibrate all the keys.
+                for (Key key : mKeys) key.playError();
+            }
+
+            //Reset the view.
             new android.os.Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if (mPinToCheck.equals(mPinTyped)) {
-                        mPinChangeListener.onAuthenticationSuccessful();
-                    } else {
-                        mPinChangeListener.onAuthenticationFailed();
-                    }
-
                     reset();
                 }
-            }, 500);
+            }, 350);
         }
     }
 

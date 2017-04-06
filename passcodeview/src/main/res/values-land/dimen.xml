@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="indicator_padding">10dp</dimen>
-    <dimen name="indicator_radius">15dp</dimen>
+    <dimen name="indicator_padding">12dp</dimen>
+    <dimen name="indicator_radius">12dp</dimen>
     <dimen name="indicator_stroke_width">4dp</dimen>
-    <dimen name="key_stroke_width">4dp</dimen>
-    <dimen name="key_text_size">24sp</dimen>
-    <dimen name="key_padding">15dp</dimen>
-    <dimen name="divider_vertical_margin">10dp</dimen>
+    <dimen name="key_stroke_width">2dp</dimen>
+    <dimen name="key_text_size">20sp</dimen>
+    <dimen name="key_padding">5dp</dimen>
+    <dimen name="divider_vertical_margin">6dp</dimen>
     <dimen name="divider_horizontal_margin">20dp</dimen>
     <dimen name="key_backspace_icon_vertical_padding">26dp</dimen>
     <dimen name="key_backspace_icon_horizontal_padding">42dp</dimen>

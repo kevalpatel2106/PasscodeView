@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.graphics.Rect;
 import android.view.View;
+import android.view.animation.CycleInterpolator;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -159,5 +160,21 @@ class Key {
      */
     private float calculateKeyRadius(Rect bounds, float padding) {
         return Math.min(bounds.height(), bounds.width()) / 2 - padding;       //radius = height or width - padding for single key
+    }
+
+    /**
+     * Show animation indicated invalid pin code
+     */
+    void playError() {
+        ValueAnimator goLeftAnimator = ValueAnimator.ofInt(0, 10);
+        goLeftAnimator.setInterpolator(new CycleInterpolator(2));
+        goLeftAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override public void onAnimationUpdate(ValueAnimator animation) {
+                mBounds.left += (int) animation.getAnimatedValue();
+                mBounds.right += (int) animation.getAnimatedValue();
+                mView.invalidate();
+            }
+        });
+        goLeftAnimator.start();
     }
 }
