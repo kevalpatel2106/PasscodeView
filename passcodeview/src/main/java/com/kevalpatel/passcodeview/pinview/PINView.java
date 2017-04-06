@@ -21,11 +21,14 @@ import java.util.ArrayList;
  */
 
 public class PINView extends View {
-    private static final int DEF_PIN_LENGTH = 4;
-    private static final float DEF_KEY_PADDING = 20f;
     private static final int NO_OF_COLUMNS = 3;
     private static final int NO_OF_ROWS = 4;
+    private static final float KEY_BOARD_PROPOTION = 0.7F;
     private static final String[] KEY_VALUES = new String[]{"1", "4", "7", "", "2", "5", "8", "0", "3", "6", "9", "-1"};
+
+    private static final int DEF_PIN_LENGTH = 4;
+    private static final float DEF_KEY_PADDING = 20f;
+    private static final float DEF_KEY_TEXT_SIZE = 100f;
 
     private Context mContext;
     private float mDownKeyX;    //X coordinate of the ACTION_DOWN point
@@ -36,6 +39,8 @@ public class PINView extends View {
     //Theme attributes
     private int mPinCodeLength = DEF_PIN_LENGTH;    //PIN code length
     private float mKeyPadding = DEF_KEY_PADDING;    //Surround padding to each single key
+    private float mKeyTextSize = DEF_KEY_TEXT_SIZE;    //Surround padding to each single key
+    private boolean mIsOneHandOperation = false;
 
     //Paints
     private TextPaint mKeyTextPaint;
@@ -77,24 +82,14 @@ public class PINView extends View {
     private void prepareKeyBgPaint() {
         mKeyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mKeyPaint.setColor(Color.RED);
+        mKeyPaint.setTextSize(mKeyTextSize);
     }
 
     private void prepareKeyTextPaint() {
         mKeyTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         mKeyTextPaint.setColor(Color.BLACK);
-        mKeyTextPaint.setTextSize(100f);
+        mKeyTextPaint.setTextSize(mKeyTextSize);
         mKeyTextPaint.setTextAlign(Paint.Align.CENTER);
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        mViewHeight = MeasureSpec.getSize(heightMeasureSpec);
-        mViewWidth = MeasureSpec.getSize(widthMeasureSpec);
-
-        measureKeys(mViewWidth, mViewHeight);
-
-        setMeasuredDimension(mViewWidth, mViewHeight);
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     @Override
@@ -120,19 +115,36 @@ public class PINView extends View {
         }
     }
 
-    private void measureKeys(float keyBoardWidth, float keyBoardHeight) {
-        float mSingleSlotHeight = keyBoardHeight / NO_OF_ROWS;
-        float mSingleSlotWidth = keyBoardWidth / NO_OF_COLUMNS;
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        mViewHeight = MeasureSpec.getSize(heightMeasureSpec);
+        mViewWidth = MeasureSpec.getSize(widthMeasureSpec);
+
+        measureKeys(mIsOneHandOperation ? (float) (mViewWidth * 0.3) : 0,
+                mViewWidth,
+                mViewHeight - (mViewHeight * KEY_BOARD_PROPOTION),
+                mViewHeight);
+
+        setMeasuredDimension(mViewWidth, mViewHeight);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    private void measureKeys(float keyboardLeft,
+                             float keyboardRight,
+                             float keyboardTop,
+                             float keyboardBottom) {
+        float singleKeyHeight = (keyboardBottom - keyboardTop) / NO_OF_ROWS;
+        float singleKeyWidth = (keyboardRight - keyboardLeft) / NO_OF_COLUMNS;
 
         mKeys = new ArrayList<>();
         for (int colNo = 0; colNo < NO_OF_COLUMNS; colNo++) {
 
             for (int rowNo = 0; rowNo < NO_OF_ROWS; rowNo++) {
                 Rect rect = new Rect();
-                rect.left = (int) (colNo * mSingleSlotWidth);
-                rect.right = (int) (rect.left + mSingleSlotWidth);
-                rect.top = (int) (rowNo * mSingleSlotHeight);
-                rect.bottom = (int) (rect.top + mSingleSlotHeight);
+                rect.left = (int) ((colNo * singleKeyWidth) + keyboardLeft);
+                rect.right = (int) (rect.left + singleKeyWidth);
+                rect.top = (int) ((rowNo * singleKeyHeight) + keyboardTop);
+                rect.bottom = (int) (rect.top + singleKeyHeight);
 
                 Key key = new Key(KEY_VALUES[mKeys.size()], rect);
                 mKeys.add(key);
@@ -200,6 +212,10 @@ public class PINView extends View {
         }
     }
 
+    public void reset() {
+        mPinTyped = "";
+    }
+
     public float getKeyPadding() {
         return mKeyPadding;
     }
@@ -216,7 +232,19 @@ public class PINView extends View {
         mPinCodeLength = pinCodeLength;
     }
 
-    public void reset() {
-        mPinTyped = "";
+    public float getKeyTextSize() {
+        return mKeyTextSize;
+    }
+
+    public void setKeyTextSize(float keyTextSize) {
+        mKeyTextSize = keyTextSize;
+    }
+
+    public boolean isOneHandOperationEnabled() {
+        return mIsOneHandOperation;
+    }
+
+    public void enableOneHandOperation(boolean isEnable) {
+        mIsOneHandOperation = isEnable;
     }
 }
