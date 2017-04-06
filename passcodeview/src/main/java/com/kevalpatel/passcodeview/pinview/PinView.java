@@ -53,27 +53,26 @@ public class PinView extends View {
     private float mKeyTextSize;                     //Surround padding to each single key
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
     @ColorInt
-    private int mKeyStrokeColor;
+    private int mKeyStrokeColor;                    //Key background stroke color
     @ColorInt
-    private int mKeyTextColor;
+    private int mKeyTextColor;                      //Key text color
     @ColorInt
-    private int mIndicatorStrokeColor;
+    private int mIndicatorStrokeColor;              //Empty indicator stroke color
     @ColorInt
-    private int mIndicatorFilledColor;
+    private int mIndicatorFilledColor;              //Filled indicator stroke color
     @ColorInt
-    private int mDividerColor;
+    private int mDividerColor;                      //Horizontal divider color
     @ColorInt
-    private int mTitleColor;
-    private String mTitle;
-
+    private int mTitleColor;                        //Title text color
+    private String mTitle;                          //Title color
 
     //Paints
-    private TextPaint mKeyTextPaint;
-    private Paint mKeyPaint;
-    private Paint mDividerPaint;
-    private Paint mEmptyIndicatorPaint;
-    private Paint mSolidIndicatorPaint;
-    private Paint mRipplePaint;
+    private TextPaint mKeyTextPaint;                //Key text paint
+    private Paint mKeyPaint;                        //Key background pain
+    private Paint mDividerPaint;                    //Horizontal divider paint color
+    private Paint mEmptyIndicatorPaint;             //Empty indicator color
+    private Paint mSolidIndicatorPaint;             //Solid indicator color
+    private Paint mRipplePaint;                     //Key ripple color
 
     ///////////////////////////////////////////////////////////////
     //                  CONSTRUCTORS
