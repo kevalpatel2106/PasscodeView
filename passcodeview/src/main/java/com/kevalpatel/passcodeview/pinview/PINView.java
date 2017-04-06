@@ -36,7 +36,9 @@ public class PINView extends View {
     private ArrayList<Key> mKeys;   //List of al the keys
     private String mPinTyped = "";  //PIN typed.
 
-    private Rect mKeyBound = new Rect();
+    private Rect mKeyBoardBound = new Rect();
+    private Rect mDividerBound = new Rect();
+    private Rect mRootViewBound = new Rect();
 
     //Theme attributes
     private int mPinCodeLength = DEF_PIN_LENGTH;    //PIN code length
@@ -47,10 +49,6 @@ public class PINView extends View {
     //Paints
     private TextPaint mKeyTextPaint;
     private Paint mKeyPaint;
-
-    //Cached measurements
-    private int mViewHeight;    //Height of the whole key
-    private int mViewWidth;     //Width of the whole key
 
     public PINView(Context context) {
         super(context);
@@ -98,6 +96,15 @@ public class PINView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         drawKeys(canvas);
+        drawDivider(canvas);
+    }
+
+    private void drawDivider(Canvas canvas) {
+        canvas.drawLine(mDividerBound.left,
+                mDividerBound.top,
+                mDividerBound.right,
+                mDividerBound.bottom,
+                mKeyPaint);
     }
 
     private void drawKeys(Canvas canvas) {
@@ -119,32 +126,49 @@ public class PINView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        mViewHeight = MeasureSpec.getSize(heightMeasureSpec);
-        mViewWidth = MeasureSpec.getSize(widthMeasureSpec);
+        measureManiView(widthMeasureSpec, heightMeasureSpec);
+        measureKeyboard();
+        measureDivider();
 
-        measureKeys();
-        setMeasuredDimension(mViewWidth, mViewHeight);
+        setMeasuredDimension(mRootViewBound.width(), mRootViewBound.height());
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
-    private void measureKeys() {
-        mKeyBound.left = mIsOneHandOperation ? (int) (mViewWidth * 0.3) : 0;
-        mKeyBound.right = mViewWidth;
-        mKeyBound.top = (int) (mViewHeight - (mViewHeight * KEY_BOARD_PROPOTION));
-        mKeyBound.bottom = mViewHeight;
+    private void measureDivider() {
+        mDividerBound.left = mRootViewBound.left + 20;
+        mDividerBound.right = mRootViewBound.right - 20;
+        mDividerBound.top = mKeyBoardBound.top - 20;
+        mDividerBound.bottom = mKeyBoardBound.top - 20;
+    }
+
+    private void measureManiView(int widthMeasureSpec, int heightMeasureSpec) {
+        int[] l = new int[2];
+        getLocationOnScreen(l);
+
+        mRootViewBound.left = l[0];
+        mRootViewBound.top = l[1];
+        mRootViewBound.right = mRootViewBound.left + MeasureSpec.getSize(widthMeasureSpec);
+        mRootViewBound.bottom = mRootViewBound.top + MeasureSpec.getSize(heightMeasureSpec);
+    }
+
+    private void measureKeyboard() {
+        mKeyBoardBound.left = mIsOneHandOperation ? (int) (mRootViewBound.width() * 0.3) : 0;
+        mKeyBoardBound.right = mRootViewBound.width();
+        mKeyBoardBound.top = (int) (mRootViewBound.height() - (mRootViewBound.height() * KEY_BOARD_PROPOTION));
+        mKeyBoardBound.bottom = mRootViewBound.height();
 
 
-        float singleKeyHeight = mKeyBound.height() / NO_OF_ROWS;
-        float singleKeyWidth = mKeyBound.width() / NO_OF_COLUMNS;
+        float singleKeyHeight = mKeyBoardBound.height() / NO_OF_ROWS;
+        float singleKeyWidth = mKeyBoardBound.width() / NO_OF_COLUMNS;
 
         mKeys = new ArrayList<>();
         for (int colNo = 0; colNo < NO_OF_COLUMNS; colNo++) {
 
             for (int rowNo = 0; rowNo < NO_OF_ROWS; rowNo++) {
                 Rect rect = new Rect();
-                rect.left = (int) ((colNo * singleKeyWidth) + mKeyBound.left);
+                rect.left = (int) ((colNo * singleKeyWidth) + mKeyBoardBound.left);
                 rect.right = (int) (rect.left + singleKeyWidth);
-                rect.top = (int) ((rowNo * singleKeyHeight) + mKeyBound.top);
+                rect.top = (int) ((rowNo * singleKeyHeight) + mKeyBoardBound.top);
                 rect.bottom = (int) (rect.top + singleKeyHeight);
 
                 Key key = new Key(KEY_VALUES[mKeys.size()], rect);
