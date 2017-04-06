@@ -330,15 +330,20 @@ public class PINView extends View {
         mPinTyped = mPinTyped + newDigit;
         invalidate();
 
-        if (mPinTyped.length() == mPinCodeLength) {
-            if (mPinToCheck.equals(mPinTyped)) {
-                mPinChangeListener.onAuthenticationSuccessful();
-            } else {
-                mPinChangeListener.onAuthenticationFailed();
-            }
+        new android.os.Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mPinTyped.length() == mPinCodeLength) {
+                    if (mPinToCheck.equals(mPinTyped)) {
+                        mPinChangeListener.onAuthenticationSuccessful();
+                    } else {
+                        mPinChangeListener.onAuthenticationFailed();
+                    }
 
-            reset();
-        }
+                    reset();
+                }
+            }
+        }, 800);
     }
 
     public void reset() {
