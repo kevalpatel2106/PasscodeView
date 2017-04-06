@@ -5,11 +5,9 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -22,6 +20,8 @@ import java.util.ArrayList;
 
 /**
  * Created by Keval on 06-Apr-17.
+ *
+ * @author 'https://github.com/kevalpatel2106'
  */
 
 public class PinView extends View {
@@ -47,7 +47,7 @@ public class PinView extends View {
     private float mKeyTextSize;                             //Surround padding to each single key
     private boolean mIsOneHandOperation = false;            //Bool to set true if you want to display one hand key board.
     @ColorInt
-    private int mKeyBackgroundColor;
+    private int mKeyStrokeColor;
     @ColorInt
     private int mKeyTextColor;
     @ColorInt
@@ -87,12 +87,6 @@ public class PinView extends View {
         init(context, attrs);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public PinView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        init(context, attrs);
-    }
-
     ///////////////////////////////////////////////////////////////
     //                  SET THEME PARAMS
     ///////////////////////////////////////////////////////////////
@@ -108,7 +102,7 @@ public class PinView extends View {
                 mIndicatorFilledColor = a.getColor(R.styleable.PinView_indicatorSolidColor, Defults.DEF_INDICATOR_FILLED_COLOR);
                 mIndicatorStrokeColor = a.getColor(R.styleable.PinView_indicatorStrokeColor, Defults.DEF_INDICATOR_STROKE_COLOR);
                 mKeyTextColor = a.getColor(R.styleable.PinView_keyTextColor, Defults.DEF_KEY_TEXT_COLOR);
-                mKeyBackgroundColor = a.getColor(R.styleable.PinView_keyBackground, Defults.DEF_KEY_BACKGROUND_COLOR);
+                mKeyStrokeColor = a.getColor(R.styleable.PinView_keyStrokeColor, Defults.DEF_KEY_BACKGROUND_COLOR);
                 mKeyTextSize = a.getDimensionPixelSize(R.styleable.PinView_keyTextSize, (int) mContext.getResources().getDimension(R.dimen.key_text_size));
                 mTitleColor = a.getColor(R.styleable.PinView_titleTextColor, Defults.DEF_TITLE_TEXT_COLOR);
                 mPinCodeLength = a.getInteger(R.styleable.PinView_pinLength, Defults.DEF_PIN_LENGTH);
@@ -121,7 +115,7 @@ public class PinView extends View {
             mIndicatorFilledColor = Defults.DEF_INDICATOR_FILLED_COLOR;
             mIndicatorStrokeColor = Defults.DEF_INDICATOR_STROKE_COLOR;
             mKeyTextColor = Defults.DEF_KEY_TEXT_COLOR;
-            mKeyBackgroundColor = Defults.DEF_KEY_BACKGROUND_COLOR;
+            mKeyStrokeColor = Defults.DEF_KEY_BACKGROUND_COLOR;
             mKeyTextSize = mContext.getResources().getDimension(R.dimen.key_text_size);
             mTitleColor = Defults.DEF_TITLE_TEXT_COLOR;
             mPinCodeLength = Defults.DEF_PIN_LENGTH;
@@ -157,8 +151,10 @@ public class PinView extends View {
 
     private void prepareKeyBgPaint() {
         mKeyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mKeyPaint.setColor(mKeyBackgroundColor);
+        mKeyPaint.setStyle(Paint.Style.STROKE);
+        mKeyPaint.setColor(mKeyStrokeColor);
         mKeyPaint.setTextSize(mKeyTextSize);
+        mKeyPaint.setStrokeWidth(mContext.getResources().getDimension(R.dimen.key_stroke_width));
 
         invalidate();
     }
@@ -205,6 +201,8 @@ public class PinView extends View {
     private void drawKeys(Canvas canvas) {
         for (Key key : mKeys) {
 
+            if (key.getDigit().isEmpty()) continue; //Don't draw the empty button
+
             //Draw circle background
             canvas.drawCircle(key.getBounds().exactCenterX(),   //Set center width of key
                     key.getBounds().exactCenterY(),             //Set center height of key
@@ -225,7 +223,8 @@ public class PinView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        measureManiView(widthMeasureSpec, heightMeasureSpec);
+
+        measureMainView(widthMeasureSpec, heightMeasureSpec);
         measureKeyboard();
         measureDivider();
         measureIndicators();
@@ -235,14 +234,13 @@ public class PinView extends View {
     }
 
     private void measureIndicators() {
-        int indicatorWidth = 2 * (int) (mContext.getResources().getDimension(R.dimen.indicator_radius)
-                + mContext.getResources().getDimension(R.dimen.indicator_padding));
+        int indicatorWidth = 2 * (int) (mContext.getResources().getDimension(R.dimen.indicator_radius) + mContext.getResources().getDimension(R.dimen.indicator_padding));
         int totalSpace = indicatorWidth * mPinCodeLength;
 
         Rect dotsIndicatorBound = new Rect();
         dotsIndicatorBound.left = (mRootViewBound.width() - totalSpace) / 2;
         dotsIndicatorBound.right = dotsIndicatorBound.left + totalSpace;
-        dotsIndicatorBound.bottom = mDividerBound.top - 20;
+        dotsIndicatorBound.bottom = (int) (mDividerBound.top - mContext.getResources().getDimension(R.dimen.divider_horizontal_margin));
         dotsIndicatorBound.top = dotsIndicatorBound.bottom - indicatorWidth;
 
         mDotsIndicator = new ArrayList<>(mPinCodeLength);
@@ -258,13 +256,13 @@ public class PinView extends View {
     }
 
     private void measureDivider() {
-        mDividerBound.left = mRootViewBound.left + 20;
-        mDividerBound.right = mRootViewBound.right - 20;
-        mDividerBound.top = mKeyBoardBound.top - 20;
-        mDividerBound.bottom = mKeyBoardBound.top - 20;
+        mDividerBound.left = (int) (mRootViewBound.left + mContext.getResources().getDimension(R.dimen.divider_horizontal_margin));
+        mDividerBound.right = (int) (mRootViewBound.right - mContext.getResources().getDimension(R.dimen.divider_horizontal_margin));
+        mDividerBound.top = (int) (mKeyBoardBound.top - mContext.getResources().getDimension(R.dimen.divider_vertical_margin));
+        mDividerBound.bottom = (int) (mKeyBoardBound.top - mContext.getResources().getDimension(R.dimen.divider_vertical_margin));
     }
 
-    private void measureManiView(int widthMeasureSpec, int heightMeasureSpec) {
+    private void measureMainView(int widthMeasureSpec, int heightMeasureSpec) {
         int[] l = new int[2];
         getLocationOnScreen(l);
 
@@ -391,7 +389,7 @@ public class PinView extends View {
                     reset();
                 }
             }
-        }, 800);
+        }, 500);
     }
 
     public void reset() {
@@ -415,15 +413,6 @@ public class PinView extends View {
     public void setPinCodeLength(int pinCodeLength) {
         mPinCodeLength = pinCodeLength;
         invalidate();
-    }
-
-    public float getKeyTextSize() {
-        return mKeyTextSize;
-    }
-
-    public void setKeyTextSize(float keyTextSize) {
-        mKeyTextSize = keyTextSize;
-        prepareKeyTextPaint();
     }
 
     public boolean isOneHandOperationEnabled() {
@@ -455,11 +444,11 @@ public class PinView extends View {
     }
 
     public int getKeyBackgroundColor() {
-        return mKeyBackgroundColor;
+        return mKeyStrokeColor;
     }
 
     public void setKeyBackgroundColor(int keyBackgroundColor) {
-        mKeyBackgroundColor = keyBackgroundColor;
+        mKeyStrokeColor = keyBackgroundColor;
         prepareKeyBgPaint();
     }
 

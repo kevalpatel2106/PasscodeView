@@ -2,8 +2,7 @@
 <resources>
     <declare-styleable name="PinView">
         <attr name="keyTextSize" format="dimension"/>
-        <attr name="keyBackground" format="reference"/>
-        <attr name="keyBackgroundColor" format="color"/>
+        <attr name="keyStrokeColor" format="color"/>
         <attr name="keyTextColor" format="color"/>
         <attr name="indicatorStrokeColor" format="color"/>
         <attr name="indicatorSolidColor" format="color"/>

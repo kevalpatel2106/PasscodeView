@@ -3,6 +3,9 @@
     <dimen name="indicator_padding">5dp</dimen>
     <dimen name="indicator_radius">15dp</dimen>
     <dimen name="indicator_stroke_width">4dp</dimen>
+    <dimen name="key_stroke_width">4dp</dimen>
     <dimen name="key_text_size">24sp</dimen>
     <dimen name="key_padding">10dp</dimen>
+    <dimen name="divider_vertical_margin">10dp</dimen>
+    <dimen name="divider_horizontal_margin">20dp</dimen>
 </resources>
