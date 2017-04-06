@@ -6,7 +6,8 @@ import android.graphics.Color;
  * Created by Keval on 06-Apr-17.
  */
 
-class Defults {
+class Defaults {
+    static final String BACKSPACE_TITLE = "-1";
     static final int DEF_PIN_LENGTH = 4;
 
     static final int NO_OF_COLUMNS = 3;

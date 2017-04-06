@@ -33,23 +33,25 @@ public class PinView extends View {
     private float mDownKeyX;                        //X coordinate of the ACTION_DOWN point
     private float mDownKeyY;                        //Y coordinate of the ACTION_DOWN point
 
-    private PinChangeListener mPinChangeListener;
-    private String mPinToCheck;
+    private PinChangeListener mPinChangeListener;   //Callback listener for application to get notify when authentication successful.
+    private String mPinToCheck;                     //Current PIN with witch entered PIN will check.
     @NonNull
     private String mPinTyped = "";                  //PIN typed.
 
+    //Collections
     private ArrayList<Key> mKeys;                   //List of al the keys
     private ArrayList<Indicator> mDotsIndicator;    //List of al the keys
 
-    private Rect mKeyBoardBound = new Rect();
-    private Rect mDividerBound = new Rect();
-    private Rect mRootViewBound = new Rect();
+    //Rectangle bounds
+    private Rect mKeyBoardBound = new Rect();       //Keyboard layout bound
+    private Rect mDividerBound = new Rect();        //Divider bound
+    private Rect mRootViewBound = new Rect();       //Main/Root view bound
 
     //Theme attributes
-    private int mPinCodeLength;                             //PIN code length
-    private float mKeyPadding;                              //Surround padding to each single key
-    private float mKeyTextSize;                             //Surround padding to each single key
-    private boolean mIsOneHandOperation = false;            //Bool to set true if you want to display one hand key board.
+    private int mPinCodeLength;                     //PIN code length
+    private float mKeyPadding;                      //Surround padding to each single key
+    private float mKeyTextSize;                     //Surround padding to each single key
+    private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
     @ColorInt
     private int mKeyStrokeColor;
     @ColorInt
@@ -71,6 +73,7 @@ public class PinView extends View {
     private Paint mDividerPaint;
     private Paint mEmptyIndicatorPaint;
     private Paint mSolidIndicatorPaint;
+    private Paint mRipplePaint;
 
     ///////////////////////////////////////////////////////////////
     //                  CONSTRUCTORS
@@ -101,30 +104,34 @@ public class PinView extends View {
         if (attrs != null) {
             TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.PinView, 0, 0);
             try {
-                mTitle = a.hasValue(R.styleable.PinView_titleText) ? a.getString(R.styleable.PinView_titleText) : Defults.DEF_TITLE_TEXT;
-                mDividerColor = a.getColor(R.styleable.PinView_dividerColor, Defults.DEF_DIVIDER_COLOR);
-                mIndicatorFilledColor = a.getColor(R.styleable.PinView_indicatorSolidColor, Defults.DEF_INDICATOR_FILLED_COLOR);
-                mIndicatorStrokeColor = a.getColor(R.styleable.PinView_indicatorStrokeColor, Defults.DEF_INDICATOR_STROKE_COLOR);
-                mKeyTextColor = a.getColor(R.styleable.PinView_keyTextColor, Defults.DEF_KEY_TEXT_COLOR);
-                mKeyStrokeColor = a.getColor(R.styleable.PinView_keyStrokeColor, Defults.DEF_KEY_BACKGROUND_COLOR);
+                mTitle = a.hasValue(R.styleable.PinView_titleText) ? a.getString(R.styleable.PinView_titleText) : Defaults.DEF_TITLE_TEXT;
+                mDividerColor = a.getColor(R.styleable.PinView_dividerColor, Defaults.DEF_DIVIDER_COLOR);
+                mIndicatorFilledColor = a.getColor(R.styleable.PinView_indicatorSolidColor, Defaults.DEF_INDICATOR_FILLED_COLOR);
+                mIndicatorStrokeColor = a.getColor(R.styleable.PinView_indicatorStrokeColor, Defaults.DEF_INDICATOR_STROKE_COLOR);
+                mKeyTextColor = a.getColor(R.styleable.PinView_keyTextColor, Defaults.DEF_KEY_TEXT_COLOR);
+                mKeyStrokeColor = a.getColor(R.styleable.PinView_keyStrokeColor, Defaults.DEF_KEY_BACKGROUND_COLOR);
                 mKeyTextSize = a.getDimensionPixelSize(R.styleable.PinView_keyTextSize, (int) mContext.getResources().getDimension(R.dimen.key_text_size));
-                mTitleColor = a.getColor(R.styleable.PinView_titleTextColor, Defults.DEF_TITLE_TEXT_COLOR);
-                mPinCodeLength = a.getInteger(R.styleable.PinView_pinLength, Defults.DEF_PIN_LENGTH);
+                mTitleColor = a.getColor(R.styleable.PinView_titleTextColor, Defaults.DEF_TITLE_TEXT_COLOR);
+                mPinCodeLength = a.getInteger(R.styleable.PinView_pinLength, Defaults.DEF_PIN_LENGTH);
             } finally {
                 a.recycle();
             }
         } else {
-            mTitle = Defults.DEF_TITLE_TEXT;
-            mDividerColor = Defults.DEF_DIVIDER_COLOR;
-            mIndicatorFilledColor = Defults.DEF_INDICATOR_FILLED_COLOR;
-            mIndicatorStrokeColor = Defults.DEF_INDICATOR_STROKE_COLOR;
-            mKeyTextColor = Defults.DEF_KEY_TEXT_COLOR;
-            mKeyStrokeColor = Defults.DEF_KEY_BACKGROUND_COLOR;
+            mTitle = Defaults.DEF_TITLE_TEXT;
+            mDividerColor = Defaults.DEF_DIVIDER_COLOR;
+            mIndicatorFilledColor = Defaults.DEF_INDICATOR_FILLED_COLOR;
+            mIndicatorStrokeColor = Defaults.DEF_INDICATOR_STROKE_COLOR;
+            mKeyTextColor = Defaults.DEF_KEY_TEXT_COLOR;
+            mKeyStrokeColor = Defaults.DEF_KEY_BACKGROUND_COLOR;
             mKeyTextSize = mContext.getResources().getDimension(R.dimen.key_text_size);
-            mTitleColor = Defults.DEF_TITLE_TEXT_COLOR;
-            mPinCodeLength = Defults.DEF_PIN_LENGTH;
+            mTitleColor = Defaults.DEF_TITLE_TEXT_COLOR;
+            mPinCodeLength = Defaults.DEF_PIN_LENGTH;
         }
         mKeyPadding = mContext.getResources().getDimension(R.dimen.key_padding);
+
+        //Set the ripple paint.
+        mRipplePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mRipplePaint.setStyle(Paint.Style.FILL);
 
         prepareKeyTextPaint();
         prepareKeyBgPaint();
@@ -211,15 +218,15 @@ public class PinView extends View {
             //Draw circle background
             canvas.drawCircle(key.getBounds().exactCenterX(),   //Set center width of key
                     key.getBounds().exactCenterY(),             //Set center height of key
-                    Math.min(key.getBounds().height(), key.getBounds().width()) / 2 - mKeyPadding, //radius = height or width - padding for single key
+                    key.getKeyRadius(),
                     mKeyPaint);
 
-            if (key.getDigit().equals("-1")) {  //Backspace key
+            if (key.getDigit().equals(Defaults.BACKSPACE_TITLE)) {  //Backspace key
                 Drawable d = ContextCompat.getDrawable(mContext, R.drawable.ic_back_space);
                 d.setBounds(key.getBounds().left + (int) getResources().getDimension(R.dimen.key_backspace_icon_horizontal_padding),
-                        key.getBounds().top +  (int) getResources().getDimension(R.dimen.key_backspace_icon_vertical_padding),
-                        key.getBounds().right -  (int) getResources().getDimension(R.dimen.key_backspace_icon_horizontal_padding),
-                        key.getBounds().bottom -  (int) getResources().getDimension(R.dimen.key_backspace_icon_vertical_padding));
+                        key.getBounds().top + (int) getResources().getDimension(R.dimen.key_backspace_icon_vertical_padding),
+                        key.getBounds().right - (int) getResources().getDimension(R.dimen.key_backspace_icon_horizontal_padding),
+                        key.getBounds().bottom - (int) getResources().getDimension(R.dimen.key_backspace_icon_vertical_padding));
                 d.setColorFilter(new PorterDuffColorFilter(mKeyTextColor, PorterDuff.Mode.SRC_ATOP));
                 d.draw(canvas);
             } else {
@@ -228,6 +235,15 @@ public class PinView extends View {
                         key.getBounds().exactCenterX(),             //Set start point at center width of key
                         key.getBounds().exactCenterY() - (mKeyTextPaint.descent() + mKeyPaint.ascent()) / 2,    //center height of key - text height/2
                         mKeyTextPaint);
+            }
+
+            //Play ripple effect if the key has ripple effect enabled.
+            if (key.isRippleEffectRunning()) {
+                mRipplePaint.setAlpha(key.getCurrentAlpha());
+                canvas.drawCircle(key.getBounds().exactCenterX(),
+                        key.getBounds().exactCenterY(),
+                        key.getCurrentRippleRadius(),
+                        mRipplePaint);
             }
         }
     }
@@ -290,24 +306,24 @@ public class PinView extends View {
     private void measureKeyboard() {
         mKeyBoardBound.left = mIsOneHandOperation ? (int) (mRootViewBound.width() * 0.3) : 0;
         mKeyBoardBound.right = mRootViewBound.width();
-        mKeyBoardBound.top = (int) (mRootViewBound.height() - (mRootViewBound.height() * Defults.KEY_BOARD_PROPORTION));
+        mKeyBoardBound.top = (int) (mRootViewBound.height() - (mRootViewBound.height() * Defaults.KEY_BOARD_PROPORTION));
         mKeyBoardBound.bottom = mRootViewBound.height();
 
 
-        float singleKeyHeight = mKeyBoardBound.height() / Defults.NO_OF_ROWS;
-        float singleKeyWidth = mKeyBoardBound.width() / Defults.NO_OF_COLUMNS;
+        float singleKeyHeight = mKeyBoardBound.height() / Defaults.NO_OF_ROWS;
+        float singleKeyWidth = mKeyBoardBound.width() / Defaults.NO_OF_COLUMNS;
 
         mKeys = new ArrayList<>();
-        for (int colNo = 0; colNo < Defults.NO_OF_COLUMNS; colNo++) {
+        for (int colNo = 0; colNo < Defaults.NO_OF_COLUMNS; colNo++) {
 
-            for (int rowNo = 0; rowNo < Defults.NO_OF_ROWS; rowNo++) {
+            for (int rowNo = 0; rowNo < Defaults.NO_OF_ROWS; rowNo++) {
                 Rect rect = new Rect();
                 rect.left = (int) ((colNo * singleKeyWidth) + mKeyBoardBound.left);
                 rect.right = (int) (rect.left + singleKeyWidth);
                 rect.top = (int) ((rowNo * singleKeyHeight) + mKeyBoardBound.top);
                 rect.bottom = (int) (rect.top + singleKeyHeight);
 
-                Key key = new Key(Defults.KEY_VALUES[mKeys.size()], rect);
+                Key key = new Key(this, Defaults.KEY_VALUES[mKeys.size()], rect, mKeyPadding);
                 mKeys.add(key);
             }
         }
@@ -338,19 +354,19 @@ public class PinView extends View {
     }
 
     private void findKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY) {
-        String downKey = "";
-        String upKey = "";
+        Key downKey = null;
+        Key upKey = null;
 
         //figure out down key.
         for (Key key : mKeys) {
             //Check if the click is between the width bounds
-            if (downEventX > key.getBounds().left
-                    && downEventX < key.getBounds().left + key.getBounds().width()) {
+            if (downEventX > key.getBounds().exactCenterX() - key.getKeyRadius()
+                    && downEventX < key.getBounds().exactCenterX() + key.getKeyRadius()) {
 
                 //Check if the click is between the height bounds
-                if (downEventY > key.getBounds().top
-                        && downEventY < key.getBounds().top + key.getBounds().height()) {
-                    downKey = key.getDigit();
+                if (downEventY > key.getBounds().exactCenterY() - key.getKeyRadius()
+                        && downEventY < key.getBounds().exactCenterY() + key.getKeyRadius()) {
+                    downKey = key;
                     break;
                 }
             }
@@ -365,15 +381,19 @@ public class PinView extends View {
                 //Check if the click is between the height bounds
                 if (upEventY > key.getBounds().top
                         && upEventY < key.getBounds().top + key.getBounds().height()) {
-                    upKey = key.getDigit();
+                    upKey = key;
                     break;
                 }
             }
         }
 
         //Check if the up and down key are same? And also blank key is not pressed.
-        if (!upKey.isEmpty() && downKey.equals(upKey)) {
-            onKeyPressed(upKey);
+        if (upKey != null && downKey != null && downKey.getDigit().equals(upKey.getDigit())) {
+            //Let it play ripple effect!!!
+            upKey.playRippleAnim();
+
+            //Update the typed passcode
+            onKeyPressed(upKey.getDigit());
         }
     }
 
@@ -388,7 +408,7 @@ public class PinView extends View {
             throw new IllegalStateException("Please set current PIN to check with the entered value.");
         }
 
-        if (newDigit.equals("-1")) {
+        if (newDigit.equals(Defaults.BACKSPACE_TITLE)) {
             if (!mPinTyped.isEmpty()) mPinTyped = mPinTyped.substring(0, mPinTyped.length() - 1);
         } else {
             mPinTyped = mPinTyped + newDigit;
