@@ -13,7 +13,7 @@
         app:dividerColor="#3F51B5"
         app:indicatorSolidColor="@android:color/holo_red_dark"
         app:indicatorStrokeColor="#303F9F"
-        app:keyBackgroundColor="#303F9F"
+        app:keyStrokeColor="#303F9F"
         app:keyTextColor="#303F9F"
         app:keyTextSize="26sp"
         app:pinLength="4"

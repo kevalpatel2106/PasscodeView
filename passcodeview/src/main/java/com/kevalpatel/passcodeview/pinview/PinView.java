@@ -4,10 +4,14 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -163,6 +167,7 @@ public class PinView extends View {
         mKeyTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         mKeyTextPaint.setColor(mKeyTextColor);
         mKeyTextPaint.setTextSize(mKeyTextSize);
+        mKeyTextPaint.setFakeBoldText(true);
         mKeyTextPaint.setTextAlign(Paint.Align.CENTER);
 
         invalidate();
@@ -209,11 +214,21 @@ public class PinView extends View {
                     Math.min(key.getBounds().height(), key.getBounds().width()) / 2 - mKeyPadding, //radius = height or width - padding for single key
                     mKeyPaint);
 
-            //Draw key text
-            canvas.drawText(key.getDigit() + "",                //Text to display on key
-                    key.getBounds().exactCenterX(),             //Set start point at center width of key
-                    key.getBounds().exactCenterY() - (mKeyTextPaint.descent() + mKeyPaint.ascent()) / 2,    //center height of key - text height/2
-                    mKeyTextPaint);
+            if (key.getDigit().equals("-1")) {  //Backspace key
+                Drawable d = ContextCompat.getDrawable(mContext, R.drawable.ic_back_space);
+                d.setBounds(key.getBounds().left + (int) getResources().getDimension(R.dimen.key_backspace_icon_horizontal_padding),
+                        key.getBounds().top +  (int) getResources().getDimension(R.dimen.key_backspace_icon_vertical_padding),
+                        key.getBounds().right -  (int) getResources().getDimension(R.dimen.key_backspace_icon_horizontal_padding),
+                        key.getBounds().bottom -  (int) getResources().getDimension(R.dimen.key_backspace_icon_vertical_padding));
+                d.setColorFilter(new PorterDuffColorFilter(mKeyTextColor, PorterDuff.Mode.SRC_ATOP));
+                d.draw(canvas);
+            } else {
+                //Draw key text
+                canvas.drawText(key.getDigit() + "",                //Text to display on key
+                        key.getBounds().exactCenterX(),             //Set start point at center width of key
+                        key.getBounds().exactCenterY() - (mKeyTextPaint.descent() + mKeyPaint.ascent()) / 2,    //center height of key - text height/2
+                        mKeyTextPaint);
+            }
         }
     }
 
@@ -373,13 +388,17 @@ public class PinView extends View {
             throw new IllegalStateException("Please set current PIN to check with the entered value.");
         }
 
-        mPinTyped = mPinTyped + newDigit;
+        if (newDigit.equals("-1")) {
+            if (!mPinTyped.isEmpty()) mPinTyped = mPinTyped.substring(0, mPinTyped.length() - 1);
+        } else {
+            mPinTyped = mPinTyped + newDigit;
+        }
         invalidate();
 
-        new android.os.Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (mPinTyped.length() == mPinCodeLength) {
+        if (mPinTyped.length() == mPinCodeLength) {
+            new android.os.Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
                     if (mPinToCheck.equals(mPinTyped)) {
                         mPinChangeListener.onAuthenticationSuccessful();
                     } else {
@@ -388,8 +407,8 @@ public class PinView extends View {
 
                     reset();
                 }
-            }
-        }, 500);
+            }, 500);
+        }
     }
 
     public void reset() {

@@ -8,4 +8,6 @@
     <dimen name="key_padding">10dp</dimen>
     <dimen name="divider_vertical_margin">10dp</dimen>
     <dimen name="divider_horizontal_margin">20dp</dimen>
+    <dimen name="key_backspace_icon_vertical_padding">26dp</dimen>
+    <dimen name="key_backspace_icon_horizontal_padding">42dp</dimen>
 </resources>
