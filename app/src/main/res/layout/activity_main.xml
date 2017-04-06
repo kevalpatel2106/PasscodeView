@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context="com.securelockview.sample.MainActivity">
 
     <com.kevalpatel.passcodeview.pinview.PinView
@@ -16,6 +17,8 @@
         app:keyStrokeColor="#303F9F"
         app:keyTextColor="#303F9F"
         app:keyTextSize="26sp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
         app:pinLength="4"
         app:titleTextColor="@color/colorPrimaryDark" />
 

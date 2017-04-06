@@ -228,10 +228,10 @@ public class PinView extends View {
 
             if (key.getDigit().equals(Defaults.BACKSPACE_TITLE)) {  //Backspace key
                 Drawable d = ContextCompat.getDrawable(mContext, R.drawable.ic_back_space);
-                d.setBounds(key.getBounds().left + (int) getResources().getDimension(R.dimen.key_backspace_icon_horizontal_padding),
-                        key.getBounds().top + (int) getResources().getDimension(R.dimen.key_backspace_icon_vertical_padding),
-                        key.getBounds().right - (int) getResources().getDimension(R.dimen.key_backspace_icon_horizontal_padding),
-                        key.getBounds().bottom - (int) getResources().getDimension(R.dimen.key_backspace_icon_vertical_padding));
+                d.setBounds((int) (key.getBounds().exactCenterX() - key.getKeyRadius() / 2),
+                        (int) (key.getBounds().exactCenterY() + key.getKeyRadius() / 2),
+                        (int) (key.getBounds().exactCenterX() + key.getKeyRadius() / 2),
+                        (int) (key.getBounds().exactCenterY() - key.getKeyRadius() / 2));
                 d.setColorFilter(new PorterDuffColorFilter(mKeyTextColor, PorterDuff.Mode.SRC_ATOP));
                 d.draw(canvas);
             } else {
