@@ -193,10 +193,7 @@ public class PinView extends View {
 
     private void drawIndicatorDots(Canvas canvas) {
         for (int i = 0; i < mPinCodeLength; i++) {
-            Indicator indicator = mDotsIndicator.get(i);
-            canvas.drawCircle(indicator.getBound().exactCenterX(),
-                    indicator.getBound().exactCenterY(),
-                    mContext.getResources().getDimension(R.dimen.indicator_radius),
+            mDotsIndicator.get(i).draw(mContext, canvas,
                     i < mPinTyped.length() ? mSolidIndicatorPaint : mEmptyIndicatorPaint);
         }
     }

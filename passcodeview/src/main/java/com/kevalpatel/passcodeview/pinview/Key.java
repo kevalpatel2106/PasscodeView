@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
  *
  * @author 'https://github.com/kevalpatel2106'
  */
-abstract class Key {
+public abstract class Key {
 
     abstract void draw(@NonNull Canvas canvas,
                        @NonNull Paint keyPaint,
