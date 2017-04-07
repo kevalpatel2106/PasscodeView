@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 
 import com.kevalpatel.passcodeview.R;
 
@@ -27,7 +28,16 @@ class Indicator {
         mBound = bound;
     }
 
-    void draw(Context context, Canvas canvas,Paint paint ) {
+    /**
+     * Draw the indicator.
+     *
+     * @param context instance of the caller.
+     * @param canvas  canvas of {@link PinView}.
+     * @param paint   Paint of the indicator.
+     */
+    void draw(@NonNull Context context,
+              @NonNull Canvas canvas,
+              @NonNull Paint paint) {
         canvas.drawCircle(mBound.exactCenterX(),
                 mBound.exactCenterY(),
                 context.getResources().getDimension(R.dimen.indicator_radius),

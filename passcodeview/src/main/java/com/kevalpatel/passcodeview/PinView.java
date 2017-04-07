@@ -88,34 +88,12 @@ public class PinView extends View {
      * @param context instance of the caller.
      * @param attrs   Typed attributes or null.
      */
-    private void init(@NonNull Context context, AttributeSet attrs) {
+    private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
         mContext = context;
-        mKeyBox = new KeyBox(context, this);
+        mKeyBox = new KeyBox(this);
 
         if (attrs != null) {
-            TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.PinView, 0, 0);
-            try {
-                //Parse title params
-                mTitle = a.hasValue(R.styleable.PinView_titleText) ? a.getString(R.styleable.PinView_titleText) : Defaults.DEF_TITLE_TEXT;
-                mTitleColor = a.getColor(R.styleable.PinView_titleTextColor, Defaults.DEF_TITLE_TEXT_COLOR);
-
-                //Parse divider params
-                mDividerColor = a.getColor(R.styleable.PinView_dividerColor, Defaults.DEF_DIVIDER_COLOR);
-
-                //Parse indicator params
-                mIndicatorFilledColor = a.getColor(R.styleable.PinView_indicatorSolidColor, Defaults.DEF_INDICATOR_FILLED_COLOR);
-                mIndicatorStrokeColor = a.getColor(R.styleable.PinView_indicatorStrokeColor, Defaults.DEF_INDICATOR_STROKE_COLOR);
-
-                //Set the key box params
-                mKeyBox.setKeyTextColor(a.getColor(R.styleable.PinView_keyTextColor, Defaults.DEF_KEY_TEXT_COLOR));
-                mKeyBox.setKeyBackgroundColor(a.getColor(R.styleable.PinView_keyStrokeColor, Defaults.DEF_KEY_BACKGROUND_COLOR));
-                mKeyBox.setKeyTextSize(a.getDimensionPixelSize(R.styleable.PinView_keyTextSize, (int) mContext.getResources().getDimension(R.dimen.key_text_size)));
-                mKeyBox.setPinCodeLength(a.getInteger(R.styleable.PinView_pinLength, Defaults.DEF_PIN_LENGTH));
-                mKeyBox.setKeyStrokeWidth(a.getDimension(R.styleable.PinView_keyStrokeWidth, mContext.getResources().getDimension(R.dimen.key_stroke_width)));
-                mKeyBox.setKeyShape(a.getInt(R.styleable.PinView_keyShape, KeyBox.KEY_TYPE_CIRCLE));
-            } finally {
-                a.recycle();
-            }
+            parseTypeArr(attrs);
         } else {
             mTitle = Defaults.DEF_TITLE_TEXT;
             mTitleColor = Defaults.DEF_TITLE_TEXT_COLOR;
@@ -132,6 +110,33 @@ public class PinView extends View {
         mKeyBox.prepareKeyBgPaint();
         prepareDividerPaint();
         prepareIndicatorPaint();
+    }
+
+    private void parseTypeArr(@Nullable AttributeSet attrs) {
+        TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.PinView, 0, 0);
+        try {
+            //Parse title params
+            mTitle = a.hasValue(R.styleable.PinView_titleText) ? a.getString(R.styleable.PinView_titleText) : Defaults.DEF_TITLE_TEXT;
+            mTitleColor = a.getColor(R.styleable.PinView_titleTextColor, Defaults.DEF_TITLE_TEXT_COLOR);
+
+            //Parse divider params
+            mDividerColor = a.getColor(R.styleable.PinView_dividerColor, Defaults.DEF_DIVIDER_COLOR);
+
+            //Parse indicator params
+            mIndicatorFilledColor = a.getColor(R.styleable.PinView_indicatorSolidColor, Defaults.DEF_INDICATOR_FILLED_COLOR);
+            mIndicatorStrokeColor = a.getColor(R.styleable.PinView_indicatorStrokeColor, Defaults.DEF_INDICATOR_STROKE_COLOR);
+
+            //Set the key box params
+            mKeyBox.setKeyTextColor(a.getColor(R.styleable.PinView_keyTextColor, Defaults.DEF_KEY_TEXT_COLOR));
+            mKeyBox.setKeyBackgroundColor(a.getColor(R.styleable.PinView_keyStrokeColor, Defaults.DEF_KEY_BACKGROUND_COLOR));
+            mKeyBox.setKeyTextSize(a.getDimensionPixelSize(R.styleable.PinView_keyTextSize, (int) mContext.getResources().getDimension(R.dimen.key_text_size)));
+            mKeyBox.setPinCodeLength(a.getInteger(R.styleable.PinView_pinLength, Defaults.DEF_PIN_LENGTH));
+            mKeyBox.setKeyStrokeWidth(a.getDimension(R.styleable.PinView_keyStrokeWidth, mContext.getResources().getDimension(R.dimen.key_stroke_width)));
+            //noinspection WrongConstant
+            mKeyBox.setKeyShape(a.getInt(R.styleable.PinView_keyShape, KeyBox.KEY_TYPE_CIRCLE));
+        } finally {
+            a.recycle();
+        }
     }
 
     private void prepareIndicatorPaint() {

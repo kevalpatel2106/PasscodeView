@@ -11,8 +11,7 @@ import android.view.View;
  * Created by Keval on 06-Apr-17.
  */
 
-public class PatternView extends View
-{
+public class PatternView extends View {
     public PatternView(Context context) {
         super(context);
     }
