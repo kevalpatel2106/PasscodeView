@@ -17,8 +17,6 @@
         app:keyStrokeColor="#303F9F"
         app:keyTextColor="#303F9F"
         app:keyTextSize="26sp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
         app:pinLength="4"
         app:titleTextColor="@color/colorPrimaryDark" />
 
