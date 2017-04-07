@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview.pinview;
+package com.kevalpatel.passcodeview;
 
 import android.animation.ValueAnimator;
 import android.graphics.Canvas;
@@ -12,8 +12,6 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.animation.CycleInterpolator;
 
-import com.kevalpatel.passcodeview.R;
-
 /**
  * Created by Keval on 06-Apr-17.
  * This class represents single key.
@@ -21,9 +19,9 @@ import com.kevalpatel.passcodeview.R;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-class RectKey extends Key {
-    private final String mDigit;                        //CircleKey title.
-    private final Rect mBounds;                         //CircleKey bound.
+class KeyRect extends Key {
+    private final String mDigit;                        //KeyCircle title.
+    private final Rect mBounds;                         //KeyCircle bound.
     private final View mView;                           //Pin view
      /**
      * Public constructor.
@@ -32,7 +30,7 @@ class RectKey extends Key {
      * @param digit  title of the key. (-1 for the backspace key)
      * @param bounds {@link Rect} bound.
      */
-    RectKey(View view, String digit, Rect bounds) {
+    KeyRect(View view, String digit, Rect bounds) {
         mDigit = digit;
         mBounds = bounds;
         mView = view;
@@ -41,7 +39,7 @@ class RectKey extends Key {
     /**
      * Get the digit string.
      *
-     * @return CircleKey name
+     * @return KeyCircle name
      */
     @Override
     String getDigit() {
@@ -80,8 +78,8 @@ class RectKey extends Key {
      * Draw the key of canvas.
      *
      * @param canvas       canvas of the view o which key will be drawn
-     * @param keyPaint     CircleKey background paint
-     * @param keyTextPaint CircleKey text paint
+     * @param keyPaint     KeyCircle background paint
+     * @param keyTextPaint KeyCircle text paint
      */
     @Override
     void draw(@NonNull Canvas canvas,

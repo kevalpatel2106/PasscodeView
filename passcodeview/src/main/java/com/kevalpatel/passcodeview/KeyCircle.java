@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview.pinview;
+package com.kevalpatel.passcodeview;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
@@ -13,8 +13,6 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.animation.CycleInterpolator;
 
-import com.kevalpatel.passcodeview.R;
-
 /**
  * Created by Keval on 06-Apr-17.
  * This class represents single key.
@@ -22,13 +20,13 @@ import com.kevalpatel.passcodeview.R;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-class CircleKey extends Key {
+class KeyCircle extends Key {
     private static final int MAX_RIPPLE_ALPHA = 180;
     private static final int RIPPLE_DURATION = 350;
 
 
-    private final String mDigit;                        //CircleKey title.
-    private final Rect mBounds;                         //CircleKey bound.
+    private final String mDigit;                        //KeyCircle title.
+    private final Rect mBounds;                         //KeyCircle bound.
     private final View mView;                           //Pin view
     private final float mKeyRadius;                     //Radius of the key background.
 
@@ -45,7 +43,7 @@ class CircleKey extends Key {
      * @param digit  title of the key. (-1 for the backspace key)
      * @param bounds {@link Rect} bound.
      */
-    CircleKey(View view, String digit, Rect bounds, float keyPadding) {
+    KeyCircle(View view, String digit, Rect bounds, float keyPadding) {
         mDigit = digit;
         mBounds = bounds;
         mView = view;
@@ -66,7 +64,7 @@ class CircleKey extends Key {
     /**
      * Get the digit string.
      *
-     * @return CircleKey name
+     * @return KeyCircle name
      */
     @Override
     String getDigit() {
@@ -161,8 +159,8 @@ class CircleKey extends Key {
      * Draw the key of canvas.
      *
      * @param canvas       canvas of the view o which key will be drawn
-     * @param keyPaint     CircleKey background paint
-     * @param keyTextPaint CircleKey text paint
+     * @param keyPaint     KeyCircle background paint
+     * @param keyTextPaint KeyCircle text paint
      */
     @Override
     void draw(@NonNull Canvas canvas,

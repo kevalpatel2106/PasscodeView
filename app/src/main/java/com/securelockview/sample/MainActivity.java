@@ -1,12 +1,11 @@
 package com.securelockview.sample;
 
-import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.kevalpatel.passcodeview.PinChangeListener;
-import com.kevalpatel.passcodeview.pinview.PinView;
+import com.kevalpatel.passcodeview.interfaces.PinChangeListener;
+import com.kevalpatel.passcodeview.PinView;
 
 public class MainActivity extends AppCompatActivity {
 

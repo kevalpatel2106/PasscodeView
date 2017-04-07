@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview.pinview;
+package com.kevalpatel.passcodeview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -13,8 +13,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.kevalpatel.passcodeview.PinChangeListener;
-import com.kevalpatel.passcodeview.R;
+import com.kevalpatel.passcodeview.interfaces.PinChangeListener;
 
 import java.util.ArrayList;
 
@@ -50,9 +49,9 @@ public class PinView extends View {
     private float mKeyStrokeWidth;                   //Surround padding to each single key
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
     @ColorInt
-    private int mKeyStrokeColor;                    //CircleKey background stroke color
+    private int mKeyStrokeColor;                    //KeyCircle background stroke color
     @ColorInt
-    private int mKeyTextColor;                      //CircleKey text color
+    private int mKeyTextColor;                      //KeyCircle text color
     @ColorInt
     private int mIndicatorStrokeColor;              //Empty indicator stroke color
     @ColorInt
@@ -64,8 +63,8 @@ public class PinView extends View {
     private String mTitle;                          //Title color
 
     //Paints
-    private TextPaint mKeyTextPaint;                //CircleKey text paint
-    private Paint mKeyPaint;                        //CircleKey background pain
+    private TextPaint mKeyTextPaint;                //KeyCircle text paint
+    private Paint mKeyPaint;                        //KeyCircle background pain
     private Paint mDividerPaint;                    //Horizontal divider paint color
     private Paint mEmptyIndicatorPaint;             //Empty indicator color
     private Paint mSolidIndicatorPaint;             //Solid indicator color
@@ -229,6 +228,22 @@ public class PinView extends View {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
+    /**
+     * Measure the root view and get bounds.
+     */
+    private void measureMainView(int widthMeasureSpec, int heightMeasureSpec) {
+        int[] l = new int[2];
+        getLocationOnScreen(l);
+
+        mRootViewBound.left = l[0];
+        mRootViewBound.top = l[1];
+        mRootViewBound.right = mRootViewBound.left + MeasureSpec.getSize(widthMeasureSpec);
+        mRootViewBound.bottom = mRootViewBound.top + MeasureSpec.getSize(heightMeasureSpec);
+    }
+
+    /**
+     * Measure the dots indicators.
+     */
     private void measureIndicators() {
         int indicatorWidth = 2 * (int) (mContext.getResources().getDimension(R.dimen.indicator_radius) + mContext.getResources().getDimension(R.dimen.indicator_padding));
         int totalSpace = indicatorWidth * mPinCodeLength;
@@ -251,21 +266,14 @@ public class PinView extends View {
         }
     }
 
+    /**
+     * Measure horizontal divider bounds.
+     */
     private void measureDivider() {
         mDividerBound.left = (int) (mRootViewBound.left + mContext.getResources().getDimension(R.dimen.divider_horizontal_margin));
         mDividerBound.right = (int) (mRootViewBound.right - mContext.getResources().getDimension(R.dimen.divider_horizontal_margin));
         mDividerBound.top = (int) (mKeyBoardBound.top - mContext.getResources().getDimension(R.dimen.divider_vertical_margin));
         mDividerBound.bottom = (int) (mKeyBoardBound.top - mContext.getResources().getDimension(R.dimen.divider_vertical_margin));
-    }
-
-    private void measureMainView(int widthMeasureSpec, int heightMeasureSpec) {
-        int[] l = new int[2];
-        getLocationOnScreen(l);
-
-        mRootViewBound.left = l[0];
-        mRootViewBound.top = l[1];
-        mRootViewBound.right = mRootViewBound.left + MeasureSpec.getSize(widthMeasureSpec);
-        mRootViewBound.bottom = mRootViewBound.top + MeasureSpec.getSize(heightMeasureSpec);
     }
 
     private void measureKeyboard() {
@@ -288,7 +296,7 @@ public class PinView extends View {
                 rect.top = (int) ((rowNo * singleKeyHeight) + mKeyBoardBound.top);
                 rect.bottom = (int) (rect.top + singleKeyHeight);
 
-                mKeys.add(new RectKey(this, Defaults.KEY_VALUES[mKeys.size()], rect));
+                mKeys.add(new KeyRect(this, Defaults.KEY_VALUES[mKeys.size()], rect));
             }
         }
     }
