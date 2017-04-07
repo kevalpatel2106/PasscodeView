@@ -9,7 +9,6 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.animation.CycleInterpolator;
 
@@ -56,7 +55,7 @@ class KeyCircle extends Key {
     /**
      * Set the ripple paint.
      */
-    private void setRipplePaint(){
+    private void setRipplePaint() {
         mRipplePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mRipplePaint.setStyle(Paint.Style.FILL);
     }
@@ -174,7 +173,7 @@ class KeyCircle extends Key {
                 keyPaint);
 
         if (getDigit().equals(Defaults.BACKSPACE_TITLE)) {  //Backspace key
-            Drawable d = ContextCompat.getDrawable(mView.getContext(), R.drawable.ic_back_space);
+            Drawable d = mView.getContext().getResources().getDrawable(R.drawable.ic_back_space);
             d.setBounds((int) (mBounds.exactCenterX() - mKeyRadius / 2),
                     (int) (mBounds.exactCenterY() + mKeyRadius / 2),
                     (int) (mBounds.exactCenterX() + mKeyRadius / 2),

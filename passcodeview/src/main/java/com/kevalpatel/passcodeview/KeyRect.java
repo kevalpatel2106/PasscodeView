@@ -22,17 +22,20 @@ class KeyRect extends Key {
     private final String mDigit;                        //KeyCircle title.
     private final Rect mBounds;                         //KeyCircle bound.
     private final View mView;                           //Pin view
-     /**
+    private final float mKeyPadding;
+
+    /**
      * Public constructor.
      *
      * @param view   {@link PinView}
      * @param digit  title of the key. (-1 for the backspace key)
      * @param bounds {@link Rect} bound.
      */
-    KeyRect(View view, String digit, Rect bounds) {
+    KeyRect(View view, String digit, Rect bounds, float keyPadding) {
         mDigit = digit;
         mBounds = bounds;
         mView = view;
+        mKeyPadding = keyPadding;
     }
 
     /**
@@ -86,7 +89,11 @@ class KeyRect extends Key {
               @NonNull Paint keyTextPaint) {
 
         //Draw circle background
-        canvas.drawRect(mBounds, keyPaint);
+        canvas.drawRect(mBounds.left + mKeyPadding,
+                mBounds.top + mKeyPadding,
+                mBounds.right - mKeyPadding,
+                mBounds.bottom - mKeyPadding,
+                keyPaint);
 
         if (getDigit().equals(Defaults.BACKSPACE_TITLE)) {  //Backspace key
             Drawable d = mView.getContext().getResources().getDrawable(R.drawable.ic_back_space);

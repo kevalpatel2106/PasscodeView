@@ -15,6 +15,7 @@
         app:indicatorSolidColor="@android:color/holo_red_dark"
         app:indicatorStrokeColor="#303F9F"
         app:keyStrokeColor="#303F9F"
+        app:keyShape="square"
         app:keyTextColor="#303F9F"
         app:keyTextSize="26sp"
         app:pinLength="4"

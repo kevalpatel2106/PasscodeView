@@ -27,5 +27,10 @@
 
         <!--PIN code length-->
         <attr name="pinLength" format="integer" />
+
+        <attr name="keyShape" format="integer">
+            <enum name="circle" value="0"/>
+            <enum name="square" value="1"/>
+        </attr>
     </declare-styleable>
 </resources>
