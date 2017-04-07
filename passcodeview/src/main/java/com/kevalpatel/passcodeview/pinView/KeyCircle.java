@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview;
+package com.kevalpatel.passcodeview.pinView;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
@@ -11,6 +11,8 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.animation.CycleInterpolator;
+
+import com.kevalpatel.passcodeview.R;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -38,7 +40,7 @@ class KeyCircle extends Key {
     /**
      * Public constructor.
      *
-     * @param view   {@link PinView}
+     * @param view   {@link pinView}
      * @param digit  title of the key. (-1 for the backspace key)
      * @param bounds {@link Rect} bound.
      */

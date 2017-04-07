@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview;
+package com.kevalpatel.passcodeview.pinView;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -14,7 +14,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.kevalpatel.passcodeview.interfaces.PinChangeListener;
+import com.kevalpatel.passcodeview.R;
+import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 
 import java.util.ArrayList;
 
@@ -29,7 +30,7 @@ public class PinView extends View {
     private float mDownKeyX;                        //X coordinate of the ACTION_DOWN point
     private float mDownKeyY;                        //Y coordinate of the ACTION_DOWN point
 
-    private PinChangeListener mPinChangeListener;   //Callback listener for application to get notify when authentication successful.
+    private AuthenticationListener mAuthenticationListener;   //Callback listener for application to get notify when authentication successful.
     private String mPinToCheck;                     //Current PIN with witch entered PIN will check.
     @NonNull
     private String mPinTyped = "";                  //PIN typed.
@@ -310,8 +311,8 @@ public class PinView extends View {
      */
     private void onKeyPressed(@NonNull String newDigit) {
         //Check for the state
-        if (mPinChangeListener == null) {
-            throw new IllegalStateException("Set PinChangeListener to receive callbacks.");
+        if (mAuthenticationListener == null) {
+            throw new IllegalStateException("Set AuthenticationListener to receive callbacks.");
         } else if (mPinToCheck.isEmpty() || mPinToCheck.length() != mKeyBox.getPinCodeLength()) {
             throw new IllegalStateException("Please set current PIN to check with the entered value.");
         }
@@ -326,9 +327,9 @@ public class PinView extends View {
         if (mPinTyped.length() == mKeyBox.getPinCodeLength()) {
 
             if (mPinToCheck.equals(mPinTyped)) {
-                mPinChangeListener.onAuthenticationSuccessful();
+                mAuthenticationListener.onAuthenticationSuccessful();
             } else {
-                mPinChangeListener.onAuthenticationFailed();
+                mAuthenticationListener.onAuthenticationFailed();
 
                 //Vibrate all the keys.
                 for (Key key : mKeyBox.getKeys()) key.playError();
@@ -394,12 +395,12 @@ public class PinView extends View {
     }
 
     @Nullable
-    public PinChangeListener getPinChangeListener() {
-        return mPinChangeListener;
+    public AuthenticationListener getAuthenticationListener() {
+        return mAuthenticationListener;
     }
 
-    public void setPinChangeListener(@NonNull PinChangeListener pinChangeListener) {
-        mPinChangeListener = pinChangeListener;
+    public void setAuthenticationListener(@NonNull AuthenticationListener authenticationListener) {
+        mAuthenticationListener = authenticationListener;
     }
 
     public int getKeyBackgroundColor() {

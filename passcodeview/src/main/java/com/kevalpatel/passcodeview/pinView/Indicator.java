@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview;
+package com.kevalpatel.passcodeview.pinView;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -32,7 +32,7 @@ class Indicator {
      * Draw the indicator.
      *
      * @param context instance of the caller.
-     * @param canvas  canvas of {@link PinView}.
+     * @param canvas  canvas of {@link pinView}.
      * @param paint   Paint of the indicator.
      */
     void draw(@NonNull Context context,

@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview;
+package com.kevalpatel.passcodeview.pinView;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -10,6 +10,11 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 
+import com.kevalpatel.passcodeview.R;
+import com.kevalpatel.passcodeview.fingerprint.FingerPrintUtils;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
 /**
@@ -22,7 +27,8 @@ class KeyBox {
     static final int KEY_TYPE_CIRCLE = 0;
     static final int KEY_TYPE_RECT = 1;
 
-    private static final float KEY_BOARD_PROPORTION = 0.7F;
+    private static final float KEY_BOARD_TOP_WEIGHT = 0.3F;
+    private static final float KEY_BOARD_BOTTOM_WEIGHT = 0.8F;
     private static final String[] KEY_VALUES = new String[]{"1", "4", "7", "", "2", "5", "8", "0", "3", "6", "9", "-1"};
 
     private ArrayList<Key> mKeys;
@@ -48,6 +54,7 @@ class KeyBox {
     //Paint
     private Paint mKeyPaint;
     private TextPaint mKeyTextPaint;
+    private boolean isFingerPrintEnable;
 
     private Rect mKeyBoxBound = new Rect();
 
@@ -60,14 +67,14 @@ class KeyBox {
         mPinView = pinView;
         mContext = pinView.getContext();
         mKeyPadding = mContext.getResources().getDimension(R.dimen.key_padding);
+        isFingerPrintEnable = FingerPrintUtils.isFingerPrintEnrolled(mContext);
     }
 
     void measureKeyboard(@NonNull Rect rootViewBound) {
         mKeyBoxBound.left = mIsOneHandOperation ? (int) (rootViewBound.width() * 0.3) : 0;
         mKeyBoxBound.right = rootViewBound.width();
-        mKeyBoxBound.top = (int) (rootViewBound.height() - (rootViewBound.height() * KEY_BOARD_PROPORTION));
-        mKeyBoxBound.bottom = rootViewBound.height();
-
+        mKeyBoxBound.top = (int) (rootViewBound.top + (rootViewBound.height() * KEY_BOARD_TOP_WEIGHT));
+        mKeyBoxBound.bottom = (int) (rootViewBound.bottom - (rootViewBound.height() * KEY_BOARD_BOTTOM_WEIGHT));
 
         float singleKeyHeight = mKeyBoxBound.height() / Defaults.NO_OF_ROWS;
         float singleKeyWidth = mKeyBoxBound.width() / Defaults.NO_OF_COLUMNS;
@@ -194,6 +201,11 @@ class KeyBox {
         mKeyShape = keyShape;
     }
 
+    public void setFingerPrintEnable(boolean fingerPrintEnable) {
+        isFingerPrintEnable = fingerPrintEnable && FingerPrintUtils.isFingerPrintEnrolled(mContext);
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
     @IntDef({KEY_TYPE_CIRCLE, KEY_TYPE_RECT})
     @interface KeyShapes {
     }

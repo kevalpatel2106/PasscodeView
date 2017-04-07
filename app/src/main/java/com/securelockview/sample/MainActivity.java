@@ -4,8 +4,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.kevalpatel.passcodeview.interfaces.PinChangeListener;
-import com.kevalpatel.passcodeview.PinView;
+import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
+import com.kevalpatel.passcodeview.pinView.PinView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
         PinView pinView = (PinView) findViewById(R.id.pin_view);
         pinView.setPinToCheck("1234");
-        pinView.setPinChangeListener(new PinChangeListener() {
+        pinView.setAuthenticationListener(new AuthenticationListener() {
             @Override
             public void onAuthenticationSuccessful() {
                 Toast.makeText(MainActivity.this, "Auth successful.", Toast.LENGTH_SHORT).show();
