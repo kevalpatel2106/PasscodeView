@@ -10,7 +10,6 @@ import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -198,7 +197,7 @@ public class PinView extends View {
         measureDivider();
         measureIndicators();
 
-        setMeasuredDimension(widthMeasureSpec,heightMeasureSpec);
+        setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
@@ -265,36 +264,15 @@ public class PinView extends View {
                 mDownKeyY = event.getY();
                 break;
             case MotionEvent.ACTION_UP:
-                findKeyPressed(mDownKeyX,
+                onKeyPressed(mKeyBox.findKeyPressed(mDownKeyX,
                         mDownKeyY,
                         event.getX(),
-                        event.getY());
+                        event.getY()));
                 break;
             default:
                 return false;
         }
         return true;
-    }
-
-    /**
-     * Find which key is pressed based on the ACTION_DOWN and ACTION_UP coordinates.
-     *
-     * @param downEventX ACTION_DOWN event X coordinate
-     * @param downEventY ACTION_DOWN event Y coordinate
-     * @param upEventX   ACTION_UP event X coordinate
-     * @param upEventY   ACTION_UP event Y coordinate
-     */
-    private void findKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY) {
-        //figure out down key.
-        for (Key key : mKeyBox.getKeys()) {
-
-            if (key.checkKeyPressed(downEventX, downEventY, upEventX, upEventY)) {
-
-                //Update the typed passcode
-                onKeyPressed(key.getDigit());
-                break;
-            }
-        }
     }
 
     ///////////////////////////////////////////////////////////////
@@ -308,7 +286,9 @@ public class PinView extends View {
      *
      * @param newDigit newly pressed digit
      */
-    private void onKeyPressed(@NonNull String newDigit) {
+    private void onKeyPressed(@Nullable String newDigit) {
+        if (newDigit == null) return;
+
         //Check for the state
         if (mAuthenticationListener == null) {
             throw new IllegalStateException("Set AuthenticationListener to receive callbacks.");
@@ -321,7 +301,8 @@ public class PinView extends View {
         } else {
             mPinTyped = mPinTyped + newDigit;
         }
-        refresh();
+
+        invalidate();
 
         if (mPinTyped.length() == mKeyBox.getPinCodeLength()) {
 
@@ -329,9 +310,7 @@ public class PinView extends View {
                 mAuthenticationListener.onAuthenticationSuccessful();
             } else {
                 mAuthenticationListener.onAuthenticationFailed();
-
-                //Vibrate all the keys.
-                for (Key key : mKeyBox.getKeys()) key.playError();
+                mKeyBox.onAuthenticationError();
             }
 
             //Reset the view.
@@ -349,11 +328,6 @@ public class PinView extends View {
      */
     public void reset() {
         mPinTyped = "";
-        refresh();
-    }
-
-    void refresh() {
-        requestLayout();
         invalidate();
     }
 
@@ -363,7 +337,8 @@ public class PinView extends View {
 
     public void setKeyPadding(@Dimension float keyPadding) {
         mKeyBox.setKeyPadding(keyPadding);
-        refresh();
+        requestLayout();
+        invalidate();
     }
 
     public int getPinCodeLength() {
@@ -372,7 +347,7 @@ public class PinView extends View {
 
     public void setPinCodeLength(int pinCodeLength) {
         mKeyBox.setPinCodeLength(pinCodeLength);
-        refresh();
+        invalidate();
     }
 
     public boolean isOneHandOperationEnabled() {
@@ -381,7 +356,8 @@ public class PinView extends View {
 
     public void enableOneHandOperation(boolean isEnable) {
         mKeyBox.setOneHandOperation(isEnable);
-        refresh();
+        requestLayout();
+        invalidate();
     }
 
     @Nullable
@@ -408,7 +384,7 @@ public class PinView extends View {
 
     public void setKeyBackgroundColor(@ColorInt int keyBackgroundColor) {
         mKeyBox.setKeyBackgroundColor(keyBackgroundColor);
-        refresh();
+        invalidate();
     }
 
     public int getKeyTextColor() {
@@ -417,7 +393,7 @@ public class PinView extends View {
 
     public void setKeyTextColor(@ColorInt int keyTextColor) {
         mKeyBox.setKeyTextColor(keyTextColor);
-        refresh();
+        invalidate();
     }
 
     public int getIndicatorStrokeColor() {
@@ -427,7 +403,7 @@ public class PinView extends View {
     public void setIndicatorStrokeColor(@ColorInt int indicatorStrokeColor) {
         mIndicatorStrokeColor = indicatorStrokeColor;
         prepareIndicatorPaint();
-        refresh();
+        invalidate();
     }
 
     public int getIndicatorFilledColor() {
@@ -437,7 +413,7 @@ public class PinView extends View {
     public void setIndicatorFilledColor(@ColorInt int indicatorFilledColor) {
         mIndicatorFilledColor = indicatorFilledColor;
         prepareIndicatorPaint();
-        refresh();
+        invalidate();
     }
 
     public int getDividerColor() {
@@ -447,7 +423,7 @@ public class PinView extends View {
     public void setDividerColor(@ColorInt int dividerColor) {
         mDividerColor = dividerColor;
         prepareDividerPaint();
-        refresh();
+        invalidate();
     }
 
     public int getTitleColor() {
@@ -457,7 +433,7 @@ public class PinView extends View {
     public void setTitleColor(@ColorInt int titleColor) {
         mTitleColor = titleColor;
         //TODO set title paint
-        refresh();
+        invalidate();
     }
 
     /**
@@ -474,6 +450,6 @@ public class PinView extends View {
      */
     public void setTitle(@NonNull String title) {
         mTitle = title;
-        refresh();
+        invalidate();
     }
 }

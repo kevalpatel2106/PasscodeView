@@ -29,7 +29,7 @@ class KeyRect extends Key {
     /**
      * Public constructor.
      *
-     * @param view   {@link pinView}
+     * @param view   {@link PinView}
      * @param digit  title of the key. (-1 for the backspace key)
      * @param bounds {@link Rect} bound.
      */

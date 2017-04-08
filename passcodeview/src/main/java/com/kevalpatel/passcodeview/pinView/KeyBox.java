@@ -8,6 +8,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.Dimension;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextPaint;
 
 import com.kevalpatel.passcodeview.R;
@@ -113,7 +114,6 @@ class KeyBox {
     }
 
     void prepareKeyBgPaint() {
-
         mKeyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mKeyPaint.setStyle(Paint.Style.STROKE);
         mKeyPaint.setColor(mKeyStrokeColor);
@@ -122,7 +122,6 @@ class KeyBox {
     }
 
     void prepareKeyTextPaint() {
-
         mKeyTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         mKeyTextPaint.setColor(mKeyTextColor);
         mKeyTextPaint.setTextSize(mKeyTextSize);
@@ -135,6 +134,33 @@ class KeyBox {
             if (key.getDigit().isEmpty()) continue; //Don't draw the empty button
             key.draw(canvas, mKeyPaint, mKeyTextPaint);
         }
+    }
+
+    void onAuthenticationError(){
+        //Vibrate all the keys.
+        for (Key key : mKeys) key.playError();
+    }
+
+    /**
+     * Find which key is pressed based on the ACTION_DOWN and ACTION_UP coordinates.
+     *
+     * @param downEventX ACTION_DOWN event X coordinate
+     * @param downEventY ACTION_DOWN event Y coordinate
+     * @param upEventX   ACTION_UP event X coordinate
+     * @param upEventY   ACTION_UP event Y coordinate
+     */
+    @Nullable
+     String findKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY) {
+        //figure out down key.
+        for (Key key : mKeys) {
+
+            //Update the typed passcode
+            if (key.checkKeyPressed(downEventX, downEventY, upEventX, upEventY)) {
+                key.playClickAnimation();
+                return key.getDigit();
+            }
+        }
+        return null;
     }
 
     ArrayList<Key> getKeys() {

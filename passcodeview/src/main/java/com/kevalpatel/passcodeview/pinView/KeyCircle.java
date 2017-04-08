@@ -9,6 +9,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.CycleInterpolator;
 
@@ -40,7 +41,7 @@ class KeyCircle extends Key {
     /**
      * Public constructor.
      *
-     * @param view   {@link pinView}
+     * @param view   {@link PinView}
      * @param digit  title of the key. (-1 for the backspace key)
      * @param bounds {@link Rect} bound.
      */
@@ -88,8 +89,7 @@ class KeyCircle extends Key {
                     float animatedValue = (float) animation.getAnimatedValue();
                     mCurrentRippleRadius = (int) animatedValue;
                     mCurrentAlpha = (int) (MAX_RIPPLE_ALPHA - (animatedValue * circleAlphaOffset));
-
-                    mView.invalidate(mBounds);
+                    mView.invalidate();
                 }
             }
         });
@@ -192,6 +192,7 @@ class KeyCircle extends Key {
 
         //Play ripple effect if the key has ripple effect enabled.
         if (isRippleEffectRunning) {
+            Log.d("current ripple1", mCurrentRippleRadius + " " + mCurrentAlpha);
             mRipplePaint.setAlpha(mCurrentAlpha);
             canvas.drawCircle(mBounds.exactCenterX(),
                     mBounds.exactCenterY(),
