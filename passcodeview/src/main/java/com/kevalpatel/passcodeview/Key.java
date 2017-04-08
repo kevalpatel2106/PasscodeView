@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview.pinView;
+package com.kevalpatel.passcodeview;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;

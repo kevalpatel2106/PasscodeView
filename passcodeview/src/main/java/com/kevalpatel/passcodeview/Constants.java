@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview.pinView;
+package com.kevalpatel.passcodeview;
 
 import android.graphics.Color;
 
@@ -8,12 +8,11 @@ import android.graphics.Color;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-class Defaults {
+class Constants {
     static final String BACKSPACE_TITLE = "-1";
-    static final int DEF_PIN_LENGTH = 4;
 
-    static final int NO_OF_COLUMNS = 3;
-    static final int NO_OF_ROWS = 4;
+
+    static final int DEF_PIN_LENGTH = 4;
 
     static final String DEF_TITLE_TEXT = "Enter PIN";
     static final int DEF_TITLE_TEXT_COLOR = Color.BLACK;

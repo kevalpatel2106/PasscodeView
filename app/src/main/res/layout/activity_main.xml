@@ -7,7 +7,7 @@
     android:background="@android:color/white"
     tools:context="com.securelockview.sample.MainActivity">
 
-    <com.kevalpatel.passcodeview.pinView.PinView
+    <com.kevalpatel.passcodeview.PinView
         android:id="@+id/pin_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

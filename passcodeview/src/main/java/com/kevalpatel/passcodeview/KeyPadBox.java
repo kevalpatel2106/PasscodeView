@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview.pinView;
+package com.kevalpatel.passcodeview;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -11,9 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
 
-import com.kevalpatel.passcodeview.R;
-import com.kevalpatel.passcodeview.fingerprint.FingerPrintUtils;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -24,12 +21,14 @@ import java.util.ArrayList;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-class KeyBox {
+class KeyPadBox {
+    static final int NO_OF_COLUMNS = 3;
+    static final int NO_OF_ROWS = 4;
     static final int KEY_TYPE_CIRCLE = 0;
     static final int KEY_TYPE_RECT = 1;
 
     private static final float KEY_BOARD_TOP_WEIGHT = 0.14F;
-    private static final float KEY_BOARD_BOTTOM_WEIGHT = 0.18F;
+    static final float KEY_BOARD_BOTTOM_WEIGHT = 0.18F;
     private static final String[] KEY_VALUES = new String[]{"1", "4", "7", "", "2", "5", "8", "0", "3", "6", "9", "-1"};
 
     private ArrayList<Key> mKeys;
@@ -64,7 +63,7 @@ class KeyBox {
      *
      * @param pinView {@link PinView} in which box will be displayed.
      */
-    KeyBox(@NonNull PinView pinView) {
+    KeyPadBox(@NonNull PinView pinView) {
         mPinView = pinView;
         mContext = pinView.getContext();
         mKeyPadding = mContext.getResources().getDimension(R.dimen.key_padding);
@@ -78,13 +77,13 @@ class KeyBox {
         mKeyBoxBound.bottom = (int) (rootViewBound.height() -
                 (FingerPrintUtils.isFingerPrintEnrolled(mContext) ? rootViewBound.height() * KEY_BOARD_BOTTOM_WEIGHT : 0));
 
-        float singleKeyHeight = mKeyBoxBound.height() / Defaults.NO_OF_ROWS;
-        float singleKeyWidth = mKeyBoxBound.width() / Defaults.NO_OF_COLUMNS;
+        float singleKeyHeight = mKeyBoxBound.height() / NO_OF_ROWS;
+        float singleKeyWidth = mKeyBoxBound.width() / NO_OF_COLUMNS;
 
         mKeys = new ArrayList<>();
-        for (int colNo = 0; colNo < Defaults.NO_OF_COLUMNS; colNo++) {
+        for (int colNo = 0; colNo < NO_OF_COLUMNS; colNo++) {
 
-            for (int rowNo = 0; rowNo < Defaults.NO_OF_ROWS; rowNo++) {
+            for (int rowNo = 0; rowNo < NO_OF_ROWS; rowNo++) {
                 Rect keyBound = new Rect();
                 keyBound.left = (int) ((colNo * singleKeyWidth) + mKeyBoxBound.left);
                 keyBound.right = (int) (keyBound.left + singleKeyWidth);
@@ -106,10 +105,10 @@ class KeyBox {
     }
 
     void setDefaults() {
-        mKeyTextColor = Defaults.DEF_KEY_TEXT_COLOR;
-        mKeyStrokeColor = Defaults.DEF_KEY_BACKGROUND_COLOR;
+        mKeyTextColor = Constants.DEF_KEY_TEXT_COLOR;
+        mKeyStrokeColor = Constants.DEF_KEY_BACKGROUND_COLOR;
         mKeyTextSize = mContext.getResources().getDimension(R.dimen.key_text_size);
-        mPinCodeLength = Defaults.DEF_PIN_LENGTH;
+        mPinCodeLength = Constants.DEF_PIN_LENGTH;
         mKeyStrokeWidth = mContext.getResources().getDimension(R.dimen.key_stroke_width);
     }
 

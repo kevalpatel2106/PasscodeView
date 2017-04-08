@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview.pinView;
+package com.kevalpatel.passcodeview;
 
 import android.animation.ValueAnimator;
 import android.graphics.Canvas;
@@ -10,8 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.animation.CycleInterpolator;
-
-import com.kevalpatel.passcodeview.R;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -97,7 +95,7 @@ class KeyRect extends Key {
                 mBounds.bottom - mKeyPadding,
                 keyPaint);
 
-        if (getDigit().equals(Defaults.BACKSPACE_TITLE)) {  //Backspace key
+        if (getDigit().equals(Constants.BACKSPACE_TITLE)) {  //Backspace key
             Drawable d = mView.getContext().getResources().getDrawable(R.drawable.ic_back_space);
             d.setBounds((int) (mBounds.exactCenterX() - Math.min(mBounds.height(), mBounds.width()) / 3),
                     (int) (mBounds.exactCenterY() + Math.min(mBounds.height(), mBounds.width()) / 3),

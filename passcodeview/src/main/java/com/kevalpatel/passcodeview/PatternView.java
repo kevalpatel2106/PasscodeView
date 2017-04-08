@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview.pattern;
+package com.kevalpatel.passcodeview;
 
 import android.content.Context;
 import android.os.Build;

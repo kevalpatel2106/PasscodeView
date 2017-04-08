@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview.pinView;
+package com.kevalpatel.passcodeview;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
@@ -9,11 +9,8 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.CycleInterpolator;
-
-import com.kevalpatel.passcodeview.R;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -174,7 +171,7 @@ class KeyCircle extends Key {
                 mKeyRadius,
                 keyPaint);
 
-        if (getDigit().equals(Defaults.BACKSPACE_TITLE)) {  //Backspace key
+        if (getDigit().equals(Constants.BACKSPACE_TITLE)) {  //Backspace key
             Drawable d = mView.getContext().getResources().getDrawable(R.drawable.ic_back_space);
             d.setBounds((int) (mBounds.exactCenterX() - mKeyRadius / 2),
                     (int) (mBounds.exactCenterY() + mKeyRadius / 2),
@@ -192,7 +189,6 @@ class KeyCircle extends Key {
 
         //Play ripple effect if the key has ripple effect enabled.
         if (isRippleEffectRunning) {
-            Log.d("current ripple1", mCurrentRippleRadius + " " + mCurrentAlpha);
             mRipplePaint.setAlpha(mCurrentAlpha);
             canvas.drawCircle(mBounds.exactCenterX(),
                     mBounds.exactCenterY(),

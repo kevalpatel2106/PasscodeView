@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview.fingerprint;
+package com.kevalpatel.passcodeview;
 
 import android.Manifest;
 import android.content.Context;
@@ -34,6 +34,7 @@ public class FingerPrintUtils {
      * @param context instance of the caller.
      * @return true if device have the hardware.
      */
+    @SuppressWarnings("MissingPermission")
     @RequiresApi(api = Build.VERSION_CODES.M)
     @RequiresPermission(allOf = {Manifest.permission.USE_FINGERPRINT})
     public static boolean isSupportedHardware(Context context) {

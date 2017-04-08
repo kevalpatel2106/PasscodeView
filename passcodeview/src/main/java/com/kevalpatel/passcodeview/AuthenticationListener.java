@@ -1,4 +1,4 @@
-package com.kevalpatel.passcodeview.interfaces;
+package com.kevalpatel.passcodeview;
 
 /**
  * Created by Keval on 06-Apr-17.

@@ -4,8 +4,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
-import com.kevalpatel.passcodeview.pinView.PinView;
+import com.kevalpatel.passcodeview.AuthenticationListener;
+import com.kevalpatel.passcodeview.PinView;
 
 public class MainActivity extends AppCompatActivity {
 
