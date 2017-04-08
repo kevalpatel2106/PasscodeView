@@ -179,7 +179,6 @@ public class PinView extends View {
     }
 
     private void drawDivider(Canvas canvas) {
-        Log.d("Divider bound", mDividerBound.toString());
         canvas.drawLine(mDividerBound.left,
                 mDividerBound.top,
                 mDividerBound.right,
@@ -199,7 +198,7 @@ public class PinView extends View {
         measureDivider();
         measureIndicators();
 
-        setMeasuredDimension(mRootViewBound.width(), mRootViewBound.height());
+        setMeasuredDimension(widthMeasureSpec,heightMeasureSpec);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 

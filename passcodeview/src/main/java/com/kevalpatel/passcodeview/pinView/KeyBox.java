@@ -27,8 +27,8 @@ class KeyBox {
     static final int KEY_TYPE_CIRCLE = 0;
     static final int KEY_TYPE_RECT = 1;
 
-    private static final float KEY_BOARD_TOP_WEIGHT = 0.3F;
-    private static final float KEY_BOARD_BOTTOM_WEIGHT = 0.8F;
+    private static final float KEY_BOARD_TOP_WEIGHT = 0.14F;
+    private static final float KEY_BOARD_BOTTOM_WEIGHT = 0.18F;
     private static final String[] KEY_VALUES = new String[]{"1", "4", "7", "", "2", "5", "8", "0", "3", "6", "9", "-1"};
 
     private ArrayList<Key> mKeys;
@@ -74,7 +74,8 @@ class KeyBox {
         mKeyBoxBound.left = mIsOneHandOperation ? (int) (rootViewBound.width() * 0.3) : 0;
         mKeyBoxBound.right = rootViewBound.width();
         mKeyBoxBound.top = (int) (rootViewBound.top + (rootViewBound.height() * KEY_BOARD_TOP_WEIGHT));
-        mKeyBoxBound.bottom = (int) (rootViewBound.bottom - (rootViewBound.height() * KEY_BOARD_BOTTOM_WEIGHT));
+        mKeyBoxBound.bottom = (int) (rootViewBound.height() -
+                (FingerPrintUtils.isFingerPrintEnrolled(mContext) ? rootViewBound.height() * KEY_BOARD_BOTTOM_WEIGHT : 0));
 
         float singleKeyHeight = mKeyBoxBound.height() / Defaults.NO_OF_ROWS;
         float singleKeyWidth = mKeyBoxBound.width() / Defaults.NO_OF_COLUMNS;
