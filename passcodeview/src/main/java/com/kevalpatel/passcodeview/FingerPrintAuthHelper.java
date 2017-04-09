@@ -139,19 +139,12 @@ class FingerPrintAuthHelper {
             FingerprintManager fingerprintManager = (FingerprintManager) context.getSystemService(Context.FINGERPRINT_SERVICE);
 
             if (!fingerprintManager.isHardwareDetected()) {
-
-                // Device doesn't support fingerprint authentication
-                mCallback.onNoFingerPrintHardwareFound();
                 return false;
             } else if (!fingerprintManager.hasEnrolledFingerprints()) {
-
-                // User hasn't enrolled any fingerprints to authenticate with
-                mCallback.onNoFingerPrintRegistered();
                 return false;
             }
             return true;
         } else {
-            mCallback.onBelowMarshmallow();
             return false;
         }
     }
@@ -210,7 +203,7 @@ class FingerPrintAuthHelper {
         boolean isKeyGenerated = generateKey();
 
         if (!isKeyGenerated) {
-            mCallback.onAuthFailed(NON_RECOVERABLE_ERROR, ERROR_FAILED_TO_GENERATE_KEY);
+            mCallback.onFingerprintAuthFailed(NON_RECOVERABLE_ERROR, ERROR_FAILED_TO_GENERATE_KEY);
             return false;
         }
 
@@ -221,7 +214,7 @@ class FingerPrintAuthHelper {
                             + KeyProperties.ENCRYPTION_PADDING_PKCS7);
         } catch (NoSuchAlgorithmException |
                 NoSuchPaddingException e) {
-            mCallback.onAuthFailed(NON_RECOVERABLE_ERROR, ERROR_FAILED_TO_GENERATE_KEY);
+            mCallback.onFingerprintAuthFailed(NON_RECOVERABLE_ERROR, ERROR_FAILED_TO_GENERATE_KEY);
             return false;
         }
 
@@ -231,12 +224,12 @@ class FingerPrintAuthHelper {
             mCipher.init(Cipher.ENCRYPT_MODE, key);
             return true;
         } catch (KeyPermanentlyInvalidatedException e) {
-            mCallback.onAuthFailed(NON_RECOVERABLE_ERROR, ERROR_FAILED_TO_INIT_CHIPPER);
+            mCallback.onFingerprintAuthFailed(NON_RECOVERABLE_ERROR, ERROR_FAILED_TO_INIT_CHIPPER);
             return false;
         } catch (KeyStoreException | CertificateException
                 | UnrecoverableKeyException | IOException
                 | NoSuchAlgorithmException | InvalidKeyException e) {
-            mCallback.onAuthFailed(NON_RECOVERABLE_ERROR, ERROR_FAILED_TO_INIT_CHIPPER);
+            mCallback.onFingerprintAuthFailed(NON_RECOVERABLE_ERROR, ERROR_FAILED_TO_INIT_CHIPPER);
             return false;
         }
     }
@@ -263,7 +256,7 @@ class FingerPrintAuthHelper {
 
         FingerprintManager.CryptoObject cryptoObject = getCryptoObject();
         if (cryptoObject == null) {
-            mCallback.onAuthFailed(NON_RECOVERABLE_ERROR, ERROR_FAILED_TO_INIT_CHIPPER);
+            mCallback.onFingerprintAuthFailed(NON_RECOVERABLE_ERROR, ERROR_FAILED_TO_INIT_CHIPPER);
         } else {
             mCancellationSignal = new CancellationSignal();
             //noinspection MissingPermission
@@ -273,22 +266,22 @@ class FingerPrintAuthHelper {
                     new FingerprintManager.AuthenticationCallback() {
                         @Override
                         public void onAuthenticationError(int errMsgId, CharSequence errString) {
-                            mCallback.onAuthFailed(NON_RECOVERABLE_ERROR, errString.toString());
+                            mCallback.onFingerprintAuthFailed(NON_RECOVERABLE_ERROR, errString.toString());
                         }
 
                         @Override
                         public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
-                            mCallback.onAuthFailed(RECOVERABLE_ERROR, helpString.toString());
+                            mCallback.onFingerprintAuthFailed(RECOVERABLE_ERROR, helpString.toString());
                         }
 
                         @Override
                         public void onAuthenticationFailed() {
-                            mCallback.onAuthFailed(CANNOT_RECOGNIZE_ERROR, "Cannot recognize the fingerprint.");
+                            mCallback.onFingerprintAuthFailed(CANNOT_RECOGNIZE_ERROR, "Cannot recognize the fingerprint.");
                         }
 
                         @Override
                         public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
-                            mCallback.onAuthSuccess(result.getCryptoObject());
+                            mCallback.onFingerprintAuthSuccess(result.getCryptoObject());
                         }
                     }, null);
         }
@@ -321,34 +314,12 @@ class FingerPrintAuthHelper {
      */
 
     interface FingerPrintAuthCallback {
-
-        /**
-         * This method will notify the user whenever there is no finger print hardware found on the device.
-         * Developer should use any other way of authenticating the user, like pin or password to authenticate the user.
-         */
-        void onNoFingerPrintHardwareFound();
-
-        /**
-         * This method will execute whenever device supports finger print authentication but does not
-         * have any finger print registered.
-         * Developer should notify user to add finger prints in the settings by opening security settings
-         * by using {@link FingerPrintUtils#openSecuritySettings(Context)}.
-         */
-        void onNoFingerPrintRegistered();
-
-        /**
-         * This method will be called if the device is running on android below API 23. As starting from the
-         * API 23, android officially got the finger print hardware support, for below marshmallow devices
-         * developer should authenticate user by other ways like pin, password etc.
-         */
-        void onBelowMarshmallow();
-
         /**
          * This method will occur whenever  user authentication is successful.
          *
          * @param cryptoObject {@link FingerprintManager.CryptoObject} associated with the scanned finger print.
          */
-        void onAuthSuccess(FingerprintManager.CryptoObject cryptoObject);
+        void onFingerprintAuthSuccess(FingerprintManager.CryptoObject cryptoObject);
 
         /**
          * This method will execute whenever any error occurs during the authentication.
@@ -356,6 +327,6 @@ class FingerPrintAuthHelper {
          * @param errorCode    Error code for the error occurred. These error code will be from error codes.
          * @param errorMessage A human-readable error string that can be shown in UI
          */
-        void onAuthFailed(int errorCode, String errorMessage);
+        void onFingerprintAuthFailed(int errorCode, String errorMessage);
     }
 }

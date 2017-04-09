@@ -25,7 +25,7 @@ import android.view.animation.CycleInterpolator;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-class FingerPrintBox implements FingerPrintAuthHelper.FingerPrintAuthCallback {
+class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAuthCallback {
     static final String DEF_FINGERPRINT_STATUS = "Scan your finger to authenticate";
 
     private View mView;
@@ -46,22 +46,22 @@ class FingerPrintBox implements FingerPrintAuthHelper.FingerPrintAuthCallback {
     @Nullable
     private FingerPrintAuthHelper mFingerPrintAuthHelper;
 
-    FingerPrintBox(@NonNull View view) {
+    BoxFingerprint(@NonNull View view) {
         mView = view;
         mContext = view.getContext();
         isFingerPrintBoxVisible = FingerPrintUtils.isFingerPrintEnrolled(mContext);
 
-        enableFingerPrint();
+        enableFingerprintScanner();
     }
 
-    private void enableFingerPrint() {
+    private void enableFingerprintScanner() {
         if (!isFingerPrintBoxVisible) return;
 
         mFingerPrintAuthHelper = FingerPrintAuthHelper.getHelper(mContext, this);
         mFingerPrintAuthHelper.startAuth();
     }
 
-    void disableFingerPrint() {
+    void stopFingerprintScanner() {
         if (mFingerPrintAuthHelper != null) mFingerPrintAuthHelper.stopAuth();
     }
 
@@ -73,23 +73,19 @@ class FingerPrintBox implements FingerPrintAuthHelper.FingerPrintAuthCallback {
         mStatusTextColor = mContext.getResources().getColor(R.color.key_default_color);
     }
 
-    void prepareStatusTextPaint() {
-        mStatusTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        mStatusTextPaint.setTextAlign(Paint.Align.CENTER);
-        mStatusTextPaint.setTextSize(mStatusTextSize);
-        mStatusTextPaint.setColor(mStatusTextColor);
+    @Override
+    void onAuthenticationFail() {
+        playErrorAnimation();
     }
 
-    void measureFingerPrintBox(@NonNull Rect rootViewBound) {
-        if (isFingerPrintBoxVisible) {
-            mBounds.left = rootViewBound.left;
-            mBounds.right = rootViewBound.right;
-            mBounds.top = (int) (rootViewBound.bottom - rootViewBound.height() * (KeyPadBox.KEY_BOARD_BOTTOM_WEIGHT));
-            mBounds.bottom = rootViewBound.bottom;
-        }
+    @Override
+    void onAuthenticationSuccess() {
+        //TODO How to notify the user.
     }
 
-    void drawFingerPrintBox(@NonNull Canvas canvas) {
+    @SuppressWarnings("deprecation")
+    @Override
+    void draw(@NonNull Canvas canvas) {
         if (isFingerPrintBoxVisible) {
             canvas.drawLine(mBounds.left + mContext.getResources().getDimension(R.dimen.divider_horizontal_margin),
                     mBounds.top,
@@ -114,36 +110,38 @@ class FingerPrintBox implements FingerPrintAuthHelper.FingerPrintAuthCallback {
         }
     }
 
-
     @Override
-    public void onNoFingerPrintHardwareFound() {
-        //Do nothing.
+    void measure(@NonNull Rect rootViewBounds) {
+        if (isFingerPrintBoxVisible) {
+            mBounds.left = rootViewBounds.left;
+            mBounds.right = rootViewBounds.right;
+            mBounds.top = (int) (rootViewBounds.bottom - rootViewBounds.height() * (BoxKeypad.KEY_BOARD_BOTTOM_WEIGHT));
+            mBounds.bottom = rootViewBounds.bottom;
+        }
     }
 
     @Override
-    public void onNoFingerPrintRegistered() {
-        //Do nothing.
+    void preparePaint() {
+        mStatusTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        mStatusTextPaint.setTextAlign(Paint.Align.CENTER);
+        mStatusTextPaint.setTextSize(mStatusTextSize);
+        mStatusTextPaint.setColor(mStatusTextColor);
     }
 
     @Override
-    public void onBelowMarshmallow() {
-        //Do nothing.
+    public void onFingerprintAuthSuccess(FingerprintManager.CryptoObject cryptoObject) {
+        onAuthenticationSuccess();
     }
 
     @Override
-    public void onAuthSuccess(FingerprintManager.CryptoObject cryptoObject) {
-
-    }
-
-    @Override
-    public void onAuthFailed(int errorCode, String errorMessage) {
+    public void onFingerprintAuthFailed(int errorCode, String errorMessage) {
         switch (errorCode) {
             case FingerPrintAuthHelper.CANNOT_RECOGNIZE_ERROR:
             case FingerPrintAuthHelper.NON_RECOVERABLE_ERROR:
             case FingerPrintAuthHelper.RECOVERABLE_ERROR:
                 mStatusTextPaint.setColor(Color.RED);
                 mCurrentStatusText = errorMessage;
-                playErrorAnimation();
+                onAuthenticationFail();
                 break;
         }
     }
@@ -190,6 +188,8 @@ class FingerPrintBox implements FingerPrintAuthHelper.FingerPrintAuthCallback {
             }
         });
     }
+
+    ///////////////// SETTERS/GETTERS //////////////
 
     @NonNull
     String getStatusText() {

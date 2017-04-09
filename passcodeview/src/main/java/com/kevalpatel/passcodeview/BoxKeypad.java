@@ -21,7 +21,7 @@ import java.util.ArrayList;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-class KeyPadBox {
+class BoxKeypad extends Box {
     static final int KEY_TYPE_CIRCLE = 0;
     static final int KEY_TYPE_RECT = 1;
     static final float KEY_BOARD_BOTTOM_WEIGHT = 0.14F;
@@ -31,7 +31,7 @@ class KeyPadBox {
     private final float KEY_BOARD_TOP_WEIGHT;
     private final Context mContext;
     private final PinView mPinView;
-    private ArrayList<Key> mKeys;
+
     //Theme params
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
     private int mPinCodeLength;                     //PIN code length
@@ -46,6 +46,9 @@ class KeyPadBox {
     @ColorInt
     private int mKeyTextColor;                      //KeyCircle text color
     private int mKeyShape = KEY_TYPE_CIRCLE;
+
+    private ArrayList<Key> mKeys;
+
     //Paint
     private Paint mKeyPaint;
     private TextPaint mKeyTextPaint;
@@ -58,7 +61,7 @@ class KeyPadBox {
      *
      * @param pinView {@link PinView} in which box will be displayed.
      */
-    KeyPadBox(@NonNull PinView pinView) {
+    BoxKeypad(@NonNull PinView pinView) {
         mPinView = pinView;
         mContext = pinView.getContext();
         mKeyPadding = mContext.getResources().getDimension(R.dimen.key_padding);
@@ -66,7 +69,8 @@ class KeyPadBox {
         KEY_BOARD_TOP_WEIGHT = isFingerPrintEnable ? 0.3F : 0.14F;
     }
 
-    void measureKeyboard(@NonNull Rect rootViewBound) {
+    @Override
+    void measure(@NonNull Rect rootViewBound) {
         mKeyBoxBound.left = mIsOneHandOperation ? (int) (rootViewBound.width() * 0.3) : 0;
         mKeyBoxBound.right = rootViewBound.width();
         mKeyBoxBound.top = (int) (rootViewBound.top + (rootViewBound.height() * KEY_BOARD_TOP_WEIGHT));
@@ -100,6 +104,28 @@ class KeyPadBox {
         }
     }
 
+    @Override
+    void preparePaint() {
+        //Set the keyboard paint
+        mKeyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mKeyPaint.setStyle(Paint.Style.STROKE);
+        mKeyPaint.setColor(mKeyStrokeColor);
+        mKeyPaint.setTextSize(mKeyTextSize);
+        mKeyPaint.setStrokeWidth(mKeyStrokeWidth);
+
+        //Set the keyboard text paint
+        mKeyTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        mKeyTextPaint.setColor(mKeyTextColor);
+        mKeyTextPaint.setTextSize(mKeyTextSize);
+        mKeyTextPaint.setFakeBoldText(true);
+        mKeyTextPaint.setTextAlign(Paint.Align.CENTER);
+    }
+
+    /**
+     * Set the default theme parameters.
+     */
+    @SuppressWarnings("deprecation")
+    @Override
     void setDefaults() {
         mKeyTextColor = mContext.getResources().getColor(R.color.key_default_color);
         mKeyStrokeColor = mContext.getResources().getColor(R.color.key_background_color);
@@ -108,32 +134,28 @@ class KeyPadBox {
         mKeyStrokeWidth = mContext.getResources().getDimension(R.dimen.key_stroke_width);
     }
 
-    void prepareKeyBgPaint() {
-        mKeyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mKeyPaint.setStyle(Paint.Style.STROKE);
-        mKeyPaint.setColor(mKeyStrokeColor);
-        mKeyPaint.setTextSize(mKeyTextSize);
-        mKeyPaint.setStrokeWidth(mKeyStrokeWidth);
+    @Override
+    void onAuthenticationFail() {
+        //Vibrate all the keys.
+        for (Key key : mKeys) key.playError();
     }
 
-    void prepareKeyTextPaint() {
-        mKeyTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        mKeyTextPaint.setColor(mKeyTextColor);
-        mKeyTextPaint.setTextSize(mKeyTextSize);
-        mKeyTextPaint.setFakeBoldText(true);
-        mKeyTextPaint.setTextAlign(Paint.Align.CENTER);
+    @Override
+    void onAuthenticationSuccess() {
+        //DO nothing
     }
 
-    void drawKeys(Canvas canvas) {
+    /**
+     * Draw keyboard on the canvas. This will draw all the {@link #KEY_VALUES} on the canvas.
+     *
+     * @param canvas canvas on which the keyboard will be drawn.
+     */
+    @Override
+    void draw(@NonNull Canvas canvas) {
         for (Key key : mKeys) {
             if (key.getDigit().isEmpty()) continue; //Don't draw the empty button
             key.draw(canvas, mKeyPaint, mKeyTextPaint);
         }
-    }
-
-    void onAuthenticationError() {
-        //Vibrate all the keys.
-        for (Key key : mKeys) key.playError();
     }
 
     /**
@@ -157,6 +179,8 @@ class KeyPadBox {
         }
         return null;
     }
+
+    ///////////////// SETTERS/GETTERS //////////////
 
     ArrayList<Key> getKeys() {
         return mKeys;

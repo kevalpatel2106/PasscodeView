@@ -56,8 +56,8 @@ public class PinView extends View {
     private Paint mEmptyIndicatorPaint;             //Empty indicator color
     private Paint mSolidIndicatorPaint;             //Solid indicator color
 
-    private KeyPadBox mKeyPadBox;
-    private FingerPrintBox mFingerPrintBox;
+    private BoxKeypad mBoxKeypad;
+    private BoxFingerprint mBoxFingerprint;
 
     ///////////////////////////////////////////////////////////////
     //                  CONSTRUCTORS
@@ -91,8 +91,8 @@ public class PinView extends View {
     @SuppressWarnings("deprecation")
     private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
         mContext = context;
-        mKeyPadBox = new KeyPadBox(this);
-        mFingerPrintBox = new FingerPrintBox(this);
+        mBoxKeypad = new BoxKeypad(this);
+        mBoxFingerprint = new BoxFingerprint(this);
 
         if (attrs != null) {
             parseTypeArr(attrs);
@@ -105,13 +105,12 @@ public class PinView extends View {
             mIndicatorFilledColor = getResources().getColor(R.color.indicator_filled_color);
             mIndicatorStrokeColor = getResources().getColor(R.color.indicator_stroke_color);
 
-            mKeyPadBox.setDefaults();
-            mFingerPrintBox.setDefaults();
+            mBoxKeypad.setDefaults();
+            mBoxFingerprint.setDefaults();
         }
 
-        mKeyPadBox.prepareKeyTextPaint();
-        mKeyPadBox.prepareKeyBgPaint();
-        mFingerPrintBox.prepareStatusTextPaint();
+        mBoxKeypad.preparePaint();
+        mBoxFingerprint.preparePaint();
         prepareDividerPaint();
         prepareIndicatorPaint();
     }
@@ -137,29 +136,29 @@ public class PinView extends View {
                     getResources().getColor(R.color.indicator_stroke_color));
 
             //Set the key box params
-            mKeyPadBox.setKeyTextColor(a.getColor(R.styleable.PinView_keyTextColor,
+            mBoxKeypad.setKeyTextColor(a.getColor(R.styleable.PinView_keyTextColor,
                     mContext.getResources().getColor(R.color.key_default_color)));
-            mKeyPadBox.setKeyBackgroundColor(a.getColor(R.styleable.PinView_keyStrokeColor,
+            mBoxKeypad.setKeyBackgroundColor(a.getColor(R.styleable.PinView_keyStrokeColor,
                     mContext.getResources().getColor(R.color.key_background_color)));
-            mKeyPadBox.setKeyTextSize(a.getDimensionPixelSize(R.styleable.PinView_keyTextSize,
+            mBoxKeypad.setKeyTextSize(a.getDimensionPixelSize(R.styleable.PinView_keyTextSize,
                     (int) mContext.getResources().getDimension(R.dimen.key_text_size)));
-            mKeyPadBox.setPinCodeLength(a.getInteger(R.styleable.PinView_pinLength,
+            mBoxKeypad.setPinCodeLength(a.getInteger(R.styleable.PinView_pinLength,
                     Constants.DEF_PIN_LENGTH));
-            mKeyPadBox.setKeyStrokeWidth(a.getDimension(R.styleable.PinView_keyStrokeWidth,
+            mBoxKeypad.setKeyStrokeWidth(a.getDimension(R.styleable.PinView_keyStrokeWidth,
                     mContext.getResources().getDimension(R.dimen.key_stroke_width)));
             //noinspection WrongConstant
-            mKeyPadBox.setKeyShape(a.getInt(R.styleable.PinView_keyShape, KeyPadBox.KEY_TYPE_CIRCLE));
-            mKeyPadBox.setFingerPrintEnable(a.getBoolean(R.styleable.PinView_fingerprintEnable, true));
+            mBoxKeypad.setKeyShape(a.getInt(R.styleable.PinView_keyShape, BoxKeypad.KEY_TYPE_CIRCLE));
+            mBoxKeypad.setFingerPrintEnable(a.getBoolean(R.styleable.PinView_fingerprintEnable, true));
 
             //Fet fingerprint params
             //noinspection ConstantConditions
-            mFingerPrintBox.setStatusText(a.hasValue(R.styleable.PinView_titleText) ?
-                    a.getString(R.styleable.PinView_fingerprintDefaultText) : FingerPrintBox.DEF_FINGERPRINT_STATUS);
-            mFingerPrintBox.setStatusTextColor(a.getColor(R.styleable.PinView_fingerprintTextColor,
+            mBoxFingerprint.setStatusText(a.hasValue(R.styleable.PinView_titleText) ?
+                    a.getString(R.styleable.PinView_fingerprintDefaultText) : BoxFingerprint.DEF_FINGERPRINT_STATUS);
+            mBoxFingerprint.setStatusTextColor(a.getColor(R.styleable.PinView_fingerprintTextColor,
                     mContext.getResources().getColor(R.color.key_default_color)));
-            mFingerPrintBox.setStatusTextSize(a.getDimension(R.styleable.PinView_fingerprintTextSize,
+            mBoxFingerprint.setStatusTextSize(a.getDimension(R.styleable.PinView_fingerprintTextSize,
                     (int) mContext.getResources().getDimension(R.dimen.fingerprint_status_text_size)));
-            mFingerPrintBox.setFingerPrintEnable(a.getBoolean(R.styleable.PinView_fingerprintEnable, true));
+            mBoxFingerprint.setFingerPrintEnable(a.getBoolean(R.styleable.PinView_fingerprintEnable, true));
         } finally {
             a.recycle();
         }
@@ -190,14 +189,14 @@ public class PinView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        mKeyPadBox.drawKeys(canvas);
+        mBoxKeypad.draw(canvas);
         drawDivider(canvas);
         drawIndicatorDots(canvas);
-        mFingerPrintBox.drawFingerPrintBox(canvas);
+        mBoxFingerprint.draw(canvas);
     }
 
     private void drawIndicatorDots(Canvas canvas) {
-        for (int i = 0; i < mKeyPadBox.getPinCodeLength(); i++) {
+        for (int i = 0; i < mBoxKeypad.getPinCodeLength(); i++) {
             mDotsIndicator.get(i).draw(mContext, canvas,
                     i < mPinTyped.length() ? mSolidIndicatorPaint : mEmptyIndicatorPaint);
         }
@@ -219,10 +218,10 @@ public class PinView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
         measureMainView(widthMeasureSpec, heightMeasureSpec);
-        mKeyPadBox.measureKeyboard(mRootViewBound);
+        mBoxKeypad.measure(mRootViewBound);
         measureDivider();
         measureIndicators();
-        mFingerPrintBox.measureFingerPrintBox(mRootViewBound);
+        mBoxFingerprint.measure(mRootViewBound);
 
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -248,7 +247,7 @@ public class PinView extends View {
      */
     private void measureIndicators() {
         int indicatorWidth = 2 * (int) (mContext.getResources().getDimension(R.dimen.indicator_radius) + mContext.getResources().getDimension(R.dimen.indicator_padding));
-        int totalSpace = indicatorWidth * mKeyPadBox.getPinCodeLength();
+        int totalSpace = indicatorWidth * mBoxKeypad.getPinCodeLength();
 
         Rect dotsIndicatorBound = new Rect();
         dotsIndicatorBound.left = (mRootViewBound.width() - totalSpace) / 2;
@@ -256,8 +255,8 @@ public class PinView extends View {
         dotsIndicatorBound.bottom = (int) (mDividerBound.top - mContext.getResources().getDimension(R.dimen.divider_horizontal_margin));
         dotsIndicatorBound.top = dotsIndicatorBound.bottom - indicatorWidth;
 
-        mDotsIndicator = new ArrayList<>(mKeyPadBox.getPinCodeLength());
-        for (int i = 0; i < mKeyPadBox.getPinCodeLength(); i++) {
+        mDotsIndicator = new ArrayList<>(mBoxKeypad.getPinCodeLength());
+        for (int i = 0; i < mBoxKeypad.getPinCodeLength(); i++) {
             Rect rect = new Rect();
             rect.left = dotsIndicatorBound.left + i * indicatorWidth;
             rect.right = rect.left + indicatorWidth;
@@ -274,8 +273,8 @@ public class PinView extends View {
     private void measureDivider() {
         mDividerBound.left = (int) (mRootViewBound.left + mContext.getResources().getDimension(R.dimen.divider_horizontal_margin));
         mDividerBound.right = (int) (mRootViewBound.right - mContext.getResources().getDimension(R.dimen.divider_horizontal_margin));
-        mDividerBound.top = (int) (mKeyPadBox.getBounds().top - mContext.getResources().getDimension(R.dimen.divider_vertical_margin));
-        mDividerBound.bottom = (int) (mKeyPadBox.getBounds().top - mContext.getResources().getDimension(R.dimen.divider_vertical_margin));
+        mDividerBound.top = (int) (mBoxKeypad.getBounds().top - mContext.getResources().getDimension(R.dimen.divider_vertical_margin));
+        mDividerBound.bottom = (int) (mBoxKeypad.getBounds().top - mContext.getResources().getDimension(R.dimen.divider_vertical_margin));
     }
 
     ///////////////////////////////////////////////////////////////
@@ -291,7 +290,7 @@ public class PinView extends View {
                 mDownKeyY = event.getY();
                 break;
             case MotionEvent.ACTION_UP:
-                onKeyPressed(mKeyPadBox.findKeyPressed(mDownKeyX,
+                onKeyPressed(mBoxKeypad.findKeyPressed(mDownKeyX,
                         mDownKeyY,
                         event.getX(),
                         event.getY()));
@@ -305,7 +304,7 @@ public class PinView extends View {
     /**
      * Handle the newly added key digit. Append the digit to {@link #mPinTyped}.
      * If the new digit is {@link Constants#BACKSPACE_TITLE}, remove the last digit of the {@link #mPinTyped}.
-     * If the {@link #mPinTyped} has length of {@link KeyPadBox#mPinCodeLength} and equals to {@link #mPinToCheck}
+     * If the {@link #mPinTyped} has length of {@link BoxKeypad#mPinCodeLength} and equals to {@link #mPinToCheck}
      * notify application as authenticated.
      *
      * @param newDigit newly pressed digit
@@ -316,7 +315,7 @@ public class PinView extends View {
         //Check for the state
         if (mAuthenticationListener == null) {
             throw new IllegalStateException("Set AuthenticationListener to receive callbacks.");
-        } else if (mPinToCheck.isEmpty() || mPinToCheck.length() != mKeyPadBox.getPinCodeLength()) {
+        } else if (mPinToCheck.isEmpty() || mPinToCheck.length() != mBoxKeypad.getPinCodeLength()) {
             throw new IllegalStateException("Please set current PIN to check with the entered value.");
         }
 
@@ -328,13 +327,14 @@ public class PinView extends View {
 
         invalidate();
 
-        if (mPinTyped.length() == mKeyPadBox.getPinCodeLength()) {
+        if (mPinTyped.length() == mBoxKeypad.getPinCodeLength()) {
 
             if (mPinToCheck.equals(mPinTyped)) {
                 mAuthenticationListener.onAuthenticationSuccessful();
+                mBoxKeypad.onAuthenticationSuccess();
             } else {
                 mAuthenticationListener.onAuthenticationFailed();
-                mKeyPadBox.onAuthenticationError();
+                mBoxKeypad.onAuthenticationFail();
             }
 
             //Reset the view.
@@ -358,7 +358,7 @@ public class PinView extends View {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mFingerPrintBox.disableFingerPrint();
+        mBoxFingerprint.stopFingerprintScanner();
     }
 
     ///////////////////////////////////////////////////////////////
@@ -366,30 +366,30 @@ public class PinView extends View {
     ///////////////////////////////////////////////////////////////
 
     public float getKeyPadding() {
-        return mKeyPadBox.getKeyPadding();
+        return mBoxKeypad.getKeyPadding();
     }
 
     public void setKeyPadding(@Dimension float keyPadding) {
-        mKeyPadBox.setKeyPadding(keyPadding);
+        mBoxKeypad.setKeyPadding(keyPadding);
         requestLayout();
         invalidate();
     }
 
     public int getPinCodeLength() {
-        return mKeyPadBox.getPinCodeLength();
+        return mBoxKeypad.getPinCodeLength();
     }
 
     public void setPinCodeLength(int pinCodeLength) {
-        mKeyPadBox.setPinCodeLength(pinCodeLength);
+        mBoxKeypad.setPinCodeLength(pinCodeLength);
         invalidate();
     }
 
     public boolean isOneHandOperationEnabled() {
-        return mKeyPadBox.isOneHandOperation();
+        return mBoxKeypad.isOneHandOperation();
     }
 
     public void enableOneHandOperation(boolean isEnable) {
-        mKeyPadBox.setOneHandOperation(isEnable);
+        mBoxKeypad.setOneHandOperation(isEnable);
         requestLayout();
         invalidate();
     }
@@ -413,20 +413,20 @@ public class PinView extends View {
     }
 
     public int getKeyBackgroundColor() {
-        return mKeyPadBox.getKeyBackgroundColor();
+        return mBoxKeypad.getKeyBackgroundColor();
     }
 
     public void setKeyBackgroundColor(@ColorInt int keyBackgroundColor) {
-        mKeyPadBox.setKeyBackgroundColor(keyBackgroundColor);
+        mBoxKeypad.setKeyBackgroundColor(keyBackgroundColor);
         invalidate();
     }
 
     public int getKeyTextColor() {
-        return mKeyPadBox.getKeyTextColor();
+        return mBoxKeypad.getKeyTextColor();
     }
 
     public void setKeyTextColor(@ColorInt int keyTextColor) {
-        mKeyPadBox.setKeyTextColor(keyTextColor);
+        mBoxKeypad.setKeyTextColor(keyTextColor);
         invalidate();
     }
 
@@ -489,48 +489,48 @@ public class PinView extends View {
 
     @NonNull
     String getFingerPrintStatusText() {
-        return mFingerPrintBox.getStatusText();
+        return mBoxFingerprint.getStatusText();
     }
 
     void setFingerPrintStatusText(@NonNull String statusText) {
-        mFingerPrintBox.setStatusText(statusText);
+        mBoxFingerprint.setStatusText(statusText);
         invalidate();
     }
 
     int getFingerPrintStatusTextColor() {
-        return mFingerPrintBox.getStatusTextColor();
+        return mBoxFingerprint.getStatusTextColor();
     }
 
     void setFingerPrintStatusTextColor(@ColorInt int statusTextColor) {
-        mFingerPrintBox.setStatusTextColor(statusTextColor);
+        mBoxFingerprint.setStatusTextColor(statusTextColor);
         invalidate();
     }
 
     void setFingerPrintStatusTextColorRes(@ColorRes int statusTextColor) {
-        mFingerPrintBox.setStatusTextColor(mContext.getResources().getColor(statusTextColor));
+        mBoxFingerprint.setStatusTextColor(mContext.getResources().getColor(statusTextColor));
         invalidate();
     }
 
     float getFingerPrintStatusTextSize() {
-        return mFingerPrintBox.getStatusTextSize();
-    }
-
-    void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mFingerPrintBox.setStatusTextSize(statusTextSize);
-        invalidate();
+        return mBoxFingerprint.getStatusTextSize();
     }
 
     void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mFingerPrintBox.setStatusTextSize(getResources().getDimension(statusTextSize));
+        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
+        invalidate();
+    }
+
+    void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(statusTextSize);
         invalidate();
     }
 
     Boolean isFingerPrintEnable() {
-        return mFingerPrintBox.setFingerPrintEnable();
+        return mBoxFingerprint.setFingerPrintEnable();
     }
 
     void isFingerPrintEnable(boolean isEnable) {
-        mFingerPrintBox.setFingerPrintEnable(isEnable);
-        mKeyPadBox.setFingerPrintEnable(isEnable);
+        mBoxFingerprint.setFingerPrintEnable(isEnable);
+        mBoxKeypad.setFingerPrintEnable(isEnable);
     }
 }
