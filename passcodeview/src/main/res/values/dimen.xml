@@ -8,5 +8,5 @@
     <dimen name="key_padding">15dp</dimen>
     <dimen name="divider_vertical_margin">10dp</dimen>
     <dimen name="divider_horizontal_margin">20dp</dimen>
-    <dimen name="fingerprint_status_text_size">12sp</dimen>
+    <dimen name="fingerprint_status_text_size">16sp</dimen>
 </resources>

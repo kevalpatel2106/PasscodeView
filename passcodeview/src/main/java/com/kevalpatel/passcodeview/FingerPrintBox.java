@@ -6,7 +6,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.hardware.fingerprint.FingerprintManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Dimension;
@@ -88,9 +91,25 @@ class FingerPrintBox implements FingerPrintAuthHelper.FingerPrintAuthCallback {
 
     void drawFingerPrintBox(@NonNull Canvas canvas) {
         if (isFingerPrintBoxVisible) {
+            canvas.drawLine(mBounds.left + mContext.getResources().getDimension(R.dimen.divider_horizontal_margin),
+                    mBounds.top,
+                    mBounds.right - mContext.getResources().getDimension(R.dimen.divider_horizontal_margin),
+                    mBounds.top,
+                    mStatusTextPaint);
+
+            //Show fingerprint icon
+            Drawable d = mView.getContext().getResources().getDrawable(R.drawable.ic_fingerprint);
+            d.setBounds((int) (mBounds.exactCenterX() - mBounds.height() / 4),
+                    mBounds.top + 15,
+                    (int) (mBounds.exactCenterX() + mBounds.height() / 4),
+                    mBounds.top + mBounds.height() / 2 + 15);
+            d.setColorFilter(new PorterDuffColorFilter(mStatusTextPaint.getColor(), PorterDuff.Mode.SRC_ATOP));
+            d.draw(canvas);
+
+            //Show finger print text
             canvas.drawText(mCurrentStatusText,
                     mBounds.exactCenterX(),
-                    mBounds.exactCenterY() - (mStatusTextPaint.descent() + mStatusTextPaint.ascent()) / 2,
+                    (float) (mBounds.top + (mBounds.height() / 1.3) - ((mStatusTextPaint.descent() + mStatusTextPaint.ascent()) / 2)),
                     mStatusTextPaint);
         }
     }
@@ -122,6 +141,7 @@ class FingerPrintBox implements FingerPrintAuthHelper.FingerPrintAuthCallback {
             case FingerPrintAuthHelper.CANNOT_RECOGNIZE_ERROR:
             case FingerPrintAuthHelper.NON_RECOVERABLE_ERROR:
             case FingerPrintAuthHelper.RECOVERABLE_ERROR:
+                mStatusTextPaint.setColor(Color.RED);
                 mCurrentStatusText = errorMessage;
                 playErrorAnimation();
                 break;
@@ -145,7 +165,6 @@ class FingerPrintBox implements FingerPrintAuthHelper.FingerPrintAuthCallback {
         goLeftAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-                mStatusTextPaint.setColor(Color.RED);
             }
 
             @Override
