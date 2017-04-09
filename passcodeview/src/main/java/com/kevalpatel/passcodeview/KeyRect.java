@@ -78,6 +78,7 @@ class KeyRect extends Key {
 
     /**
      * Draw the key of canvas.
+     * Don't change until you know what you are doing. :-)
      *
      * @param canvas       canvas of the view o which key will be drawn
      * @param keyPaint     KeyCircle background paint

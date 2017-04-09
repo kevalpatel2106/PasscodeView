@@ -72,11 +72,31 @@ class BoxIndicator extends Box {
         }
     }
 
+    /**
+     * |------------------------|=|
+     * |                        | |
+     * |                        | |
+     * |         TITLE          | | => 2 * {@link com.kevalpatel.passcodeview.R.dimen#divider_vertical_margin} px up from the bottom of the indicators.
+     * |   |===============|    | |
+     * |   |   INDICATORS  |    | |
+     * |   |===============|    | | => 2 * {@link com.kevalpatel.passcodeview.R.dimen#divider_vertical_margin} px up from the bottom key board
+     * |------------------------|=| => {@link BoxKeypad#KEY_BOARD_TOP_WEIGHT} of the total height.
+     * |                        | |
+     * |                        | |
+     * |                        | | => Keypad height. ({@link BoxKeypad#measure(Rect)})
+     * |                        | |
+     * |                        | |
+     * |------------------------|=| => {@link BoxKeypad#KEY_BOARD_BOTTOM_WEIGHT} of the total weight if the fingerprint is available. Else it touches to the bottom of the main view.
+     * |                        | | => Section for fingerprint. If the fingerprint is enabled. Otherwise keyboard streaches to the bottom of the root view.
+     * |------------------------|=|
+     * Don't change until you know what you are doing. :-)
+     *
+     * @param rootViewBounds
+     */
     @Override
     void measure(@NonNull Rect rootViewBounds) {
 
-        int indicatorWidth = 2 * (int) (getContext().getResources().getDimension(R.dimen.indicator_radius)
-                + getContext().getResources().getDimension(R.dimen.indicator_padding));
+        int indicatorWidth = 2 * (int) (getContext().getResources().getDimension(R.dimen.indicator_radius) + getContext().getResources().getDimension(R.dimen.indicator_padding));
         int totalSpace = indicatorWidth * mPintCodeLength;
 
         //Dots indicator
