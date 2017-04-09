@@ -32,5 +32,10 @@
             <enum name="circle" value="0"/>
             <enum name="square" value="1"/>
         </attr>
+
+        <attr name="fingerprintEnable" format="boolean" />
+        <attr name="fingerprintDefaultText" format="string" />
+        <attr name="fingerprintTextColor" format="color" />
+        <attr name="fingerprintTextSize" format="dimension" />
     </declare-styleable>
 </resources>

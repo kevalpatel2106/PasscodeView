@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
+import android.support.annotation.DimenRes;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -86,53 +88,77 @@ public class PinView extends View {
      * @param context instance of the caller.
      * @param attrs   Typed attributes or null.
      */
+    @SuppressWarnings("deprecation")
     private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
         mContext = context;
         mKeyPadBox = new KeyPadBox(this);
-        mFingerPrintBox = new FingerPrintBox(context);
+        mFingerPrintBox = new FingerPrintBox(this);
 
         if (attrs != null) {
             parseTypeArr(attrs);
         } else {
             mTitle = Constants.DEF_TITLE_TEXT;
-            mTitleColor = Constants.DEF_TITLE_TEXT_COLOR;
+            mTitleColor = getResources().getColor(R.color.key_default_color);
 
-            mDividerColor = Constants.DEF_DIVIDER_COLOR;
+            mDividerColor = getResources().getColor(R.color.divider_color);
 
-            mIndicatorFilledColor = Constants.DEF_INDICATOR_FILLED_COLOR;
-            mIndicatorStrokeColor = Constants.DEF_INDICATOR_STROKE_COLOR;
+            mIndicatorFilledColor = getResources().getColor(R.color.indicator_filled_color);
+            mIndicatorStrokeColor = getResources().getColor(R.color.indicator_stroke_color);
 
             mKeyPadBox.setDefaults();
+            mFingerPrintBox.setDefaults();
         }
 
         mKeyPadBox.prepareKeyTextPaint();
         mKeyPadBox.prepareKeyBgPaint();
+        mFingerPrintBox.prepareStatusTextPaint();
         prepareDividerPaint();
         prepareIndicatorPaint();
     }
 
+    @SuppressWarnings("deprecation")
     private void parseTypeArr(@Nullable AttributeSet attrs) {
         TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.PinView, 0, 0);
         try {
             //Parse title params
-            mTitle = a.hasValue(R.styleable.PinView_titleText) ? a.getString(R.styleable.PinView_titleText) : Constants.DEF_TITLE_TEXT;
-            mTitleColor = a.getColor(R.styleable.PinView_titleTextColor, Constants.DEF_TITLE_TEXT_COLOR);
+            mTitle = a.hasValue(R.styleable.PinView_titleText) ?
+                    a.getString(R.styleable.PinView_titleText) : Constants.DEF_TITLE_TEXT;
+            mTitleColor = a.getColor(R.styleable.PinView_titleTextColor,
+                    mContext.getResources().getColor(R.color.key_default_color));
 
             //Parse divider params
-            mDividerColor = a.getColor(R.styleable.PinView_dividerColor, Constants.DEF_DIVIDER_COLOR);
+            mDividerColor = a.getColor(R.styleable.PinView_dividerColor,
+                    mContext.getResources().getColor(R.color.divider_color));
 
             //Parse indicator params
-            mIndicatorFilledColor = a.getColor(R.styleable.PinView_indicatorSolidColor, Constants.DEF_INDICATOR_FILLED_COLOR);
-            mIndicatorStrokeColor = a.getColor(R.styleable.PinView_indicatorStrokeColor, Constants.DEF_INDICATOR_STROKE_COLOR);
+            mIndicatorFilledColor = a.getColor(R.styleable.PinView_indicatorSolidColor,
+                    getResources().getColor(R.color.indicator_filled_color));
+            mIndicatorStrokeColor = a.getColor(R.styleable.PinView_indicatorStrokeColor,
+                    getResources().getColor(R.color.indicator_stroke_color));
 
             //Set the key box params
-            mKeyPadBox.setKeyTextColor(a.getColor(R.styleable.PinView_keyTextColor, Constants.DEF_KEY_TEXT_COLOR));
-            mKeyPadBox.setKeyBackgroundColor(a.getColor(R.styleable.PinView_keyStrokeColor, Constants.DEF_KEY_BACKGROUND_COLOR));
-            mKeyPadBox.setKeyTextSize(a.getDimensionPixelSize(R.styleable.PinView_keyTextSize, (int) mContext.getResources().getDimension(R.dimen.key_text_size)));
-            mKeyPadBox.setPinCodeLength(a.getInteger(R.styleable.PinView_pinLength, Constants.DEF_PIN_LENGTH));
-            mKeyPadBox.setKeyStrokeWidth(a.getDimension(R.styleable.PinView_keyStrokeWidth, mContext.getResources().getDimension(R.dimen.key_stroke_width)));
+            mKeyPadBox.setKeyTextColor(a.getColor(R.styleable.PinView_keyTextColor,
+                    mContext.getResources().getColor(R.color.key_default_color)));
+            mKeyPadBox.setKeyBackgroundColor(a.getColor(R.styleable.PinView_keyStrokeColor,
+                    mContext.getResources().getColor(R.color.key_background_color)));
+            mKeyPadBox.setKeyTextSize(a.getDimensionPixelSize(R.styleable.PinView_keyTextSize,
+                    (int) mContext.getResources().getDimension(R.dimen.key_text_size)));
+            mKeyPadBox.setPinCodeLength(a.getInteger(R.styleable.PinView_pinLength,
+                    Constants.DEF_PIN_LENGTH));
+            mKeyPadBox.setKeyStrokeWidth(a.getDimension(R.styleable.PinView_keyStrokeWidth,
+                    mContext.getResources().getDimension(R.dimen.key_stroke_width)));
             //noinspection WrongConstant
             mKeyPadBox.setKeyShape(a.getInt(R.styleable.PinView_keyShape, KeyPadBox.KEY_TYPE_CIRCLE));
+
+            //Fet fingerprint params
+            //noinspection ConstantConditions
+            mFingerPrintBox.setStatusText(a.hasValue(R.styleable.PinView_titleText) ?
+                    a.getString(R.styleable.PinView_fingerprintDefaultText) : FingerPrintBox.DEF_FINGERPRINT_STATUS);
+            mFingerPrintBox.setStatusTextColor(a.getColor(R.styleable.PinView_fingerprintTextColor,
+                    mContext.getResources().getColor(R.color.key_default_color)));
+            mFingerPrintBox.setStatusTextSize(a.getDimension(R.styleable.PinView_fingerprintTextSize,
+                    (int) mContext.getResources().getDimension(R.dimen.fingerprint_status_text_size)));
+            mFingerPrintBox.isFingerPrintEnable(a.getBoolean(R.styleable.PinView_fingerprintEnable, true));
         } finally {
             a.recycle();
         }
@@ -275,9 +301,6 @@ public class PinView extends View {
         return true;
     }
 
-    ///////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////
-
     /**
      * Handle the newly added key digit. Append the digit to {@link #mPinTyped}.
      * If the new digit is {@link Constants#BACKSPACE_TITLE}, remove the last digit of the {@link #mPinTyped}.
@@ -330,6 +353,16 @@ public class PinView extends View {
         mPinTyped = "";
         invalidate();
     }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mFingerPrintBox.disableFingerPrint();
+    }
+
+    ///////////////////////////////////////////////////////////////
+    //                  GETTERS/SETTERS
+    ///////////////////////////////////////////////////////////////
 
     public float getKeyPadding() {
         return mKeyPadBox.getKeyPadding();
@@ -451,5 +484,38 @@ public class PinView extends View {
     public void setTitle(@NonNull String title) {
         mTitle = title;
         invalidate();
+    }
+
+    @NonNull
+    String getFingerPrintStatusText() {
+        return mFingerPrintBox.getStatusText();
+    }
+
+    void setFingerPrintStatusText(@NonNull String statusText) {
+        mFingerPrintBox.setStatusText(statusText);
+    }
+
+    int getFingerPrintStatusTextColor() {
+        return mFingerPrintBox.getStatusTextColor();
+    }
+
+    void setFingerPrintStatusTextColor(@ColorInt int statusTextColor) {
+        mFingerPrintBox.setStatusTextColor(statusTextColor);
+    }
+
+    void setFingerPrintStatusTextColorRes(@ColorRes int statusTextColor) {
+        mFingerPrintBox.setStatusTextColor(mContext.getResources().getColor(statusTextColor));
+    }
+
+    float getFingerPrintStatusTextSize() {
+        return mFingerPrintBox.getStatusTextSize();
+    }
+
+    void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+        mFingerPrintBox.setStatusTextSize(getResources().getDimension(statusTextSize));
+    }
+
+    void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mFingerPrintBox.setStatusTextSize(statusTextSize);
     }
 }

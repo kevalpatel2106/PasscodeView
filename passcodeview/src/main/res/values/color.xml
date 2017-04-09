@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><!--Created by Keval Patel. Author: 'https://github.com/kevalpatel2106' -->
+<resources>
+    <color name="key_default_color">#0000FF</color>
+    <color name="key_background_color">#FFFFFF</color>
+
+    <color name="divider_color">#0000FF</color>
+
+
+    <color name="indicator_stroke_color">#0000FF</color>
+    <color name="indicator_filled_color">#FF0000</color>
+</resources>

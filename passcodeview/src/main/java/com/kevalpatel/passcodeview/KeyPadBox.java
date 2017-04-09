@@ -22,17 +22,16 @@ import java.util.ArrayList;
  */
 
 class KeyPadBox {
-    static final int NO_OF_COLUMNS = 3;
-    static final int NO_OF_ROWS = 4;
     static final int KEY_TYPE_CIRCLE = 0;
     static final int KEY_TYPE_RECT = 1;
-
-    private static final float KEY_BOARD_TOP_WEIGHT = 0.14F;
-    static final float KEY_BOARD_BOTTOM_WEIGHT = 0.18F;
+    static final float KEY_BOARD_BOTTOM_WEIGHT = 0.14F;
+    private static final int NO_OF_COLUMNS = 3;
+    private static final int NO_OF_ROWS = 4;
     private static final String[] KEY_VALUES = new String[]{"1", "4", "7", "", "2", "5", "8", "0", "3", "6", "9", "-1"};
-
+    private final float KEY_BOARD_TOP_WEIGHT;
+    private final Context mContext;
+    private final PinView mPinView;
     private ArrayList<Key> mKeys;
-
     //Theme params
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
     private int mPinCodeLength;                     //PIN code length
@@ -47,10 +46,6 @@ class KeyPadBox {
     @ColorInt
     private int mKeyTextColor;                      //KeyCircle text color
     private int mKeyShape = KEY_TYPE_CIRCLE;
-
-    private final Context mContext;
-    private final PinView mPinView;
-
     //Paint
     private Paint mKeyPaint;
     private TextPaint mKeyTextPaint;
@@ -68,6 +63,7 @@ class KeyPadBox {
         mContext = pinView.getContext();
         mKeyPadding = mContext.getResources().getDimension(R.dimen.key_padding);
         isFingerPrintEnable = FingerPrintUtils.isFingerPrintEnrolled(mContext);
+        KEY_BOARD_TOP_WEIGHT = isFingerPrintEnable ? 0.3F : 0.14F;
     }
 
     void measureKeyboard(@NonNull Rect rootViewBound) {
@@ -75,7 +71,7 @@ class KeyPadBox {
         mKeyBoxBound.right = rootViewBound.width();
         mKeyBoxBound.top = (int) (rootViewBound.top + (rootViewBound.height() * KEY_BOARD_TOP_WEIGHT));
         mKeyBoxBound.bottom = (int) (rootViewBound.height() -
-                (FingerPrintUtils.isFingerPrintEnrolled(mContext) ? rootViewBound.height() * KEY_BOARD_BOTTOM_WEIGHT : 0));
+                rootViewBound.height() * (isFingerPrintEnable ? KEY_BOARD_BOTTOM_WEIGHT : 0));
 
         float singleKeyHeight = mKeyBoxBound.height() / NO_OF_ROWS;
         float singleKeyWidth = mKeyBoxBound.width() / NO_OF_COLUMNS;
@@ -105,8 +101,8 @@ class KeyPadBox {
     }
 
     void setDefaults() {
-        mKeyTextColor = Constants.DEF_KEY_TEXT_COLOR;
-        mKeyStrokeColor = Constants.DEF_KEY_BACKGROUND_COLOR;
+        mKeyTextColor = mContext.getResources().getColor(R.color.key_default_color);
+        mKeyStrokeColor = mContext.getResources().getColor(R.color.key_background_color);
         mKeyTextSize = mContext.getResources().getDimension(R.dimen.key_text_size);
         mPinCodeLength = Constants.DEF_PIN_LENGTH;
         mKeyStrokeWidth = mContext.getResources().getDimension(R.dimen.key_stroke_width);
@@ -135,7 +131,7 @@ class KeyPadBox {
         }
     }
 
-    void onAuthenticationError(){
+    void onAuthenticationError() {
         //Vibrate all the keys.
         for (Key key : mKeys) key.playError();
     }
@@ -149,7 +145,7 @@ class KeyPadBox {
      * @param upEventY   ACTION_UP event Y coordinate
      */
     @Nullable
-     String findKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY) {
+    String findKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY) {
         //figure out down key.
         for (Key key : mKeys) {
 

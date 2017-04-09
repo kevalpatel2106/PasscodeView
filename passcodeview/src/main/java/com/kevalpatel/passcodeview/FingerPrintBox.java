@@ -1,13 +1,20 @@
 package com.kevalpatel.passcodeview;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.hardware.fingerprint.FingerprintManager;
 import android.support.annotation.ColorInt;
+import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextPaint;
+import android.view.View;
+import android.view.animation.CycleInterpolator;
 
 /**
  * Created by Keval on 07-Apr-17.
@@ -16,47 +23,74 @@ import android.text.TextPaint;
  */
 
 class FingerPrintBox implements FingerPrintAuthHelper.FingerPrintAuthCallback {
-    private static final String DEF_FINGERPRINT_STATUS = "Scan your finger to authenticate";
+    static final String DEF_FINGERPRINT_STATUS = "Scan your finger to authenticate";
 
+    private View mView;
     private Context mContext;
     private Boolean isFingerPrintBoxVisible;
     private Rect mBounds = new Rect();
 
-    private TextPaint mStatusTextPaint;
     @ColorInt
     private int mStatusTextColor;
-    @NonNull
-    private String mStatusText = DEF_FINGERPRINT_STATUS;
+    @Dimension
+    private float mStatusTextSize;
+    private String mNormalStatusText;
 
+    private String mCurrentStatusText;
 
-    public FingerPrintBox(@NonNull Context context) {
-        mContext = context;
-        FingerPrintAuthHelper.getHelper(mContext, this);
+    private TextPaint mStatusTextPaint;
+
+    @Nullable
+    private FingerPrintAuthHelper mFingerPrintAuthHelper;
+
+    FingerPrintBox(@NonNull View view) {
+        mView = view;
+        mContext = view.getContext();
         isFingerPrintBoxVisible = FingerPrintUtils.isFingerPrintEnrolled(mContext);
 
-        prepareStatusTextPaint();
+        enableFingerPrint();
     }
 
-    private void prepareStatusTextPaint() {
+    private void enableFingerPrint() {
+        if (!isFingerPrintBoxVisible) return;
+
+        mFingerPrintAuthHelper = FingerPrintAuthHelper.getHelper(mContext, this);
+        mFingerPrintAuthHelper.startAuth();
+    }
+
+    void disableFingerPrint() {
+        if (mFingerPrintAuthHelper != null) mFingerPrintAuthHelper.stopAuth();
+    }
+
+    @SuppressWarnings("deprecation")
+    void setDefaults() {
+        mStatusTextSize = mContext.getResources().getDimension(R.dimen.fingerprint_status_text_size);
+        mNormalStatusText = DEF_FINGERPRINT_STATUS;
+        mCurrentStatusText = mNormalStatusText;
+        mStatusTextColor = mContext.getResources().getColor(R.color.key_default_color);
+    }
+
+    void prepareStatusTextPaint() {
         mStatusTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         mStatusTextPaint.setTextAlign(Paint.Align.CENTER);
+        mStatusTextPaint.setTextSize(mStatusTextSize);
         mStatusTextPaint.setColor(mStatusTextColor);
     }
 
-    void measureFingerPrintBox(Rect rootViewBound) {
+    void measureFingerPrintBox(@NonNull Rect rootViewBound) {
         if (isFingerPrintBoxVisible) {
             mBounds.left = rootViewBound.left;
             mBounds.right = rootViewBound.right;
-            mBounds.top = (int) (rootViewBound.top + rootViewBound.height() * (1 - KeyPadBox.KEY_BOARD_BOTTOM_WEIGHT));
-            mBounds.top = rootViewBound.bottom;
+            mBounds.top = (int) (rootViewBound.bottom - rootViewBound.height() * (KeyPadBox.KEY_BOARD_BOTTOM_WEIGHT));
+            mBounds.bottom = rootViewBound.bottom;
         }
     }
 
-    void drawFingerPrintBox(Canvas canvas) {
+    void drawFingerPrintBox(@NonNull Canvas canvas) {
         if (isFingerPrintBoxVisible) {
-            canvas.drawText(mStatusText,
+            canvas.drawText(mCurrentStatusText,
                     mBounds.exactCenterX(),
-                    mBounds.exactCenterY()- (mStatusTextPaint.descent() + mStatusTextPaint.ascent()) / 2,
+                    mBounds.exactCenterY() - (mStatusTextPaint.descent() + mStatusTextPaint.ascent()) / 2,
                     mStatusTextPaint);
         }
     }
@@ -64,17 +98,17 @@ class FingerPrintBox implements FingerPrintAuthHelper.FingerPrintAuthCallback {
 
     @Override
     public void onNoFingerPrintHardwareFound() {
-
+        //Do nothing.
     }
 
     @Override
     public void onNoFingerPrintRegistered() {
-
+        //Do nothing.
     }
 
     @Override
     public void onBelowMarshmallow() {
-
+        //Do nothing.
     }
 
     @Override
@@ -84,22 +118,91 @@ class FingerPrintBox implements FingerPrintAuthHelper.FingerPrintAuthCallback {
 
     @Override
     public void onAuthFailed(int errorCode, String errorMessage) {
-
+        switch (errorCode) {
+            case FingerPrintAuthHelper.CANNOT_RECOGNIZE_ERROR:
+            case FingerPrintAuthHelper.NON_RECOVERABLE_ERROR:
+            case FingerPrintAuthHelper.RECOVERABLE_ERROR:
+                mCurrentStatusText = errorMessage;
+                playErrorAnimation();
+                break;
+        }
     }
 
-    public String getmStatusText() {
-        return mStatusText;
+    private void playErrorAnimation() {
+        ValueAnimator goLeftAnimator = ValueAnimator.ofInt(0, 10);
+        goLeftAnimator.setDuration(500);
+        goLeftAnimator.setInterpolator(new CycleInterpolator(2));
+        goLeftAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mBounds.left += (int) animation.getAnimatedValue();
+                mBounds.right += (int) animation.getAnimatedValue();
+                mView.invalidate();
+            }
+        });
+        goLeftAnimator.start();
+
+        goLeftAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                mStatusTextPaint.setColor(Color.RED);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                new android.os.Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCurrentStatusText = mNormalStatusText;
+                        mStatusTextPaint.setColor(mStatusTextColor);
+                        mView.invalidate();
+                    }
+                }, 1000);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
     }
 
-    public void setmStatusText(String mStatusText) {
-        this.mStatusText = mStatusText;
+    @NonNull
+    String getStatusText() {
+        return mNormalStatusText;
     }
 
-    public int getmStatusTextColor() {
+    void setStatusText(@NonNull String statusText) {
+        this.mNormalStatusText = statusText;
+        mCurrentStatusText = mNormalStatusText;
+    }
+
+    int getStatusTextColor() {
         return mStatusTextColor;
     }
 
-    public void setmStatusTextColor(int mStatusTextColor) {
-        this.mStatusTextColor = mStatusTextColor;
+    void setStatusTextColor(@ColorInt int statusTextColor) {
+        this.mStatusTextColor = statusTextColor;
+    }
+
+    float getStatusTextSize() {
+        return mStatusTextSize;
+    }
+
+    void setStatusTextSize(float statusTextSize) {
+        this.mStatusTextSize = statusTextSize;
+    }
+
+    Boolean isFingerPrintEnable() {
+        return isFingerPrintBoxVisible;
+    }
+
+    void isFingerPrintEnable(boolean isEnable) {
+        this.isFingerPrintBoxVisible = isEnable && FingerPrintUtils.isFingerPrintEnrolled(mContext);
     }
 }
