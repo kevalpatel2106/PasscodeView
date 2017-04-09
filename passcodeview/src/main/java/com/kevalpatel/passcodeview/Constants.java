@@ -8,9 +8,6 @@ package com.kevalpatel.passcodeview;
 
 class Constants {
     static final String BACKSPACE_TITLE = "-1";
-
-
     static final int DEF_PIN_LENGTH = 4;
-
     static final String DEF_TITLE_TEXT = "Enter PIN";
 }

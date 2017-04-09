@@ -2,7 +2,6 @@ package com.kevalpatel.passcodeview;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -28,8 +27,6 @@ import android.view.animation.CycleInterpolator;
 class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAuthCallback {
     static final String DEF_FINGERPRINT_STATUS = "Scan your finger to authenticate";
 
-    private View mView;
-    private Context mContext;
     private Boolean isFingerPrintBoxVisible;
     private Rect mBounds = new Rect();
 
@@ -47,9 +44,8 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
     private FingerPrintAuthHelper mFingerPrintAuthHelper;
 
     BoxFingerprint(@NonNull View view) {
-        mView = view;
-        mContext = view.getContext();
-        isFingerPrintBoxVisible = FingerPrintUtils.isFingerPrintEnrolled(mContext);
+        super(view);
+        isFingerPrintBoxVisible = FingerPrintUtils.isFingerPrintEnrolled(getContext());
 
         enableFingerprintScanner();
     }
@@ -57,7 +53,7 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
     private void enableFingerprintScanner() {
         if (!isFingerPrintBoxVisible) return;
 
-        mFingerPrintAuthHelper = FingerPrintAuthHelper.getHelper(mContext, this);
+        mFingerPrintAuthHelper = FingerPrintAuthHelper.getHelper(getContext(), this);
         mFingerPrintAuthHelper.startAuth();
     }
 
@@ -67,10 +63,10 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
 
     @SuppressWarnings("deprecation")
     void setDefaults() {
-        mStatusTextSize = mContext.getResources().getDimension(R.dimen.fingerprint_status_text_size);
+        mStatusTextSize = getContext().getResources().getDimension(R.dimen.fingerprint_status_text_size);
         mNormalStatusText = DEF_FINGERPRINT_STATUS;
         mCurrentStatusText = mNormalStatusText;
-        mStatusTextColor = mContext.getResources().getColor(R.color.key_default_color);
+        mStatusTextColor = getContext().getResources().getColor(R.color.key_default_color);
     }
 
     @Override
@@ -87,14 +83,14 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
     @Override
     void draw(@NonNull Canvas canvas) {
         if (isFingerPrintBoxVisible) {
-            canvas.drawLine(mBounds.left + mContext.getResources().getDimension(R.dimen.divider_horizontal_margin),
+            canvas.drawLine(mBounds.left + getContext().getResources().getDimension(R.dimen.divider_horizontal_margin),
                     mBounds.top,
-                    mBounds.right - mContext.getResources().getDimension(R.dimen.divider_horizontal_margin),
+                    mBounds.right - getContext().getResources().getDimension(R.dimen.divider_horizontal_margin),
                     mBounds.top,
                     mStatusTextPaint);
 
             //Show fingerprint icon
-            Drawable d = mView.getContext().getResources().getDrawable(R.drawable.ic_fingerprint);
+            Drawable d = getContext().getResources().getDrawable(R.drawable.ic_fingerprint);
             d.setBounds((int) (mBounds.exactCenterX() - mBounds.height() / 4),
                     mBounds.top + 15,
                     (int) (mBounds.exactCenterX() + mBounds.height() / 4),
@@ -129,6 +125,11 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
     }
 
     @Override
+    void onValueEntered(@NonNull String valueDigits) {
+        //Do nothing
+    }
+
+    @Override
     public void onFingerprintAuthSuccess(FingerprintManager.CryptoObject cryptoObject) {
         onAuthenticationSuccess();
     }
@@ -155,7 +156,7 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
             public void onAnimationUpdate(ValueAnimator animation) {
                 mBounds.left += (int) animation.getAnimatedValue();
                 mBounds.right += (int) animation.getAnimatedValue();
-                mView.invalidate();
+                getRootView().invalidate();
             }
         });
         goLeftAnimator.start();
@@ -172,7 +173,7 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
                     public void run() {
                         mCurrentStatusText = mNormalStatusText;
                         mStatusTextPaint.setColor(mStatusTextColor);
-                        mView.invalidate();
+                        getRootView().invalidate();
                     }
                 }, 1000);
             }
@@ -222,6 +223,6 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
     }
 
     void setFingerPrintEnable(boolean isEnable) {
-        this.isFingerPrintBoxVisible = isEnable && FingerPrintUtils.isFingerPrintEnrolled(mContext);
+        this.isFingerPrintBoxVisible = isEnable && FingerPrintUtils.isFingerPrintEnrolled(getContext());
     }
 }

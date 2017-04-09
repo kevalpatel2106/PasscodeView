@@ -12,10 +12,9 @@ import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
-
-import java.util.ArrayList;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -25,16 +24,14 @@ import java.util.ArrayList;
 
 public class PinView extends View {
     private Context mContext;
-    private float mDownKeyX;                        //X coordinate of the ACTION_DOWN point
-    private float mDownKeyY;                        //Y coordinate of the ACTION_DOWN point
+    private float mDownKeyX;                                    //X coordinate of the ACTION_DOWN point
+    private float mDownKeyY;                                    //Y coordinate of the ACTION_DOWN point
+    private int mPinCodeLength;                                 //PIN code length
 
-    private AuthenticationListener mAuthenticationListener;   //Callback listener for application to get notify when authentication successful.
-    private String mPinToCheck;                     //Current PIN with witch entered PIN will check.
+    private AuthenticationListener mAuthenticationListener;     //Callback listener for application to get notify when authentication successful.
+    private String mPinToCheck;                                 //Current PIN with witch entered PIN will check.
     @NonNull
-    private String mPinTyped = "";                  //PIN typed.
-
-    //Collections
-    private ArrayList<Indicator> mDotsIndicator;    //List of al the keys
+    private String mPinTyped = "";                              //PIN typed.
 
     //Rectangle bounds
     private Rect mRootViewBound = new Rect();
@@ -42,22 +39,14 @@ public class PinView extends View {
 
     //Theme attributes
     @ColorInt
-    private int mIndicatorStrokeColor;              //Empty indicator stroke color
-    @ColorInt
-    private int mIndicatorFilledColor;              //Filled indicator stroke color
-    @ColorInt
     private int mDividerColor;                      //Horizontal divider color
-    @ColorInt
-    private int mTitleColor;                        //Title text color
-    private String mTitle;                          //Title color
 
     //Paints
     private Paint mDividerPaint;                    //Horizontal divider paint color
-    private Paint mEmptyIndicatorPaint;             //Empty indicator color
-    private Paint mSolidIndicatorPaint;             //Solid indicator color
 
     private BoxKeypad mBoxKeypad;
     private BoxFingerprint mBoxFingerprint;
+    private BoxIndicator mBoxIndicator;
 
     ///////////////////////////////////////////////////////////////
     //                  CONSTRUCTORS
@@ -93,47 +82,48 @@ public class PinView extends View {
         mContext = context;
         mBoxKeypad = new BoxKeypad(this);
         mBoxFingerprint = new BoxFingerprint(this);
+        mBoxIndicator = new BoxIndicator(this);
 
         if (attrs != null) {
             parseTypeArr(attrs);
         } else {
-            mTitle = Constants.DEF_TITLE_TEXT;
-            mTitleColor = getResources().getColor(R.color.key_default_color);
+            mPinCodeLength = Constants.DEF_PIN_LENGTH;
 
             mDividerColor = getResources().getColor(R.color.divider_color);
 
-            mIndicatorFilledColor = getResources().getColor(R.color.indicator_filled_color);
-            mIndicatorStrokeColor = getResources().getColor(R.color.indicator_stroke_color);
-
+            mBoxIndicator.setDefaults();
             mBoxKeypad.setDefaults();
             mBoxFingerprint.setDefaults();
         }
 
+        prepareDividerPaint();
         mBoxKeypad.preparePaint();
         mBoxFingerprint.preparePaint();
-        prepareDividerPaint();
-        prepareIndicatorPaint();
+        mBoxIndicator.preparePaint();
     }
 
     @SuppressWarnings("deprecation")
     private void parseTypeArr(@Nullable AttributeSet attrs) {
         TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.PinView, 0, 0);
         try {
+            mPinCodeLength = (a.getInteger(R.styleable.PinView_pinLength,
+                    Constants.DEF_PIN_LENGTH));
+
             //Parse title params
-            mTitle = a.hasValue(R.styleable.PinView_titleText) ?
-                    a.getString(R.styleable.PinView_titleText) : Constants.DEF_TITLE_TEXT;
-            mTitleColor = a.getColor(R.styleable.PinView_titleTextColor,
-                    mContext.getResources().getColor(R.color.key_default_color));
+            mBoxIndicator.setTitle(a.hasValue(R.styleable.PinView_titleText) ?
+                    a.getString(R.styleable.PinView_titleText) : Constants.DEF_TITLE_TEXT);
+            mBoxIndicator.setTitleColor(a.getColor(R.styleable.PinView_titleTextColor,
+                    mContext.getResources().getColor(R.color.key_default_color)));
 
             //Parse divider params
             mDividerColor = a.getColor(R.styleable.PinView_dividerColor,
                     mContext.getResources().getColor(R.color.divider_color));
 
             //Parse indicator params
-            mIndicatorFilledColor = a.getColor(R.styleable.PinView_indicatorSolidColor,
-                    getResources().getColor(R.color.indicator_filled_color));
-            mIndicatorStrokeColor = a.getColor(R.styleable.PinView_indicatorStrokeColor,
-                    getResources().getColor(R.color.indicator_stroke_color));
+            mBoxIndicator.setIndicatorFilledColor(a.getColor(R.styleable.PinView_indicatorSolidColor,
+                    getResources().getColor(R.color.indicator_filled_color)));
+            mBoxIndicator.setIndicatorStrokeColor(a.getColor(R.styleable.PinView_indicatorStrokeColor,
+                    getResources().getColor(R.color.indicator_stroke_color)));
 
             //Set the key box params
             mBoxKeypad.setKeyTextColor(a.getColor(R.styleable.PinView_keyTextColor,
@@ -142,8 +132,6 @@ public class PinView extends View {
                     mContext.getResources().getColor(R.color.key_background_color)));
             mBoxKeypad.setKeyTextSize(a.getDimensionPixelSize(R.styleable.PinView_keyTextSize,
                     (int) mContext.getResources().getDimension(R.dimen.key_text_size)));
-            mBoxKeypad.setPinCodeLength(a.getInteger(R.styleable.PinView_pinLength,
-                    Constants.DEF_PIN_LENGTH));
             mBoxKeypad.setKeyStrokeWidth(a.getDimension(R.styleable.PinView_keyStrokeWidth,
                     mContext.getResources().getDimension(R.dimen.key_stroke_width)));
             //noinspection WrongConstant
@@ -164,18 +152,6 @@ public class PinView extends View {
         }
     }
 
-    private void prepareIndicatorPaint() {
-        //Set empty dot paint
-        mEmptyIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mEmptyIndicatorPaint.setStyle(Paint.Style.STROKE);
-        mEmptyIndicatorPaint.setColor(mIndicatorStrokeColor);
-        mEmptyIndicatorPaint.setStrokeWidth(mContext.getResources().getDimension(R.dimen.indicator_stroke_width));
-
-        //Set filled dot paint
-        mSolidIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mSolidIndicatorPaint.setColor(mIndicatorFilledColor);
-    }
-
     private void prepareDividerPaint() {
         mDividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mDividerPaint.setColor(mDividerColor);
@@ -191,15 +167,8 @@ public class PinView extends View {
         super.onDraw(canvas);
         mBoxKeypad.draw(canvas);
         drawDivider(canvas);
-        drawIndicatorDots(canvas);
+        mBoxIndicator.draw(canvas);
         mBoxFingerprint.draw(canvas);
-    }
-
-    private void drawIndicatorDots(Canvas canvas) {
-        for (int i = 0; i < mBoxKeypad.getPinCodeLength(); i++) {
-            mDotsIndicator.get(i).draw(mContext, canvas,
-                    i < mPinTyped.length() ? mSolidIndicatorPaint : mEmptyIndicatorPaint);
-        }
     }
 
     private void drawDivider(Canvas canvas) {
@@ -217,10 +186,10 @@ public class PinView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        measureMainView(widthMeasureSpec, heightMeasureSpec);
+        measureMainView();
         mBoxKeypad.measure(mRootViewBound);
         measureDivider();
-        measureIndicators();
+        mBoxIndicator.measure(mRootViewBound);
         mBoxFingerprint.measure(mRootViewBound);
 
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
@@ -230,41 +199,17 @@ public class PinView extends View {
     /**
      * Measure the root view and get bounds.
      */
-    private Rect measureMainView(int widthMeasureSpec, int heightMeasureSpec) {
-        int[] l = new int[2];
-        getLocationOnScreen(l);
+    private Rect measureMainView() {
+        getLocalVisibleRect(mRootViewBound);
 
-        mRootViewBound.left = l[0];
-        mRootViewBound.top = l[1];
-        mRootViewBound.right = mRootViewBound.left + MeasureSpec.getSize(widthMeasureSpec);
-        mRootViewBound.bottom = mRootViewBound.top + MeasureSpec.getSize(heightMeasureSpec);
+        //Get the height of the actionbar if we have any actionbar and add it to the top
+        TypedValue tv = new TypedValue();
+        if (mContext.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            mRootViewBound.top = mRootViewBound.top
+                    + TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+        }
 
         return mRootViewBound;
-    }
-
-    /**
-     * Measure the dots indicators.
-     */
-    private void measureIndicators() {
-        int indicatorWidth = 2 * (int) (mContext.getResources().getDimension(R.dimen.indicator_radius) + mContext.getResources().getDimension(R.dimen.indicator_padding));
-        int totalSpace = indicatorWidth * mBoxKeypad.getPinCodeLength();
-
-        Rect dotsIndicatorBound = new Rect();
-        dotsIndicatorBound.left = (mRootViewBound.width() - totalSpace) / 2;
-        dotsIndicatorBound.right = dotsIndicatorBound.left + totalSpace;
-        dotsIndicatorBound.bottom = (int) (mDividerBound.top - mContext.getResources().getDimension(R.dimen.divider_horizontal_margin));
-        dotsIndicatorBound.top = dotsIndicatorBound.bottom - indicatorWidth;
-
-        mDotsIndicator = new ArrayList<>(mBoxKeypad.getPinCodeLength());
-        for (int i = 0; i < mBoxKeypad.getPinCodeLength(); i++) {
-            Rect rect = new Rect();
-            rect.left = dotsIndicatorBound.left + i * indicatorWidth;
-            rect.right = rect.left + indicatorWidth;
-            rect.top = dotsIndicatorBound.top;
-            rect.bottom = dotsIndicatorBound.bottom;
-
-            mDotsIndicator.add(new Indicator(rect));
-        }
     }
 
     /**
@@ -304,7 +249,7 @@ public class PinView extends View {
     /**
      * Handle the newly added key digit. Append the digit to {@link #mPinTyped}.
      * If the new digit is {@link Constants#BACKSPACE_TITLE}, remove the last digit of the {@link #mPinTyped}.
-     * If the {@link #mPinTyped} has length of {@link BoxKeypad#mPinCodeLength} and equals to {@link #mPinToCheck}
+     * If the {@link #mPinTyped} has length of {@link #mPinCodeLength} and equals to {@link #mPinToCheck}
      * notify application as authenticated.
      *
      * @param newDigit newly pressed digit
@@ -315,7 +260,7 @@ public class PinView extends View {
         //Check for the state
         if (mAuthenticationListener == null) {
             throw new IllegalStateException("Set AuthenticationListener to receive callbacks.");
-        } else if (mPinToCheck.isEmpty() || mPinToCheck.length() != mBoxKeypad.getPinCodeLength()) {
+        } else if (mPinToCheck.isEmpty() || mPinToCheck.length() != mPinCodeLength) {
             throw new IllegalStateException("Please set current PIN to check with the entered value.");
         }
 
@@ -325,16 +270,21 @@ public class PinView extends View {
             mPinTyped = mPinTyped + newDigit;
         }
 
+        mBoxIndicator.onValueEntered(mPinTyped);
         invalidate();
 
-        if (mPinTyped.length() == mBoxKeypad.getPinCodeLength()) {
+        if (mPinTyped.length() == mPinCodeLength) {
 
             if (mPinToCheck.equals(mPinTyped)) {
                 mAuthenticationListener.onAuthenticationSuccessful();
                 mBoxKeypad.onAuthenticationSuccess();
+                mBoxIndicator.onAuthenticationSuccess();
+                mBoxFingerprint.onAuthenticationSuccess();
             } else {
                 mAuthenticationListener.onAuthenticationFailed();
+                mBoxFingerprint.onAuthenticationFail();
                 mBoxKeypad.onAuthenticationFail();
+                mBoxIndicator.onAuthenticationFail();
             }
 
             //Reset the view.
@@ -352,6 +302,7 @@ public class PinView extends View {
      */
     public void reset() {
         mPinTyped = "";
+        mBoxIndicator.onValueEntered(mPinTyped);
         invalidate();
     }
 
@@ -375,15 +326,6 @@ public class PinView extends View {
         invalidate();
     }
 
-    public int getPinCodeLength() {
-        return mBoxKeypad.getPinCodeLength();
-    }
-
-    public void setPinCodeLength(int pinCodeLength) {
-        mBoxKeypad.setPinCodeLength(pinCodeLength);
-        invalidate();
-    }
-
     public boolean isOneHandOperationEnabled() {
         return mBoxKeypad.isOneHandOperation();
     }
@@ -401,6 +343,9 @@ public class PinView extends View {
 
     public void setPinToCheck(@NonNull String pinToCheck) {
         mPinToCheck = pinToCheck;
+        mPinCodeLength = mPinToCheck.length();
+        mBoxIndicator.setPintCodeLength(mPinCodeLength);
+        invalidate();
     }
 
     @Nullable
@@ -431,22 +376,20 @@ public class PinView extends View {
     }
 
     public int getIndicatorStrokeColor() {
-        return mIndicatorStrokeColor;
+        return mBoxIndicator.getIndicatorStrokeColor();
     }
 
     public void setIndicatorStrokeColor(@ColorInt int indicatorStrokeColor) {
-        mIndicatorStrokeColor = indicatorStrokeColor;
-        prepareIndicatorPaint();
+        mBoxIndicator.setIndicatorStrokeColor(indicatorStrokeColor);
         invalidate();
     }
 
     public int getIndicatorFilledColor() {
-        return mIndicatorFilledColor;
+        return mBoxIndicator.getIndicatorFilledColor();
     }
 
     public void setIndicatorFilledColor(@ColorInt int indicatorFilledColor) {
-        mIndicatorFilledColor = indicatorFilledColor;
-        prepareIndicatorPaint();
+        mBoxIndicator.setIndicatorFilledColor(indicatorFilledColor);
         invalidate();
     }
 
@@ -461,12 +404,11 @@ public class PinView extends View {
     }
 
     public int getTitleColor() {
-        return mTitleColor;
+        return mBoxIndicator.getTitleColor();
     }
 
     public void setTitleColor(@ColorInt int titleColor) {
-        mTitleColor = titleColor;
-        //TODO set title paint
+        mBoxIndicator.setTitleColor(titleColor);
         invalidate();
     }
 
@@ -474,7 +416,7 @@ public class PinView extends View {
      * @return Current title of the view.
      */
     public String getTitle() {
-        return mTitle;
+        return mBoxIndicator.getTitle();
     }
 
     /**
@@ -483,7 +425,7 @@ public class PinView extends View {
      * @param title title string
      */
     public void setTitle(@NonNull String title) {
-        mTitle = title;
+        mBoxIndicator.setTitle(title);
         invalidate();
     }
 
@@ -515,13 +457,13 @@ public class PinView extends View {
         return mBoxFingerprint.getStatusTextSize();
     }
 
-    void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
+    void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(statusTextSize);
         invalidate();
     }
 
-    void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(statusTextSize);
+    void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
         invalidate();
     }
 
@@ -532,5 +474,6 @@ public class PinView extends View {
     void isFingerPrintEnable(boolean isEnable) {
         mBoxFingerprint.setFingerPrintEnable(isEnable);
         mBoxKeypad.setFingerPrintEnable(isEnable);
+        invalidate();
     }
 }

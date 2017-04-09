@@ -16,7 +16,7 @@ import android.support.annotation.RequiresPermission;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class FingerPrintUtils {
+public final class FingerPrintUtils {
 
     /**
      * Open the Security settings screen.

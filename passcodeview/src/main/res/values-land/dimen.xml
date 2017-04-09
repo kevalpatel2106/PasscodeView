@@ -7,5 +7,6 @@
     <dimen name="key_text_size">20sp</dimen>
     <dimen name="key_padding">5dp</dimen>
     <dimen name="divider_vertical_margin">6dp</dimen>
+    <dimen name="title_vertical_margin">2dp</dimen>
     <dimen name="divider_horizontal_margin">20dp</dimen>
 </resources>

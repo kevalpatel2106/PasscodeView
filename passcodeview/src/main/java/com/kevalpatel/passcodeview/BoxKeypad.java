@@ -1,6 +1,5 @@
 package com.kevalpatel.passcodeview;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -10,6 +9,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
+import android.util.Log;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -25,16 +25,13 @@ class BoxKeypad extends Box {
     static final int KEY_TYPE_CIRCLE = 0;
     static final int KEY_TYPE_RECT = 1;
     static final float KEY_BOARD_BOTTOM_WEIGHT = 0.14F;
+    static final float KEY_BOARD_TOP_WEIGHT = 0.2F;
     private static final int NO_OF_COLUMNS = 3;
     private static final int NO_OF_ROWS = 4;
     private static final String[] KEY_VALUES = new String[]{"1", "4", "7", "", "2", "5", "8", "0", "3", "6", "9", "-1"};
-    private final float KEY_BOARD_TOP_WEIGHT;
-    private final Context mContext;
-    private final PinView mPinView;
 
     //Theme params
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
-    private int mPinCodeLength;                     //PIN code length
     @Dimension
     private float mKeyPadding;                      //Surround padding to each single key
     @Dimension
@@ -62,11 +59,9 @@ class BoxKeypad extends Box {
      * @param pinView {@link PinView} in which box will be displayed.
      */
     BoxKeypad(@NonNull PinView pinView) {
-        mPinView = pinView;
-        mContext = pinView.getContext();
-        mKeyPadding = mContext.getResources().getDimension(R.dimen.key_padding);
-        isFingerPrintEnable = FingerPrintUtils.isFingerPrintEnrolled(mContext);
-        KEY_BOARD_TOP_WEIGHT = isFingerPrintEnable ? 0.3F : 0.14F;
+        super(pinView);
+        mKeyPadding = getContext().getResources().getDimension(R.dimen.key_padding);
+        isFingerPrintEnable = FingerPrintUtils.isFingerPrintEnrolled(getContext());
     }
 
     @Override
@@ -74,9 +69,10 @@ class BoxKeypad extends Box {
         mKeyBoxBound.left = mIsOneHandOperation ? (int) (rootViewBound.width() * 0.3) : 0;
         mKeyBoxBound.right = rootViewBound.width();
         mKeyBoxBound.top = (int) (rootViewBound.top + (rootViewBound.height() * KEY_BOARD_TOP_WEIGHT));
-        mKeyBoxBound.bottom = (int) (rootViewBound.height() -
+        mKeyBoxBound.bottom = (int) (rootViewBound.bottom -
                 rootViewBound.height() * (isFingerPrintEnable ? KEY_BOARD_BOTTOM_WEIGHT : 0));
 
+        Log.d("keybox", isFingerPrintEnable + " " + rootViewBound.toString());
         float singleKeyHeight = mKeyBoxBound.height() / NO_OF_ROWS;
         float singleKeyWidth = mKeyBoxBound.width() / NO_OF_COLUMNS;
 
@@ -92,10 +88,10 @@ class BoxKeypad extends Box {
 
                 switch (mKeyShape) {
                     case KEY_TYPE_CIRCLE:
-                        mKeys.add(new KeyCircle(mPinView, KEY_VALUES[mKeys.size()], keyBound, mKeyPadding));
+                        mKeys.add(new KeyCircle(getRootView(), KEY_VALUES[mKeys.size()], keyBound, mKeyPadding));
                         break;
                     case KEY_TYPE_RECT:
-                        mKeys.add(new KeyRect(mPinView, KEY_VALUES[mKeys.size()], keyBound, mKeyPadding));
+                        mKeys.add(new KeyRect(getRootView(), KEY_VALUES[mKeys.size()], keyBound, mKeyPadding));
                         break;
                     default:
                         throw new IllegalArgumentException("Invalid key shape.");
@@ -121,17 +117,21 @@ class BoxKeypad extends Box {
         mKeyTextPaint.setTextAlign(Paint.Align.CENTER);
     }
 
+    @Override
+    void onValueEntered(@NonNull String valueDigits) {
+        //Do nothing
+    }
+
     /**
      * Set the default theme parameters.
      */
     @SuppressWarnings("deprecation")
     @Override
     void setDefaults() {
-        mKeyTextColor = mContext.getResources().getColor(R.color.key_default_color);
-        mKeyStrokeColor = mContext.getResources().getColor(R.color.key_background_color);
-        mKeyTextSize = mContext.getResources().getDimension(R.dimen.key_text_size);
-        mPinCodeLength = Constants.DEF_PIN_LENGTH;
-        mKeyStrokeWidth = mContext.getResources().getDimension(R.dimen.key_stroke_width);
+        mKeyTextColor = getContext().getResources().getColor(R.color.key_default_color);
+        mKeyStrokeColor = getContext().getResources().getColor(R.color.key_background_color);
+        mKeyTextSize = getContext().getResources().getDimension(R.dimen.key_text_size);
+        mKeyStrokeWidth = getContext().getResources().getDimension(R.dimen.key_stroke_width);
     }
 
     @Override
@@ -206,14 +206,6 @@ class BoxKeypad extends Box {
         mKeyTextColor = keyTextColor;
     }
 
-    int getPinCodeLength() {
-        return mPinCodeLength;
-    }
-
-    void setPinCodeLength(int pinCodeLength) {
-        mPinCodeLength = pinCodeLength;
-    }
-
     float getKeyPadding() {
         return mKeyPadding;
     }
@@ -248,7 +240,7 @@ class BoxKeypad extends Box {
     }
 
     void setFingerPrintEnable(boolean fingerPrintEnable) {
-        isFingerPrintEnable = fingerPrintEnable && FingerPrintUtils.isFingerPrintEnrolled(mContext);
+        isFingerPrintEnable = fingerPrintEnable && FingerPrintUtils.isFingerPrintEnrolled(getContext());
     }
 
     @Retention(RetentionPolicy.SOURCE)

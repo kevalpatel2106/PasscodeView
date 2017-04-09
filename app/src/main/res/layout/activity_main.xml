@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
     tools:context="com.securelockview.sample.MainActivity">
 
     <com.kevalpatel.passcodeview.PinView
@@ -13,7 +12,7 @@
         android:layout_height="match_parent"
         app:dividerColor="#3F51B5"
         app:fingerprintDefaultText="Scan your finger to unlock application"
-        app:fingerprintEnable="true"
+        app:fingerprintEnable="false"
         app:fingerprintTextColor="@color/colorPrimaryDark"
         app:fingerprintTextSize="16sp"
         app:indicatorSolidColor="@android:color/holo_red_dark"

@@ -6,8 +6,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 
-import com.kevalpatel.passcodeview.R;
-
 /**
  * Created by Keval on 06-Apr-17.
  */
@@ -31,8 +29,8 @@ class Indicator {
     /**
      * Draw the indicator.
      *
-     * @param context instance of the caller.
-     * @param canvas  canvas of {@link pinView}.
+     * @param context Instance of the caller.
+     * @param canvas  Canvas of {@link PinView}.
      * @param paint   Paint of the indicator.
      */
     void draw(@NonNull Context context,
