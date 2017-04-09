@@ -223,7 +223,7 @@ class KeyPadBox {
         mKeyShape = keyShape;
     }
 
-    public void setFingerPrintEnable(boolean fingerPrintEnable) {
+    void setFingerPrintEnable(boolean fingerPrintEnable) {
         isFingerPrintEnable = fingerPrintEnable && FingerPrintUtils.isFingerPrintEnrolled(mContext);
     }
 

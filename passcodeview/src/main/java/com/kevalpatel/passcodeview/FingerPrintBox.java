@@ -217,11 +217,11 @@ class FingerPrintBox implements FingerPrintAuthHelper.FingerPrintAuthCallback {
         this.mStatusTextSize = statusTextSize;
     }
 
-    Boolean isFingerPrintEnable() {
+    Boolean setFingerPrintEnable() {
         return isFingerPrintBoxVisible;
     }
 
-    void isFingerPrintEnable(boolean isEnable) {
+    void setFingerPrintEnable(boolean isEnable) {
         this.isFingerPrintBoxVisible = isEnable && FingerPrintUtils.isFingerPrintEnrolled(mContext);
     }
 }

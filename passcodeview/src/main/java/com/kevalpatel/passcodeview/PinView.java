@@ -149,6 +149,7 @@ public class PinView extends View {
                     mContext.getResources().getDimension(R.dimen.key_stroke_width)));
             //noinspection WrongConstant
             mKeyPadBox.setKeyShape(a.getInt(R.styleable.PinView_keyShape, KeyPadBox.KEY_TYPE_CIRCLE));
+            mKeyPadBox.setFingerPrintEnable(a.getBoolean(R.styleable.PinView_fingerprintEnable, true));
 
             //Fet fingerprint params
             //noinspection ConstantConditions
@@ -158,7 +159,7 @@ public class PinView extends View {
                     mContext.getResources().getColor(R.color.key_default_color)));
             mFingerPrintBox.setStatusTextSize(a.getDimension(R.styleable.PinView_fingerprintTextSize,
                     (int) mContext.getResources().getDimension(R.dimen.fingerprint_status_text_size)));
-            mFingerPrintBox.isFingerPrintEnable(a.getBoolean(R.styleable.PinView_fingerprintEnable, true));
+            mFingerPrintBox.setFingerPrintEnable(a.getBoolean(R.styleable.PinView_fingerprintEnable, true));
         } finally {
             a.recycle();
         }
@@ -493,6 +494,7 @@ public class PinView extends View {
 
     void setFingerPrintStatusText(@NonNull String statusText) {
         mFingerPrintBox.setStatusText(statusText);
+        invalidate();
     }
 
     int getFingerPrintStatusTextColor() {
@@ -501,21 +503,34 @@ public class PinView extends View {
 
     void setFingerPrintStatusTextColor(@ColorInt int statusTextColor) {
         mFingerPrintBox.setStatusTextColor(statusTextColor);
+        invalidate();
     }
 
     void setFingerPrintStatusTextColorRes(@ColorRes int statusTextColor) {
         mFingerPrintBox.setStatusTextColor(mContext.getResources().getColor(statusTextColor));
+        invalidate();
     }
 
     float getFingerPrintStatusTextSize() {
         return mFingerPrintBox.getStatusTextSize();
     }
 
-    void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mFingerPrintBox.setStatusTextSize(getResources().getDimension(statusTextSize));
-    }
-
     void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
         mFingerPrintBox.setStatusTextSize(statusTextSize);
+        invalidate();
+    }
+
+    void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+        mFingerPrintBox.setStatusTextSize(getResources().getDimension(statusTextSize));
+        invalidate();
+    }
+
+    Boolean isFingerPrintEnable() {
+        return mFingerPrintBox.setFingerPrintEnable();
+    }
+
+    void isFingerPrintEnable(boolean isEnable) {
+        mFingerPrintBox.setFingerPrintEnable(isEnable);
+        mKeyPadBox.setFingerPrintEnable(isEnable);
     }
 }
