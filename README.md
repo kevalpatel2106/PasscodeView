@@ -1,11 +1,13 @@
 # PasscodeView
-###### PasscodeView is an Android Library to easily and securely authenticate user with PIN code or using the fingerprint scanner.
+#### PasscodeView is an Android Library to easily and securely authenticate user with PIN code or using the fingerprint scanner.
+
 
 ## Why❓
 - Secure authentication is the key factor in many application (e.g. financial applications). Many application uses PIN based authentication. 
 - But Android System doesn't provide any easy to set view for PIN based authentication which can tightly integrate and take advantage of fingerprint API introduced in newer versions of android. This limitation led me to work on this project.
 
 - With use of *PasscodeView* you can easily integrate PIN & Fingerprint based authentication in your application. 
+
 
 ## Features:
 This library provide easy and secure PIN authentication view, which
@@ -16,8 +18,10 @@ This library provide easy and secure PIN authentication view, which
   - color of the key and pin indicators.
   - size of the each single key.
   
+
 ## How to integrate?
 - Gradle dependency and guide to integrate this library coming soon. Meanwhile you can see sample project if you want.
+
 
 ## Demo: 
 *Here is the link of the demo application. 👉 [Demo](resource/sample.apk)*
@@ -25,6 +29,11 @@ This library provide easy and secure PIN authentication view, which
 
 ## How to contribute?
 * Check out contribution guidelines 👉[CONTRIBUTING.md](https://github.com/kevalpatel2106/PasscodeView/blob/master/CONTRIBUTING.md)
+
+
+## Questions:
+Hit me on twitter [![Twitter](https://img.shields.io/badge/Twitter-@kevalpatel2106-blue.svg?style=flat)](https://twitter.com/kevalpatel2106)
+
 
 ## License
 Copyright 2017 Keval Patel
