@@ -31,6 +31,11 @@ This library provide easy and secure PIN authentication view, which
 * Check out contribution guidelines 👉[CONTRIBUTING.md](https://github.com/kevalpatel2106/PasscodeView/blob/master/CONTRIBUTING.md)
 
 
+## What's next?
+- Create view for pattern based authentication.
+- Build more customisation parameters to provide granular control over the theme of the view. 
+
+
 ## Questions?🤔
 Hit me on twitter [![Twitter](https://img.shields.io/badge/Twitter-@kevalpatel2106-blue.svg?style=flat)](https://twitter.com/kevalpatel2106)
 
