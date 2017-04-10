@@ -27,6 +27,7 @@ This library provide easy and secure PIN authentication view, which
 <p align="center">
   <img src="https://github.com/kevalpatel2106/PasscodeView/blob/master/resource/image1.png?raw=true" alt="PasscodeView sample" width="400"/>
 </p>
+
 *Here is the link of the demo application. 👉 [Demo](resource/sample.apk)*
 
 
