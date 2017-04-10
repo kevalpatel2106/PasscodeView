@@ -9,7 +9,6 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
-import android.util.Log;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -99,7 +98,6 @@ class BoxKeypad extends Box {
         mKeyBoxBound.bottom = (int) (rootViewBound.bottom -
                 rootViewBound.height() * (isFingerPrintEnable ? KEY_BOARD_BOTTOM_WEIGHT : 0));
 
-        Log.d("keybox", isFingerPrintEnable + " " + rootViewBound.toString());
         float singleKeyHeight = mKeyBoxBound.height() / NO_OF_ROWS;
         float singleKeyWidth = mKeyBoxBound.width() / NO_OF_COLUMNS;
 
