@@ -42,5 +42,5 @@ public abstract class Box {
 
     abstract void preparePaint();
 
-    abstract void onValueEntered(@NonNull String valueDigits);
+    abstract void onValueEntered(@NonNull String newValue);
 }

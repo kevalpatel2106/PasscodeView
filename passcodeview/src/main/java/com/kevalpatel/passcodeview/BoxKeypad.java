@@ -68,7 +68,7 @@ class BoxKeypad extends Box {
      * Measure and display the keypad box.
      * |------------------------|=|
      * |                        | |
-     * |                        | | => The title and the indicator. ({@link BoxIndicator#measure(Rect)})
+     * |                        | | => The title and the indicator. ({@link BoxTitleIndicator#measure(Rect)})
      * |                        | |
      * |                        | |
      * |------------------------|=| => {@link #KEY_BOARD_TOP_WEIGHT} of the total height.
@@ -145,7 +145,7 @@ class BoxKeypad extends Box {
     }
 
     @Override
-    void onValueEntered(@NonNull String valueDigits) {
+    void onValueEntered(@NonNull String newValue) {
         //Do nothing
     }
 

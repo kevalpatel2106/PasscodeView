@@ -46,7 +46,7 @@ public class PinView extends View {
 
     private BoxKeypad mBoxKeypad;
     private BoxFingerprint mBoxFingerprint;
-    private BoxIndicator mBoxIndicator;
+    private BoxTitleIndicator mBoxIndicator;
 
     ///////////////////////////////////////////////////////////////
     //                  CONSTRUCTORS
@@ -82,7 +82,7 @@ public class PinView extends View {
         mContext = context;
         mBoxKeypad = new BoxKeypad(this);
         mBoxFingerprint = new BoxFingerprint(this);
-        mBoxIndicator = new BoxIndicator(this);
+        mBoxIndicator = new BoxTitleIndicator(this);
 
         if (attrs != null) {
             parseTypeArr(attrs);
@@ -458,13 +458,13 @@ public class PinView extends View {
         return mBoxFingerprint.getStatusTextSize();
     }
 
-    void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
+    void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(statusTextSize);
         invalidate();
     }
 
-    void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(statusTextSize);
+    void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
         invalidate();
     }
 

@@ -125,7 +125,7 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
     }
 
     @Override
-    void onValueEntered(@NonNull String valueDigits) {
+    void onValueEntered(@NonNull String newValue) {
         //Do nothing
     }
 

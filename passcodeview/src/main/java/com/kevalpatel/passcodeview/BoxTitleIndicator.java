@@ -11,11 +11,13 @@ import java.util.ArrayList;
 
 /**
  * Created by Keval Patel on 09/04/17.
+ * This {@link Box} is to display title and passcode indicator. The number of the passcode indicator
+ * will depend on the length of the passcode indicator.
  *
  * @author 'https://github.com/kevalpatel2106'
  */
 
-class BoxIndicator extends Box {
+class BoxTitleIndicator extends Box {
     private int mPintCodeLength;
 
     @ColorInt
@@ -29,13 +31,13 @@ class BoxIndicator extends Box {
     //Paints
     private Paint mEmptyIndicatorPaint;             //Empty indicator color
     private Paint mSolidIndicatorPaint;             //Solid indicator color
-    private Paint mTitlePaint;             //Solid indicator color
+    private Paint mTitlePaint;                      //Solid indicator color
 
-    private String mPinTyped = "";
+    private String mPinTyped = "";                  //Characters of the PIN typed. Whenever user types pin update it using onValueEntered().
     private ArrayList<Indicator> mDotsIndicator;
     private Rect mDotsIndicatorBound;
 
-    BoxIndicator(@NonNull View view) {
+    BoxTitleIndicator(@NonNull View view) {
         super(view);
     }
 
@@ -91,7 +93,7 @@ class BoxIndicator extends Box {
      * |------------------------|=|
      * Don't change until you know what you are doing. :-)
      *
-     * @param rootViewBounds
+     * @param rootViewBounds {@link Rect} bounds of the main view.
      */
     @Override
     void measure(@NonNull Rect rootViewBounds) {
@@ -140,8 +142,8 @@ class BoxIndicator extends Box {
     }
 
     @Override
-    void onValueEntered(@NonNull String valueDigits) {
-        mPinTyped = valueDigits;
+    void onValueEntered(@NonNull String newValue) {
+        mPinTyped = newValue;
     }
 
     @ColorInt
