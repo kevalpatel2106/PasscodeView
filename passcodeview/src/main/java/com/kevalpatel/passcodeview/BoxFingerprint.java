@@ -90,7 +90,7 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
 
     @Override
     void onAuthenticationFail() {
-        playErrorAnimation();
+        //Do nothing
     }
 
     @Override
@@ -103,12 +103,6 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
     @Override
     void draw(@NonNull Canvas canvas) {
         if (isFingerPrintBoxVisible) {
-//            canvas.drawLine(mBounds.left + getContext().getResources().getDimension(R.dimen.lib_divider_horizontal_margin),
-//                    mBounds.top,
-//                    mBounds.right - getContext().getResources().getDimension(R.dimen.lib_divider_horizontal_margin),
-//                    mBounds.top,
-//                    mStatusTextPaint);
-
             //Show fingerprint icon
             Drawable d = getContext().getResources().getDrawable(R.drawable.ic_fingerprint);
             d.setBounds((int) (mBounds.exactCenterX() - mBounds.height() / 4),
@@ -162,9 +156,10 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
             case FingerPrintAuthHelper.RECOVERABLE_ERROR:
                 mStatusTextPaint.setColor(Color.RED);
                 mCurrentStatusText = errorMessage;
-                onAuthenticationFail();
+                playErrorAnimation();
                 break;
         }
+
     }
 
     private void playErrorAnimation() {
