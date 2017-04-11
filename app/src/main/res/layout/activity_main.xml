@@ -22,7 +22,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    android:padding="@dimen/lib_divider_horizontal_margin"
+    android:paddingBottom="10dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="10dp"
     tools:context="com.securelockview.sample.MainActivity">
 
     <ImageView

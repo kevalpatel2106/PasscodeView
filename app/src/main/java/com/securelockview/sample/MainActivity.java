@@ -16,8 +16,8 @@
 
 package com.securelockview.sample;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.kevalpatel.passcodeview.AuthenticationListener;
@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         PinView pinView = (PinView) findViewById(R.id.pin_view);
         pinView.setPinToCheck("1234");
+        pinView.setKeyPadding(getResources().getDimension(R.dimen.key_padding));
         pinView.setAuthenticationListener(new AuthenticationListener() {
             @Override
             public void onAuthenticationSuccessful() {

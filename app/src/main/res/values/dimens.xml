@@ -22,4 +22,5 @@
     <dimen name="key_stroke_width">4dp</dimen>
     <dimen name="indicator_stroke_width">4dp</dimen>
     <dimen name="indicator_radius">15dp</dimen>
+    <dimen name="key_padding">8dp</dimen>
 </resources>
