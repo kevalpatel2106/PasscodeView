@@ -27,7 +27,7 @@ class BoxKeypad extends Box {
     static final float KEY_BOARD_TOP_WEIGHT = 0.2F;
     private static final int NO_OF_COLUMNS = 3;
     private static final int NO_OF_ROWS = 4;
-    private static final String[] KEY_VALUES = new String[]{"1", "4", "7", "", "2", "5", "8", "0", "3", "6", "9", "-1"};
+    private static final String[] KEY_VALUES = new String[]{"1", "4", "7", "", "2", "5", "8", "0", "3", "6", "9", Constants.BACKSPACE_TITLE};
 
     //Theme params
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.

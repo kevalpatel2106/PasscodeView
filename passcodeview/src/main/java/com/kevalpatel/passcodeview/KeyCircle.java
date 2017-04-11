@@ -8,7 +8,9 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.CycleInterpolator;
 
@@ -47,6 +49,7 @@ class KeyCircle extends Key {
         mBounds = bounds;
         mView = view;
         mKeyRadius = calculateKeyRadius(bounds, keyPadding);
+        Log.d("Radius", mKeyRadius + "");
 
         setRipplePaint();
         setUpAnimator();
@@ -173,11 +176,15 @@ class KeyCircle extends Key {
                 keyPaint);
 
         if (getDigit().equals(Constants.BACKSPACE_TITLE)) {  //Backspace key
-            Drawable d = mView.getContext().getResources().getDrawable(R.drawable.ic_back_space);
+            Drawable d = Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ?
+                    mView.getContext().getResources().getDrawable(R.drawable.ic_back_space) :
+                    mView.getContext().getDrawable(R.drawable.ic_back_space);
             d.setBounds((int) (mBounds.exactCenterX() - mKeyRadius / 2),
-                    (int) (mBounds.exactCenterY() + mKeyRadius / 2),
+                    (int) (mBounds.exactCenterY() - mKeyRadius / 2),
                     (int) (mBounds.exactCenterX() + mKeyRadius / 2),
-                    (int) (mBounds.exactCenterY() - mKeyRadius / 2));
+                    (int) (mBounds.exactCenterY() + mKeyRadius / 2));
+
+            Log.d("Rounds", d.getBounds().toString() + " ");
             d.setColorFilter(new PorterDuffColorFilter(keyTextPaint.getColor(), PorterDuff.Mode.SRC_ATOP));
             d.draw(canvas);
         } else {
