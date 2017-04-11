@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright 2017 Keval Patel.
   ~
@@ -15,13 +16,10 @@
   -->
 
 <resources>
-
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
+    <dimen name="profile_image_dimen">150dp</dimen>
+    <dimen name="finger_print_text_size">14sp</dimen>
+    <dimen name="key_text_size">20sp</dimen>
+    <dimen name="key_stroke_width">2dp</dimen>
+    <dimen name="indicator_stroke_width">2dp</dimen>
+    <dimen name="indicator_radius">13dp</dimen>
 </resources>

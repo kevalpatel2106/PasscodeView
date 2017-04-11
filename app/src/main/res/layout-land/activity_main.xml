@@ -29,7 +29,8 @@
         android:id="@+id/imageView"
         android:layout_width="@dimen/profile_image_dimen"
         android:layout_height="@dimen/profile_image_dimen"
-        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="20dp"
         android:elevation="4dp"
         android:src="@drawable/user_face"
         tools:ignore="ContentDescription"/>
@@ -38,7 +39,7 @@
         android:id="@+id/pin_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/imageView"
+        android:layout_toRightOf="@id/imageView"
         app:dividerColor="@color/colorPrimaryDark"
         app:fingerprintDefaultText="Scan your finger to unlock application"
         app:fingerprintEnable="true"
