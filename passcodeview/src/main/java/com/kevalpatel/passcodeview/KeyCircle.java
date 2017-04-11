@@ -142,7 +142,7 @@ class KeyCircle extends Key {
      * Show animation indicated invalid pin code
      */
     @Override
-    void playError() {
+    void playErrorAnimation() {
         ValueAnimator goLeftAnimator = ValueAnimator.ofInt(0, 10);
         goLeftAnimator.setInterpolator(new CycleInterpolator(2));
         goLeftAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

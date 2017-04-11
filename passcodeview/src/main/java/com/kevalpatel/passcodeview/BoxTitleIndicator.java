@@ -34,7 +34,7 @@ class BoxTitleIndicator extends Box {
     private Paint mTitlePaint;                      //Solid indicator color
 
     private String mPinTyped = "";                  //Characters of the PIN typed. Whenever user types pin update it using onValueEntered().
-    private ArrayList<Indicator> mDotsIndicator;
+    private ArrayList<Indicator> mIndicators;
     private Rect mDotsIndicatorBound;
 
     BoxTitleIndicator(@NonNull View view) {
@@ -69,8 +69,7 @@ class BoxTitleIndicator extends Box {
                 mTitlePaint);
 
         for (int i = 0; i < mPintCodeLength; i++) {
-            mDotsIndicator.get(i).draw(getContext(), canvas,
-                    i < mPinTyped.length() ? mSolidIndicatorPaint : mEmptyIndicatorPaint);
+            mIndicators.get(i).draw(getContext(), canvas, i < mPinTyped.length() ? mSolidIndicatorPaint : mEmptyIndicatorPaint);
         }
     }
 
@@ -110,7 +109,7 @@ class BoxTitleIndicator extends Box {
                 - 2 * getContext().getResources().getDimension(R.dimen.divider_vertical_margin));
         mDotsIndicatorBound.top = mDotsIndicatorBound.bottom - indicatorWidth;
 
-        mDotsIndicator = new ArrayList<>();
+        mIndicators = new ArrayList<>();
         for (int i = 0; i < mPintCodeLength; i++) {
             Rect rect = new Rect();
             rect.left = mDotsIndicatorBound.left + i * indicatorWidth;
@@ -118,7 +117,7 @@ class BoxTitleIndicator extends Box {
             rect.top = mDotsIndicatorBound.top;
             rect.bottom = mDotsIndicatorBound.bottom;
 
-            mDotsIndicator.add(new Indicator(rect));
+            mIndicators.add(new IndicatorCircle(rect));
         }
     }
 

@@ -12,7 +12,7 @@ import android.view.View;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public abstract class Box {
+abstract class Box {
 
     private final View mView;
 

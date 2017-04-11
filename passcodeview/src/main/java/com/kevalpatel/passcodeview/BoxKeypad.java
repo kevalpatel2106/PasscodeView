@@ -162,7 +162,7 @@ class BoxKeypad extends Box {
     @Override
     void onAuthenticationFail() {
         //Vibrate all the keys.
-        for (Key key : mKeys) key.playError();
+        for (Key key : mKeys) key.playErrorAnimation();
     }
 
     @Override

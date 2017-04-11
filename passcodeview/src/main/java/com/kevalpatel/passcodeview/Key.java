@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
  *
  * @author 'https://github.com/kevalpatel2106'
  */
-public abstract class Key {
+abstract class Key {
 
     abstract void draw(@NonNull Canvas canvas,
                        @NonNull Paint keyPaint,
@@ -17,7 +17,7 @@ public abstract class Key {
 
     abstract String getDigit();
 
-    abstract void playError();
+    abstract void playErrorAnimation();
 
     abstract boolean checkKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY);
 

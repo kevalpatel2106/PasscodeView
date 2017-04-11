@@ -7,38 +7,24 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 
 /**
- * Created by Keval on 06-Apr-17.
+ * Created by Keval Patel on 07/04/17.
+ *
+ * @author 'https://github.com/kevalpatel2106'
  */
-
-class Indicator {
+abstract class Indicator {
 
     private Rect mBound;
 
-    Indicator(Rect rect) {
-        mBound = rect;
-    }
-
-    Rect getBound() {
-        return mBound;
-    }
-
-    void setBound(Rect bound) {
+    Indicator(Rect bound){
         mBound = bound;
     }
 
-    /**
-     * Draw the indicator.
-     *
-     * @param context Instance of the caller.
-     * @param canvas  Canvas of {@link PinView}.
-     * @param paint   Paint of the indicator.
-     */
-    void draw(@NonNull Context context,
-              @NonNull Canvas canvas,
-              @NonNull Paint paint) {
-        canvas.drawCircle(mBound.exactCenterX(),
-                mBound.exactCenterY(),
-                context.getResources().getDimension(R.dimen.indicator_radius),
-                paint);
+
+    abstract  void draw(@NonNull Context context,
+                        @NonNull Canvas canvas,
+                        @NonNull Paint paint);
+
+    Rect getBound() {
+        return mBound;
     }
 }
