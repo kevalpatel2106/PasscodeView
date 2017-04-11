@@ -17,38 +17,34 @@
 
 <resources>
     <declare-styleable name="PinView">
-        <!--Size of the text to display in key.-->
+        <!--KEY-->
         <attr name="keyTextSize" format="dimension" />
-        <!--Color of the text to display in key.-->
         <attr name="keyTextColor" format="color" />
-        <!--Color of the key stroke.-->
         <attr name="keyStrokeColor" format="color" />
-        <!--Width of the key stroke.-->
         <attr name="keyStrokeWidth" format="dimension" />
-
-        <!--Empty PIN indicator stroke color.-->
-        <attr name="indicatorStrokeColor" format="color" />
-        <!--Filled PIN indicator fill color.-->
-        <attr name="indicatorSolidColor" format="color" />
-
-        <!--Horizontal divider color.-->
-        <attr name="dividerColor" format="color" />
-
-        <!--Title text-->
-        <attr name="titleText" format="string" />
-        <!--Title text color-->
-        <attr name="titleTextColor" format="color" />
-         <!--Title text size-->
-        <attr name="titleTextSize" format="color" />
-
-        <!--PIN code length-->
-        <attr name="pinLength" format="integer" />
-
         <attr name="keyShape" format="integer">
             <enum name="circle" value="0"/>
             <enum name="square" value="1"/>
         </attr>
 
+        <!--Indicator.-->
+        <attr name="indicatorStrokeColor" format="color" />
+        <attr name="indicatorSolidColor" format="color" />
+        <attr name="indicatorStrokeWidth" format="dimension"/>
+        <attr name="indicatorRadius" format="dimension"/>
+
+        <!--Horizontal divider-->
+        <attr name="dividerColor" format="color" />
+
+        <!--Title text-->
+        <attr name="titleText" format="string" />
+        <attr name="titleTextColor" format="color" />
+        <attr name="titleTextSize" format="color" />
+
+        <!--PIN code length-->
+        <attr name="pinLength" format="integer" />
+
+        <!--Fingerprint-->
         <attr name="fingerprintEnable" format="boolean" />
         <attr name="fingerprintDefaultText" format="string" />
         <attr name="fingerprintTextColor" format="color" />

@@ -16,18 +16,18 @@
   -->
 
 <resources>
-    <dimen name="indicator_padding">10dp</dimen>
-    <dimen name="indicator_radius">15dp</dimen>
-    <dimen name="indicator_stroke_width">4dp</dimen>
+    <dimen name="lib_indicator_padding">10dp</dimen>
+    <dimen name="lib_indicator_radius">15dp</dimen>
+    <dimen name="lib_indicator_stroke_width">4dp</dimen>
 
-    <dimen name="key_stroke_width">4dp</dimen>
-    <dimen name="key_text_size">24sp</dimen>
-    <dimen name="key_padding">15dp</dimen>
+    <dimen name="lib_key_stroke_width">4dp</dimen>
+    <dimen name="lib_key_text_size">24sp</dimen>
+    <dimen name="lib_key_padding">15dp</dimen>
 
-    <dimen name="divider_vertical_margin">10dp</dimen>
-    <dimen name="divider_horizontal_margin">20dp</dimen>
+    <dimen name="lib_divider_vertical_margin">10dp</dimen>
+    <dimen name="lib_divider_horizontal_margin">20dp</dimen>
 
-    <dimen name="fingerprint_status_text_size">16sp</dimen>
-    <dimen name="title_vertical_margin">16dp</dimen>
-    <dimen name="title_text_size">16sp</dimen>
+    <dimen name="lib_fingerprint_status_text_size">16sp</dimen>
+    <dimen name="lib_title_vertical_margin">16dp</dimen>
+    <dimen name="lib_title_text_size">16sp</dimen>
 </resources>

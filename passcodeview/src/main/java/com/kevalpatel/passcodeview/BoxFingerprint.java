@@ -79,10 +79,10 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
 
     @SuppressWarnings("deprecation")
     void setDefaults() {
-        mStatusTextSize = getContext().getResources().getDimension(R.dimen.fingerprint_status_text_size);
+        mStatusTextSize = getContext().getResources().getDimension(R.dimen.lib_fingerprint_status_text_size);
         mNormalStatusText = DEF_FINGERPRINT_STATUS;
         mCurrentStatusText = mNormalStatusText;
-        mStatusTextColor = getContext().getResources().getColor(R.color.key_default_color);
+        mStatusTextColor = getContext().getResources().getColor(R.color.lib_key_default_color);
     }
 
     @Override
@@ -99,9 +99,9 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
     @Override
     void draw(@NonNull Canvas canvas) {
         if (isFingerPrintBoxVisible) {
-            canvas.drawLine(mBounds.left + getContext().getResources().getDimension(R.dimen.divider_horizontal_margin),
+            canvas.drawLine(mBounds.left + getContext().getResources().getDimension(R.dimen.lib_divider_horizontal_margin),
                     mBounds.top,
-                    mBounds.right - getContext().getResources().getDimension(R.dimen.divider_horizontal_margin),
+                    mBounds.right - getContext().getResources().getDimension(R.dimen.lib_divider_horizontal_margin),
                     mBounds.top,
                     mStatusTextPaint);
 

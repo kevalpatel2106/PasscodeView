@@ -20,6 +20,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.ColorInt;
+import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 import android.view.View;
 
@@ -40,6 +41,11 @@ class BoxTitleIndicator extends Box {
     private int mIndicatorStrokeColor;              //Empty indicator stroke color
     @ColorInt
     private int mIndicatorFilledColor;              //Filled indicator stroke color
+    @Dimension
+    private float mIndicatorRadius;
+    @Dimension
+    private float mIndicatorStrokeWidth;
+
     @ColorInt
     private int mTitleColor;                        //Title text color
     private String mTitle;                          //Title color
@@ -61,10 +67,12 @@ class BoxTitleIndicator extends Box {
     @Override
     void setDefaults() {
         mTitle = Constants.DEF_TITLE_TEXT;
-        mTitleColor = getContext().getResources().getColor(R.color.key_default_color);
+        mTitleColor = getContext().getResources().getColor(R.color.lib_key_default_color);
 
-        mIndicatorFilledColor = getContext().getResources().getColor(R.color.indicator_filled_color);
-        mIndicatorStrokeColor = getContext().getResources().getColor(R.color.indicator_stroke_color);
+        mIndicatorRadius = getContext().getResources().getDimension(R.dimen.lib_indicator_radius);
+        mIndicatorStrokeWidth = getContext().getResources().getDimension(R.dimen.lib_indicator_stroke_width);
+        mIndicatorFilledColor = getContext().getResources().getColor(R.color.lib_indicator_filled_color);
+        mIndicatorStrokeColor = getContext().getResources().getColor(R.color.lib_indicator_stroke_color);
     }
 
     @Override
@@ -81,7 +89,7 @@ class BoxTitleIndicator extends Box {
     void draw(@NonNull Canvas canvas) {
         canvas.drawText(mTitle,
                 mDotsIndicatorBound.exactCenterX(),
-                mDotsIndicatorBound.top - (int) getContext().getResources().getDimension(R.dimen.divider_vertical_margin),
+                mDotsIndicatorBound.top - (int) getContext().getResources().getDimension(R.dimen.lib_divider_vertical_margin),
                 mTitlePaint);
 
         for (int i = 0; i < mPintCodeLength; i++) {
@@ -93,10 +101,10 @@ class BoxTitleIndicator extends Box {
      * |------------------------|=|
      * |                        | |
      * |                        | |
-     * |         TITLE          | | => 2 * {@link com.kevalpatel.passcodeview.R.dimen#divider_vertical_margin} px up from the bottom of the indicators.
+     * |         TITLE          | | => 2 * {@link com.kevalpatel.passcodeview.R.dimen#lib_divider_vertical_margin} px up from the bottom of the indicators.
      * |   |===============|    | |
      * |   |   INDICATORS  |    | |
-     * |   |===============|    | | => 2 * {@link com.kevalpatel.passcodeview.R.dimen#divider_vertical_margin} px up from the bottom key board
+     * |   |===============|    | | => 2 * {@link com.kevalpatel.passcodeview.R.dimen#lib_divider_vertical_margin} px up from the bottom key board
      * |------------------------|=| => {@link BoxKeypad#KEY_BOARD_TOP_WEIGHT} of the total height.
      * |                        | |
      * |                        | |
@@ -113,7 +121,7 @@ class BoxTitleIndicator extends Box {
     @Override
     void measure(@NonNull Rect rootViewBounds) {
 
-        int indicatorWidth = 2 * (int) (getContext().getResources().getDimension(R.dimen.indicator_radius) + getContext().getResources().getDimension(R.dimen.indicator_padding));
+        int indicatorWidth = 2 * (int) (mIndicatorRadius + getContext().getResources().getDimension(R.dimen.lib_indicator_padding));
         int totalSpace = indicatorWidth * mPintCodeLength;
 
         //Dots indicator
@@ -122,7 +130,7 @@ class BoxTitleIndicator extends Box {
         mDotsIndicatorBound.right = mDotsIndicatorBound.left + totalSpace;
         mDotsIndicatorBound.bottom = rootViewBounds.top
                 + (int) (rootViewBounds.height() * BoxKeypad.KEY_BOARD_TOP_WEIGHT
-                - 2 * getContext().getResources().getDimension(R.dimen.divider_vertical_margin));
+                - 2 * getContext().getResources().getDimension(R.dimen.lib_divider_vertical_margin));
         mDotsIndicatorBound.top = mDotsIndicatorBound.bottom - indicatorWidth;
 
         mIndicators = new ArrayList<>();
@@ -143,7 +151,7 @@ class BoxTitleIndicator extends Box {
         mEmptyIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mEmptyIndicatorPaint.setStyle(Paint.Style.STROKE);
         mEmptyIndicatorPaint.setColor(mIndicatorStrokeColor);
-        mEmptyIndicatorPaint.setStrokeWidth(getContext().getResources().getDimension(R.dimen.indicator_stroke_width));
+        mEmptyIndicatorPaint.setStrokeWidth(mIndicatorStrokeWidth);
 
         //Set filled dot paint
         mSolidIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -153,7 +161,7 @@ class BoxTitleIndicator extends Box {
         mTitlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTitlePaint.setColor(mTitleColor);
         mTitlePaint.setTextAlign(Paint.Align.CENTER);
-        mTitlePaint.setTextSize(getContext().getResources().getDimension(R.dimen.title_text_size));
+        mTitlePaint.setTextSize(getContext().getResources().getDimension(R.dimen.lib_title_text_size));
     }
 
     @Override
@@ -200,5 +208,23 @@ class BoxTitleIndicator extends Box {
     void setTitleColor(int titleColor) {
         this.mTitleColor = titleColor;
         preparePaint();
+    }
+
+    @Dimension
+    float getIndicatorRadius() {
+        return mIndicatorRadius;
+    }
+
+    void setIndicatorRadius(@Dimension float indicatorRadius) {
+        mIndicatorRadius = indicatorRadius;
+    }
+
+    @Dimension
+    float getIndicatorStrokeWidth() {
+        return mIndicatorStrokeWidth;
+    }
+
+    void setIndicatorStrokeWidth(@Dimension float indicatorStrokeWidth) {
+        mIndicatorStrokeWidth = indicatorStrokeWidth;
     }
 }

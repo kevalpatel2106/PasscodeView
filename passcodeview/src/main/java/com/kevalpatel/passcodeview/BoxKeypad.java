@@ -75,7 +75,7 @@ class BoxKeypad extends Box {
      */
     BoxKeypad(@NonNull PinView pinView) {
         super(pinView);
-        mKeyPadding = getContext().getResources().getDimension(R.dimen.key_padding);
+        mKeyPadding = getContext().getResources().getDimension(R.dimen.lib_key_padding);
         isFingerPrintEnable = FingerPrintUtils.isFingerPrintEnrolled(getContext());
     }
 
@@ -169,10 +169,10 @@ class BoxKeypad extends Box {
     @SuppressWarnings("deprecation")
     @Override
     void setDefaults() {
-        mKeyTextColor = getContext().getResources().getColor(R.color.key_default_color);
-        mKeyStrokeColor = getContext().getResources().getColor(R.color.key_background_color);
-        mKeyTextSize = getContext().getResources().getDimension(R.dimen.key_text_size);
-        mKeyStrokeWidth = getContext().getResources().getDimension(R.dimen.key_stroke_width);
+        mKeyTextColor = getContext().getResources().getColor(R.color.lib_key_default_color);
+        mKeyStrokeColor = getContext().getResources().getColor(R.color.lib_key_background_color);
+        mKeyTextSize = getContext().getResources().getDimension(R.dimen.lib_key_text_size);
+        mKeyStrokeWidth = getContext().getResources().getDimension(R.dimen.lib_key_stroke_width);
     }
 
     @Override

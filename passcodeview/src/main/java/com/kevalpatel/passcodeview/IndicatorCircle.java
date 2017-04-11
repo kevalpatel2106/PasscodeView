@@ -47,7 +47,7 @@ class IndicatorCircle extends Indicator {
               @NonNull Paint paint) {
         canvas.drawCircle(getBound().exactCenterX(),
                 getBound().exactCenterY(),
-                context.getResources().getDimension(R.dimen.indicator_radius),
+                context.getResources().getDimension(R.dimen.lib_indicator_radius),
                 paint);
     }
 }
