@@ -38,7 +38,7 @@ import android.view.animation.CycleInterpolator;
  */
 
 class KeyCircle extends Key {
-    private static final int MAX_RIPPLE_ALPHA = 180;
+    private static final int MAX_RIPPLE_ALPHA = 100;
     private static final int RIPPLE_DURATION = 350;
 
 

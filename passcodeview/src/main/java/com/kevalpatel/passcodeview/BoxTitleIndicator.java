@@ -17,6 +17,7 @@
 package com.kevalpatel.passcodeview;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.ColorInt;
@@ -37,6 +38,8 @@ import java.util.ArrayList;
 class BoxTitleIndicator extends Box {
     private int mPintCodeLength;
 
+    private boolean isDisplayError = false;
+
     @ColorInt
     private int mIndicatorStrokeColor;              //Empty indicator stroke color
     @ColorInt
@@ -53,6 +56,7 @@ class BoxTitleIndicator extends Box {
     //Paints
     private Paint mEmptyIndicatorPaint;             //Empty indicator color
     private Paint mSolidIndicatorPaint;             //Solid indicator color
+    private Paint mErrorIndicatorPaint;             //Error indicator color
     private Paint mTitlePaint;                      //Solid indicator color
 
     private String mPinTyped = "";                  //Characters of the PIN typed. Whenever user types pin update it using onValueEntered().
@@ -61,6 +65,10 @@ class BoxTitleIndicator extends Box {
 
     BoxTitleIndicator(@NonNull View view) {
         super(view);
+
+        //Set filled dot paint
+        mErrorIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mErrorIndicatorPaint.setColor(Color.RED);
     }
 
     @SuppressWarnings("deprecation")
@@ -77,7 +85,15 @@ class BoxTitleIndicator extends Box {
 
     @Override
     void onAuthenticationFail() {
-        //Do nothing
+        isDisplayError = true;
+        getRootView().invalidate();
+
+        new android.os.Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                isDisplayError = false;
+            }
+        }, 400);
     }
 
     @Override
@@ -93,7 +109,10 @@ class BoxTitleIndicator extends Box {
                 mTitlePaint);
 
         for (int i = 0; i < mPintCodeLength; i++) {
-            mIndicators.get(i).draw(getContext(), canvas, i < mPinTyped.length() ? mSolidIndicatorPaint : mEmptyIndicatorPaint);
+            mIndicators.get(i).draw(getContext(),
+                    canvas,
+                    isDisplayError ? mErrorIndicatorPaint :
+                            i < mPinTyped.length() ? mSolidIndicatorPaint : mEmptyIndicatorPaint);
         }
     }
 
