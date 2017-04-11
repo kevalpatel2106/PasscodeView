@@ -24,9 +24,11 @@ import android.support.annotation.NonNull;
 
 /**
  * Created by Keval on 06-Apr-17.
+ *
+ * @author 'https://github.com/kevalpatel2106'
  */
 
-class IndicatorCircle extends Indicator{
+class IndicatorCircle extends Indicator {
 
     IndicatorCircle(Rect rect) {
         super(rect);

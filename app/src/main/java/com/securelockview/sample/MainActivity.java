@@ -23,6 +23,11 @@ import android.widget.Toast;
 import com.kevalpatel.passcodeview.AuthenticationListener;
 import com.kevalpatel.passcodeview.PinView;
 
+/**
+ * Created by Keval on 06-Apr-17.
+ *
+ * @author 'https://github.com/kevalpatel2106'
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override
