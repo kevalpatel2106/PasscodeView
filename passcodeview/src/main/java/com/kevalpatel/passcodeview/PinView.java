@@ -96,13 +96,15 @@ public class PinView extends View {
     @SuppressWarnings("deprecation")
     private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
         mContext = context;
+
+        //Initialize UI boxes.
         mBoxKeypad = new BoxKeypad(this);
         mBoxFingerprint = new BoxFingerprint(this);
         mBoxIndicator = new BoxTitleIndicator(this);
 
-        if (attrs != null) {
+        if (attrs != null) {    //Parse all the params from the arguments.
             parseTypeArr(attrs);
-        } else {
+        } else {        //Nothing's provided in XML. Set default for now.
             mPinCodeLength = Constants.DEF_PIN_LENGTH;
 
             mDividerColor = getResources().getColor(R.color.lib_divider_color);
@@ -112,6 +114,7 @@ public class PinView extends View {
             mBoxFingerprint.setDefaults();
         }
 
+        //Prepare paints.
         prepareDividerPaint();
         mBoxKeypad.preparePaint();
         mBoxFingerprint.preparePaint();
@@ -376,6 +379,7 @@ public class PinView extends View {
 
     public void setAuthenticationListener(@NonNull AuthenticationListener authenticationListener) {
         mAuthenticationListener = authenticationListener;
+        mBoxFingerprint.setAuthListener(authenticationListener);
     }
 
     public int getKeyBackgroundColor() {

@@ -46,6 +46,9 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
     private Boolean isFingerPrintBoxVisible;
     private Rect mBounds = new Rect();
 
+    @Nullable
+    private AuthenticationListener mAuthListener;
+
     @ColorInt
     private int mStatusTextColor;
     @Dimension
@@ -93,17 +96,18 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
     @Override
     void onAuthenticationSuccess() {
         //TODO How to notify the user.
+        if (mAuthListener != null) mAuthListener.onAuthenticationSuccessful();
     }
 
     @SuppressWarnings("deprecation")
     @Override
     void draw(@NonNull Canvas canvas) {
         if (isFingerPrintBoxVisible) {
-            canvas.drawLine(mBounds.left + getContext().getResources().getDimension(R.dimen.lib_divider_horizontal_margin),
-                    mBounds.top,
-                    mBounds.right - getContext().getResources().getDimension(R.dimen.lib_divider_horizontal_margin),
-                    mBounds.top,
-                    mStatusTextPaint);
+//            canvas.drawLine(mBounds.left + getContext().getResources().getDimension(R.dimen.lib_divider_horizontal_margin),
+//                    mBounds.top,
+//                    mBounds.right - getContext().getResources().getDimension(R.dimen.lib_divider_horizontal_margin),
+//                    mBounds.top,
+//                    mStatusTextPaint);
 
             //Show fingerprint icon
             Drawable d = getContext().getResources().getDrawable(R.drawable.ic_fingerprint);
@@ -192,6 +196,7 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
                         getRootView().invalidate();
                     }
                 }, 1000);
+                if (mAuthListener != null) mAuthListener.onAuthenticationFailed();
             }
 
             @Override
@@ -240,5 +245,9 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
 
     void setFingerPrintEnable(boolean isEnable) {
         this.isFingerPrintBoxVisible = isEnable && FingerPrintUtils.isFingerPrintEnrolled(getContext());
+    }
+
+    void setAuthListener(AuthenticationListener authListener) {
+        this.mAuthListener = authListener;
     }
 }
