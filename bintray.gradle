@@ -70,14 +70,15 @@ if (project.rootProject.file('local.properties').exists()) {
     task javadoc(type: Javadoc) {
         source = android.sourceSets.main.java.srcDirs
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        failOnError false
     }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
         classifier = 'javadoc'
         from javadoc.destinationDir
     }
-
     artifacts {
+        archives javadocJar
         archives sourcesJar
     }
 
