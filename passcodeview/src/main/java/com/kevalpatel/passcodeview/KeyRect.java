@@ -99,9 +99,9 @@ class KeyRect extends Key {
         if (getDigit().equals(Constants.BACKSPACE_TITLE)) {  //Backspace key
             Drawable d = mView.getContext().getResources().getDrawable(R.drawable.ic_back_space);
             d.setBounds((int) (mBounds.exactCenterX() - Math.min(mBounds.height(), mBounds.width()) / 3),
-                    (int) (mBounds.exactCenterY() + Math.min(mBounds.height(), mBounds.width()) / 3),
+                    (int) (mBounds.exactCenterY() - Math.min(mBounds.height(), mBounds.width()) / 3),
                     (int) (mBounds.exactCenterX() + Math.min(mBounds.height(), mBounds.width()) / 3),
-                    (int) (mBounds.exactCenterY() - Math.min(mBounds.height(), mBounds.width()) / 3));
+                    (int) (mBounds.exactCenterY() + Math.min(mBounds.height(), mBounds.width()) / 3));
             d.setColorFilter(new PorterDuffColorFilter(keyTextPaint.getColor(), PorterDuff.Mode.SRC_ATOP));
             d.draw(canvas);
         } else {

@@ -164,6 +164,7 @@ class KeyCircle extends Key {
      * @param keyPaint     KeyCircle background paint
      * @param keyTextPaint KeyCircle text paint
      */
+    @SuppressWarnings({"deprecation", "ConstantConditions"})
     @Override
     void draw(@NonNull Canvas canvas,
               @NonNull Paint keyPaint,
@@ -183,8 +184,6 @@ class KeyCircle extends Key {
                     (int) (mBounds.exactCenterY() - mKeyRadius / 2),
                     (int) (mBounds.exactCenterX() + mKeyRadius / 2),
                     (int) (mBounds.exactCenterY() + mKeyRadius / 2));
-
-            Log.d("Rounds", d.getBounds().toString() + " ");
             d.setColorFilter(new PorterDuffColorFilter(keyTextPaint.getColor(), PorterDuff.Mode.SRC_ATOP));
             d.draw(canvas);
         } else {
