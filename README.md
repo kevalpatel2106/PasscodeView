@@ -27,13 +27,14 @@ This library provide easy and secure PIN authentication view, which
 
 ## Demo: 
 ** Authentication using PIN **
+
 |Success|Fail|
-|--------------------------|------------------------:|
+|:--------------------------:|:------------------------:|
 |![PIN Success](/resource/pin_success.gif)|![PIN Failed](/resource/fingerprint_failed.gif):|
 
 ** Authentication using fingerprint **
 |Success|Fail|
-|--------------------------|------------------------:|
+|:--------------------------:|:------------------------:|
 |![Fingerprint Success](/resource/fingerprint_success.gif)|![Fingerprint Failed](/resource/pin_failed.gif):|
 
 *Here is the link of the demo application. 👉 [Demo](resource/sample.apk)*
