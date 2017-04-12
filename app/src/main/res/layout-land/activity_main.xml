@@ -45,15 +45,6 @@
         app:fingerprintEnable="true"
         app:fingerprintTextColor="@color/colorAccent"
         app:fingerprintTextSize="@dimen/finger_print_text_size"
-        app:indicatorRadius="@dimen/indicator_radius"
-        app:indicatorSolidColor="@color/colorAccent"
-        app:indicatorStrokeColor="@color/colorAccent"
-        app:indicatorStrokeWidth="@dimen/indicator_stroke_width"
-        app:keyShape="circle"
-        app:keyStrokeColor="@color/colorAccent"
-        app:keyStrokeWidth="@dimen/lib_key_stroke_width"
-        app:keyTextColor="@color/colorAccent"
-        app:keyTextSize="@dimen/lib_key_text_size"
         app:pinLength="4"
         app:titleTextColor="@android:color/white"/>
 

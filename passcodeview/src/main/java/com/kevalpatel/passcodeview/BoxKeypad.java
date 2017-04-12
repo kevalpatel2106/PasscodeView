@@ -17,17 +17,12 @@
 package com.kevalpatel.passcodeview;
 
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
-import android.support.annotation.ColorInt;
-import android.support.annotation.Dimension;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextPaint;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import com.kevalpatel.passcodeview.keys.Key;
+
 import java.util.ArrayList;
 
 /**
@@ -36,37 +31,18 @@ import java.util.ArrayList;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-class BoxKeypad extends Box {
-    static final int KEY_TYPE_CIRCLE = 0;
-    static final int KEY_TYPE_RECT = 1;
+final class BoxKeypad extends Box {
     static final float KEY_BOARD_BOTTOM_WEIGHT = 0.14F;
     static final float KEY_BOARD_TOP_WEIGHT = 0.2F;
     private static final int NO_OF_COLUMNS = 3;
     private static final int NO_OF_ROWS = 4;
     private static final String[] KEY_VALUES = new String[]{"1", "4", "7", "", "2", "5", "8", "0", "3", "6", "9", Constants.BACKSPACE_TITLE};
 
-    //Theme params
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
-    @Dimension
-    private float mKeyPadding;                      //Surround padding to each single key
-    @Dimension
-    private float mKeyTextSize;                     //Surround padding to each single key
-    @Dimension
-    private float mKeyStrokeWidth;                   //Surround padding to each single key
-    @ColorInt
-    private int mKeyStrokeColor;                    //KeyCircle background stroke color
-    @ColorInt
-    private int mKeyTextColor;                      //KeyCircle text color
-    private int mKeyShape = KEY_TYPE_CIRCLE;
-
     private ArrayList<Key> mKeys;
-
-    //Paint
-    private Paint mKeyPaint;
-    private TextPaint mKeyTextPaint;
     private boolean isFingerPrintEnable;
-
     private Rect mKeyBoxBound = new Rect();
+    private Key.Builder mKeyBuilder;
 
     /**
      * Public constructor
@@ -75,7 +51,6 @@ class BoxKeypad extends Box {
      */
     BoxKeypad(@NonNull PinView pinView) {
         super(pinView);
-        mKeyPadding = getContext().getResources().getDimension(R.dimen.lib_key_padding);
         isFingerPrintEnable = FingerPrintUtils.isFingerPrintEnrolled(getContext());
     }
 
@@ -108,6 +83,9 @@ class BoxKeypad extends Box {
      */
     @Override
     void measure(@NonNull Rect rootViewBound) {
+        if (mKeyBuilder == null)
+            throw new NullPointerException("Set key using KeyBuilder first.");
+
         mKeyBoxBound.left = mIsOneHandOperation ? (int) (rootViewBound.width() * 0.3) : 0;
         mKeyBoxBound.right = rootViewBound.width();
         mKeyBoxBound.top = (int) (rootViewBound.top + (rootViewBound.height() * KEY_BOARD_TOP_WEIGHT));
@@ -126,36 +104,14 @@ class BoxKeypad extends Box {
                 keyBound.right = (int) (keyBound.left + singleKeyWidth);
                 keyBound.top = (int) ((rowNo * singleKeyHeight) + mKeyBoxBound.top);
                 keyBound.bottom = (int) (keyBound.top + singleKeyHeight);
-
-                switch (mKeyShape) {
-                    case KEY_TYPE_CIRCLE:
-                        mKeys.add(new KeyCircle(getRootView(), KEY_VALUES[mKeys.size()], keyBound, mKeyPadding));
-                        break;
-                    case KEY_TYPE_RECT:
-                        mKeys.add(new KeyRect(getRootView(), KEY_VALUES[mKeys.size()], keyBound, mKeyPadding));
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Invalid key shape.");
-                }
+                mKeys.add(mKeyBuilder.getKey(KEY_VALUES[mKeys.size()], keyBound));
             }
         }
     }
 
     @Override
     void preparePaint() {
-        //Set the keyboard paint
-        mKeyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mKeyPaint.setStyle(Paint.Style.STROKE);
-        mKeyPaint.setColor(mKeyStrokeColor);
-        mKeyPaint.setTextSize(mKeyTextSize);
-        mKeyPaint.setStrokeWidth(mKeyStrokeWidth);
 
-        //Set the keyboard text paint
-        mKeyTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        mKeyTextPaint.setColor(mKeyTextColor);
-        mKeyTextPaint.setTextSize(mKeyTextSize);
-        mKeyTextPaint.setFakeBoldText(true);
-        mKeyTextPaint.setTextAlign(Paint.Align.CENTER);
     }
 
     @Override
@@ -169,21 +125,21 @@ class BoxKeypad extends Box {
     @SuppressWarnings("deprecation")
     @Override
     void setDefaults() {
-        mKeyTextColor = getContext().getResources().getColor(R.color.lib_key_default_color);
-        mKeyStrokeColor = getContext().getResources().getColor(R.color.lib_key_background_color);
-        mKeyTextSize = getContext().getResources().getDimension(R.dimen.lib_key_text_size);
-        mKeyStrokeWidth = getContext().getResources().getDimension(R.dimen.lib_key_stroke_width);
+        //Do nothing
     }
 
     @Override
     void onAuthenticationFail() {
-        //Vibrate all the keys.
-        for (Key key : mKeys) key.playErrorAnimation();
+        //Play failed animation for all keys
+        for (Key key : mKeys) key.onAuthFail();
+        getRootView().invalidate();
     }
 
     @Override
     void onAuthenticationSuccess() {
-        //DO nothing
+        //Play success animation for all keys
+        for (Key key : mKeys) key.onAuthSuccess();
+        getRootView().invalidate();
     }
 
     /**
@@ -195,7 +151,7 @@ class BoxKeypad extends Box {
     void draw(@NonNull Canvas canvas) {
         for (Key key : mKeys) {
             if (key.getDigit().isEmpty()) continue; //Don't draw the empty button
-            key.draw(canvas, mKeyPaint, mKeyTextPaint);
+            key.draw(canvas);
         }
     }
 
@@ -231,38 +187,6 @@ class BoxKeypad extends Box {
         return mKeyBoxBound;
     }
 
-    int getKeyBackgroundColor() {
-        return mKeyStrokeColor;
-    }
-
-    void setKeyBackgroundColor(@ColorInt int keyBackgroundColor) {
-        mKeyStrokeColor = keyBackgroundColor;
-    }
-
-    int getKeyTextColor() {
-        return mKeyTextColor;
-    }
-
-    void setKeyTextColor(@ColorInt int keyTextColor) {
-        mKeyTextColor = keyTextColor;
-    }
-
-    float getKeyPadding() {
-        return mKeyPadding;
-    }
-
-    void setKeyPadding(float keyPadding) {
-        mKeyPadding = keyPadding;
-    }
-
-    void setKeyTextSize(float keyTextSize) {
-        mKeyTextSize = keyTextSize;
-    }
-
-    void setKeyStrokeWidth(float keyStrokeWidth) {
-        mKeyStrokeWidth = keyStrokeWidth;
-    }
-
     boolean isOneHandOperation() {
         return mIsOneHandOperation;
     }
@@ -271,21 +195,15 @@ class BoxKeypad extends Box {
         mIsOneHandOperation = oneHandOperation;
     }
 
-    @KeyShapes
-    int getKeyShape() {
-        return mKeyShape;
-    }
-
-    void setKeyShape(@KeyShapes int keyShape) {
-        mKeyShape = keyShape;
-    }
-
     void setFingerPrintEnable(boolean fingerPrintEnable) {
         isFingerPrintEnable = fingerPrintEnable && FingerPrintUtils.isFingerPrintEnrolled(getContext());
     }
 
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({KEY_TYPE_CIRCLE, KEY_TYPE_RECT})
-    @interface KeyShapes {
+    Key.Builder getKeyBuilder() {
+        return mKeyBuilder;
+    }
+
+    void setKeyBuilder(Key.Builder keyBuilder) {
+        mKeyBuilder = keyBuilder;
     }
 }

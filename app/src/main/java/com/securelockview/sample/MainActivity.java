@@ -22,6 +22,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.kevalpatel.passcodeview.AuthenticationListener;
 import com.kevalpatel.passcodeview.PinView;
+import com.kevalpatel.passcodeview.indicators.CircleIndicator;
+import com.kevalpatel.passcodeview.keys.RoundKey;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -37,7 +39,21 @@ public class MainActivity extends AppCompatActivity {
 
         PinView pinView = (PinView) findViewById(R.id.pin_view);
         pinView.setPinToCheck("1234");
-        pinView.setKeyPadding(getResources().getDimension(R.dimen.key_padding));
+        pinView.setKey(new RoundKey.Builder(pinView)
+                .setKeyPadding(R.dimen.key_padding)
+                .setKeyStrokeColorResource(R.color.colorAccent)
+                .setKeyStrokeWidth(R.dimen.key_stroke_width)
+                .setKeyTextColorResource(R.color.colorAccent)
+                .setKeyTextSize(R.dimen.key_text_size)
+                .build());
+
+        pinView.setIndicator(new CircleIndicator.Builder(pinView)
+                .setIndicatorRadius(R.dimen.indicator_radius)
+                .setIndicatorFilledColorResource(R.color.colorAccent)
+                .setIndicatorStrokeColorResource(R.color.colorAccent)
+                .setIndicatorStrokeWidth(R.dimen.indicator_stroke_width)
+                .build());
+
         pinView.setAuthenticationListener(new AuthenticationListener() {
             @Override
             public void onAuthenticationSuccessful() {

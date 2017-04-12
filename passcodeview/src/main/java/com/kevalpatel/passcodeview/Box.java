@@ -20,7 +20,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
-import android.view.View;
 
 /**
  * Created by Keval Patel on 09/04/17.
@@ -30,19 +29,19 @@ import android.view.View;
 
 abstract class Box {
 
-    private final View mView;
+    private final PinView mView;
 
-    public Box(@NonNull View rootView) {
+    public Box(@NonNull PinView rootView) {
         mView = rootView;
     }
 
     @NonNull
-    public View getRootView() {
+    public final PinView getRootView() {
         return mView;
     }
 
     @NonNull
-    public Context getContext() {
+    public final Context getContext() {
         return mView.getContext();
     }
 

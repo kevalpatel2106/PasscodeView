@@ -17,13 +17,12 @@
 package com.kevalpatel.passcodeview;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.ColorInt;
-import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
-import android.view.View;
+
+import com.kevalpatel.passcodeview.indicators.Indicator;
 
 import java.util.ArrayList;
 
@@ -35,40 +34,22 @@ import java.util.ArrayList;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-class BoxTitleIndicator extends Box {
+final class BoxTitleIndicator extends Box {
     private int mPintCodeLength;
-
-    private boolean isDisplayError = false;
-
-    @ColorInt
-    private int mIndicatorStrokeColor;              //Empty indicator stroke color
-    @ColorInt
-    private int mIndicatorFilledColor;              //Filled indicator stroke color
-    @Dimension
-    private float mIndicatorRadius;
-    @Dimension
-    private float mIndicatorStrokeWidth;
 
     @ColorInt
     private int mTitleColor;                        //Title text color
     private String mTitle;                          //Title color
-
-    //Paints
-    private Paint mEmptyIndicatorPaint;             //Empty indicator color
-    private Paint mSolidIndicatorPaint;             //Solid indicator color
-    private Paint mErrorIndicatorPaint;             //Error indicator color
     private Paint mTitlePaint;                      //Solid indicator color
 
     private String mPinTyped = "";                  //Characters of the PIN typed. Whenever user types pin update it using onValueEntered().
     private ArrayList<Indicator> mIndicators;
+
     private Rect mDotsIndicatorBound;
+    private Indicator.Builder mIndicatorBuilder;
 
-    BoxTitleIndicator(@NonNull View view) {
+    BoxTitleIndicator(@NonNull PinView view) {
         super(view);
-
-        //Set filled dot paint
-        mErrorIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mErrorIndicatorPaint.setColor(Color.RED);
     }
 
     @SuppressWarnings("deprecation")
@@ -76,44 +57,44 @@ class BoxTitleIndicator extends Box {
     void setDefaults() {
         mTitle = Constants.DEF_TITLE_TEXT;
         mTitleColor = getContext().getResources().getColor(R.color.lib_key_default_color);
-
-        mIndicatorRadius = getContext().getResources().getDimension(R.dimen.lib_indicator_radius);
-        mIndicatorStrokeWidth = getContext().getResources().getDimension(R.dimen.lib_indicator_stroke_width);
-        mIndicatorFilledColor = getContext().getResources().getColor(R.color.lib_indicator_filled_color);
-        mIndicatorStrokeColor = getContext().getResources().getColor(R.color.lib_indicator_stroke_color);
     }
 
     @Override
     void onAuthenticationFail() {
-        isDisplayError = true;
-        getRootView().invalidate();
-
+        //Set indicator to error
         new android.os.Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                isDisplayError = false;
+                for (Indicator indicator : mIndicators) indicator.onAuthFailed();
+                getRootView().invalidate();
             }
-        }, 400);
+        }, 100);
     }
 
     @Override
     void onAuthenticationSuccess() {
-        //Do nothing
+        //Set indicator to success
+        new android.os.Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                for (Indicator indicator : mIndicators) indicator.onAuthSuccess();
+                getRootView().invalidate();
+            }
+        }, 100);
     }
 
     @Override
     void draw(@NonNull Canvas canvas) {
+        if (mIndicatorBuilder == null)
+            throw new NullPointerException("Build indicator before using it.");
+
         canvas.drawText(mTitle,
                 mDotsIndicatorBound.exactCenterX(),
                 mDotsIndicatorBound.top - (int) getContext().getResources().getDimension(R.dimen.lib_divider_vertical_margin),
                 mTitlePaint);
 
-        for (int i = 0; i < mPintCodeLength; i++) {
-            mIndicators.get(i).draw(getContext(),
-                    canvas,
-                    isDisplayError ? mErrorIndicatorPaint :
-                            i < mPinTyped.length() ? mSolidIndicatorPaint : mEmptyIndicatorPaint);
-        }
+        for (int i = 0; i < mPintCodeLength; i++)
+            mIndicators.get(i).draw(canvas, i < mPinTyped.length());
     }
 
     /**
@@ -140,7 +121,7 @@ class BoxTitleIndicator extends Box {
     @Override
     void measure(@NonNull Rect rootViewBounds) {
 
-        int indicatorWidth = 2 * (int) (mIndicatorRadius + getContext().getResources().getDimension(R.dimen.lib_indicator_padding));
+        int indicatorWidth = (int) (mIndicatorBuilder.getIndicatorWidth() + 2 * getContext().getResources().getDimension(R.dimen.lib_indicator_padding));
         int totalSpace = indicatorWidth * mPintCodeLength;
 
         //Dots indicator
@@ -159,23 +140,12 @@ class BoxTitleIndicator extends Box {
             rect.right = rect.left + indicatorWidth;
             rect.top = mDotsIndicatorBound.top;
             rect.bottom = mDotsIndicatorBound.bottom;
-
-            mIndicators.add(new IndicatorCircle(rect));
+            mIndicators.add(mIndicatorBuilder.getIndicator(rect));
         }
     }
 
     @Override
     void preparePaint() {
-        //Set empty dot paint
-        mEmptyIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mEmptyIndicatorPaint.setStyle(Paint.Style.STROKE);
-        mEmptyIndicatorPaint.setColor(mIndicatorStrokeColor);
-        mEmptyIndicatorPaint.setStrokeWidth(mIndicatorStrokeWidth);
-
-        //Set filled dot paint
-        mSolidIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mSolidIndicatorPaint.setColor(mIndicatorFilledColor);
-
         //Set title paint
         mTitlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTitlePaint.setColor(mTitleColor);
@@ -186,26 +156,6 @@ class BoxTitleIndicator extends Box {
     @Override
     void onValueEntered(@NonNull String newValue) {
         mPinTyped = newValue;
-    }
-
-    @ColorInt
-    int getIndicatorStrokeColor() {
-        return mIndicatorStrokeColor;
-    }
-
-    void setIndicatorStrokeColor(@ColorInt int indicatorStrokeColor) {
-        this.mIndicatorStrokeColor = indicatorStrokeColor;
-        preparePaint();
-    }
-
-    @ColorInt
-    int getIndicatorFilledColor() {
-        return mIndicatorFilledColor;
-    }
-
-    void setIndicatorFilledColor(@ColorInt int indicatorFilledColor) {
-        this.mIndicatorFilledColor = indicatorFilledColor;
-        preparePaint();
     }
 
     void setPintCodeLength(int pintCodeLength) {
@@ -229,21 +179,11 @@ class BoxTitleIndicator extends Box {
         preparePaint();
     }
 
-    @Dimension
-    float getIndicatorRadius() {
-        return mIndicatorRadius;
+    public Indicator.Builder getIndicatorBuilder() {
+        return mIndicatorBuilder;
     }
 
-    void setIndicatorRadius(@Dimension float indicatorRadius) {
-        mIndicatorRadius = indicatorRadius;
-    }
-
-    @Dimension
-    float getIndicatorStrokeWidth() {
-        return mIndicatorStrokeWidth;
-    }
-
-    void setIndicatorStrokeWidth(@Dimension float indicatorStrokeWidth) {
-        mIndicatorStrokeWidth = indicatorStrokeWidth;
+    public void setIndicatorBuilder(@NonNull Indicator.Builder mIndicatorBuilder) {
+        this.mIndicatorBuilder = mIndicatorBuilder;
     }
 }

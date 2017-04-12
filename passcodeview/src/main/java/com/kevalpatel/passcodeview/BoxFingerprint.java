@@ -31,7 +31,6 @@ import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
-import android.view.View;
 import android.view.animation.CycleInterpolator;
 
 /**
@@ -40,7 +39,7 @@ import android.view.animation.CycleInterpolator;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAuthCallback {
+final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAuthCallback {
     static final String DEF_FINGERPRINT_STATUS = "Scan your finger to authenticate";
 
     private Boolean isFingerPrintBoxVisible;
@@ -62,7 +61,7 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
     @Nullable
     private FingerPrintAuthHelper mFingerPrintAuthHelper;
 
-    BoxFingerprint(@NonNull View view) {
+    BoxFingerprint(@NonNull PinView view) {
         super(view);
         isFingerPrintBoxVisible = FingerPrintUtils.isFingerPrintEnrolled(getContext());
 

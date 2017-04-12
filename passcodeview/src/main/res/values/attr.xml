@@ -17,21 +17,21 @@
 
 <resources>
     <declare-styleable name="PinView">
-        <!--KEY-->
-        <attr name="keyTextSize" format="dimension" />
-        <attr name="keyTextColor" format="color" />
-        <attr name="keyStrokeColor" format="color" />
-        <attr name="keyStrokeWidth" format="dimension" />
-        <attr name="keyShape" format="integer">
-            <enum name="circle" value="0"/>
-            <enum name="square" value="1"/>
-        </attr>
+        <!--&lt;!&ndash;KEY&ndash;&gt;-->
+        <!--<attr name="keyTextSize" format="dimension" />-->
+        <!--<attr name="keyTextColor" format="color" />-->
+        <!--<attr name="keyStrokeColor" format="color" />-->
+        <!--<attr name="keyStrokeWidth" format="dimension" />-->
+        <!--<attr name="keyShape" format="integer">-->
+        <!--<enum name="circle" value="0"/>-->
+        <!--<enum name="square" value="1"/>-->
+        <!--</attr>-->
 
-        <!--Indicator.-->
-        <attr name="indicatorStrokeColor" format="color" />
-        <attr name="indicatorSolidColor" format="color" />
-        <attr name="indicatorStrokeWidth" format="dimension"/>
-        <attr name="indicatorRadius" format="dimension"/>
+        <!--&lt;!&ndash;Indicator.&ndash;&gt;-->
+        <!--<attr name="indicatorStrokeColor" format="color" />-->
+        <!--<attr name="indicatorSolidColor" format="color" />-->
+        <!--<attr name="indicatorStrokeWidth" format="dimension"/>-->
+        <!--<attr name="indicatorRadius" format="dimension"/>-->
 
         <!--Horizontal divider-->
         <attr name="dividerColor" format="color" />

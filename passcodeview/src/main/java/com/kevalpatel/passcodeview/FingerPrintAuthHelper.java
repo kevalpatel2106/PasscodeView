@@ -50,7 +50,7 @@ import javax.crypto.SecretKey;
  *
  * @author 'https://github.com/kevalpatel2106'
  */
-class FingerPrintAuthHelper {
+final class FingerPrintAuthHelper {
     /**
      * Called when a recoverable error has been encountered during authentication.
      * The help string is provided to give the user guidance for what went wrong, such as "Sensor dirty, please clean it."

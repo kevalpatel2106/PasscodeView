@@ -34,6 +34,9 @@ import android.support.annotation.RequiresPermission;
 
 public final class FingerPrintUtils {
 
+    private FingerPrintUtils() {
+    }
+
     /**
      * Open the Security settings screen.
      *
@@ -54,13 +57,13 @@ public final class FingerPrintUtils {
     @RequiresApi(api = Build.VERSION_CODES.M)
     @RequiresPermission(allOf = {Manifest.permission.USE_FINGERPRINT})
     public static boolean isSupportedHardware(Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)return false;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false;
         FingerprintManager fingerprintManager = (FingerprintManager) context.getSystemService(Context.FINGERPRINT_SERVICE);
         return fingerprintManager.isHardwareDetected();
     }
 
     @SuppressWarnings("MissingPermission")
-    public static boolean isFingerPrintEnrolled(Context context){
+    public static boolean isFingerPrintEnrolled(Context context) {
         // Check if we're running on Android 6.0 (M) or higher
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
