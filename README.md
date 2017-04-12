@@ -1,5 +1,5 @@
 # PasscodeView
-[![Build Status](https://travis-ci.org/kevalpatel2106/PasscodeView.svg?branch=master)](https://travis-ci.org/kevalpatel2106/PasscodeView) [![API](https://img.shields.io/badge/API-16%2B-orange.svg?style=flat)](https://android-arsenal.com/api?level=16)
+[![Build Status](https://travis-ci.org/kevalpatel2106/PasscodeView.svg?branch=master)](https://travis-ci.org/kevalpatel2106/PasscodeView) [ ![Download](https://api.bintray.com/packages/kevalpatel2106/maven/PasscodeView/images/download.svg) ](https://bintray.com/kevalpatel2106/maven/PasscodeView/_latestVersion) [![API](https://img.shields.io/badge/API-16%2B-orange.svg?style=flat)](https://android-arsenal.com/api?level=16)
 
 ##### PasscodeView is an Android Library to easily and securely authenticate user with PIN code or using the fingerprint scanner.
 
@@ -22,8 +22,14 @@ This library provide easy and secure PIN authentication view, which
   
 
 ## How to integrate?
-- Gradle dependency and guide to integrate this library coming soon. Meanwhile you can see sample project if you want.
-
+- ### Gradle Dependency:
+  - Add below lines to `app/build.gradle` file of your project.
+  ```
+  dependencies {
+      compile 'com.kevalpatel2106:open-weather-wrapper:1.0'
+  }
+  ```
+  
 
 ## Demo: 
 **Authentication using PIN**
