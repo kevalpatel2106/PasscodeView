@@ -16,9 +16,9 @@
 
 package com.securelockview.sample;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 
 import com.kevalpatel.passcodeview.AuthenticationListener;
 import com.kevalpatel.passcodeview.PinView;
@@ -41,12 +41,15 @@ public class MainActivity extends AppCompatActivity {
         pinView.setAuthenticationListener(new AuthenticationListener() {
             @Override
             public void onAuthenticationSuccessful() {
-                Toast.makeText(MainActivity.this, "Auth successful.", Toast.LENGTH_SHORT).show();
+                //User authenticated successfully.
+                //Navigate to secure screens.
+                startActivity(new Intent(MainActivity.this, AuthenticatedActivity.class));
             }
 
             @Override
             public void onAuthenticationFailed() {
-                Toast.makeText(MainActivity.this, "Auth failed.", Toast.LENGTH_SHORT).show();
+                //Calls whenever authentication is failed or user is unauthorized.
+                //Do something
             }
         });
     }
