@@ -29,7 +29,7 @@
     android:paddingTop="10dp"
     tools:context="com.securelockview.sample.MainActivity">
 
-    <android.support.v7.widget.AppCompatTextView
+    <android.support.v7.widget.AppCompatImageView
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:src="@drawable/locked"/>
@@ -40,6 +40,7 @@
         android:layout_marginBottom="20dp"
         android:layout_marginTop="20dp"
         android:text="Authentication Successful"
+        android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="20sp"/>
 </LinearLayout>

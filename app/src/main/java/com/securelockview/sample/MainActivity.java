@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
                 //User authenticated successfully.
                 //Navigate to secure screens.
                 startActivity(new Intent(MainActivity.this, AuthenticatedActivity.class));
+                finish();
             }
 
             @Override
