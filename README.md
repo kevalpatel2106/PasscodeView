@@ -21,15 +21,81 @@ This library provide easy and secure PIN authentication view, which
   - size of the each single key.
   
 
-## How to integrate?
+## How to use this library?
 - ### Gradle Dependency:
-  - Add below lines to `app/build.gradle` file of your project.
+  Add below lines to `app/build.gradle` file of your project.
   ```
   dependencies {
-      compile 'com.kevalpatel2106:open-weather-wrapper:1.0'
+      compile 'com.kevalpatel2106:passcodeview:1.0'
   }
   ```
   
+- ### Add `PinView` in your layout file.
+  ```
+  <com.kevalpatel.passcodeview.PinView
+          android:id="@+id/pin_view"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_below="@id/imageView"
+          app:dividerColor="@color/colorPrimaryDark"
+          app:fingerprintDefaultText="Scan your finger to unlock application"
+          app:fingerprintEnable="true"
+          app:fingerprintTextColor="@color/colorAccent"
+          app:fingerprintTextSize="@dimen/finger_print_text_size"
+          app:indicatorRadius="@dimen/indicator_radius"
+          app:indicatorSolidColor="@color/colorAccent"
+          app:indicatorStrokeColor="@color/colorAccent"
+          app:indicatorStrokeWidth="@dimen/indicator_stroke_width"
+          app:keyShape="circle"
+          app:keyStrokeColor="@color/colorAccent"
+          app:keyStrokeWidth="@dimen/lib_key_stroke_width"
+          app:keyTextColor="@color/colorAccent"
+          app:keyTextSize="@dimen/lib_key_text_size"
+          app:pinLength="4"
+          app:titleTextColor="@android:color/white"/>
+  ```
+  
+- ### Set the correct pin code to authenticate the user in your activity/fragment.
+  ```
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    //....
+    //...
+          
+    PinView pinView = (PinView) findViewById(R.id.pin_view);
+    pinView.setPinToCheck("1234");
+    //...
+  }
+  ```
+
+- ### Set callback listener to get callbacks when user is authenticated or authentication fails.
+  ```
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    //....
+    //...
+          
+    PinView pinView = (PinView) findViewById(R.id.pin_view);
+    pinView.setPinToCheck("1234");
+    pinView.setAuthenticationListener(new AuthenticationListener() {
+               @Override
+               public void onAuthenticationSuccessful() {
+                   //User authenticated successfully.
+                   //Navigate to next screens.
+               }
+   
+               @Override
+               public void onAuthenticationFailed() {
+                   //Calls whenever authentication is failed or user is unauthorized.
+                   //Do something if you want to handle unauthorized user.
+               }
+           });
+           
+    //...
+  }
+  ```
 
 ## Demo: 
 **Authentication using PIN**
