@@ -95,8 +95,7 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
 
     @Override
     void onAuthenticationSuccess() {
-        //TODO How to notify the user.
-        if (mAuthListener != null) mAuthListener.onAuthenticationSuccessful();
+        //Do nothing
     }
 
     @SuppressWarnings("deprecation")
@@ -145,7 +144,17 @@ class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAut
 
     @Override
     public void onFingerprintAuthSuccess(FingerprintManager.CryptoObject cryptoObject) {
-        onAuthenticationSuccess();
+        mCurrentStatusText = "Fingerprint recognized";
+        getRootView().invalidate();
+
+        new android.os.Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mAuthListener != null) mAuthListener.onAuthenticationSuccessful();
+                mCurrentStatusText = mNormalStatusText;
+                getRootView().invalidate();
+            }
+        }, 1000);
     }
 
     @Override
