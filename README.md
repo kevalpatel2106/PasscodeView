@@ -28,13 +28,13 @@ This library provide easy and secure PIN authentication view, which
 ## Demo: 
 **Authentication using PIN**
 
-|Success|Fail|
+|<span style="color:green">Success</span>|<span style="color:red">Fail</span>|
 |:---:|:---:|
 |![PIN Success](/resource/pin_success.gif)|![PIN Failed](/resource/fingerprint_failed.gif):|
 
 **Authentication using fingerprint**
 
-|Success|Fail|
+|<span style="color:green">Success</span>|<span style="color:red">Fail</span>|
 |:---:|:---:|
 |![Fingerprint Success](/resource/fingerprint_success.gif)|![Fingerprint Failed](/resource/pin_failed.gif):|
 
