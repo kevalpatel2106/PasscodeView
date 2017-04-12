@@ -102,13 +102,13 @@ This library provide easy and secure PIN authentication view, which
 
 |<font color="green">Success</font>|<font color="red">Fail</font>|
 |:---:|:---:|
-|![PIN Success](/resource/pin_success.gif)|![PIN Failed](/resource/fingerprint_failed.gif):|
+|![PIN Success](/resource/pin_success.gif)|![PIN Failed](/resource/pin_failed.gif):|
 
 **Authentication using fingerprint**
 
 |<font color="green">Success</font>|<font color="red">Fail</font>|
 |:---:|:---:|
-|![Fingerprint Success](/resource/fingerprint_success.gif)|![Fingerprint Failed](/resource/pin_failed.gif):|
+|![Fingerprint Success](/resource/fingerprint_success.gif)|![Fingerprint Failed](/resource/fingerprint_failed.gif):|
 
 *Here is the link of the demo application. 👉 [Demo](resource/sample.apk)*
 
