@@ -1,21 +1,22 @@
 # PasscodeView
 [![Build Status](https://travis-ci.org/kevalpatel2106/PasscodeView.svg?branch=master)](https://travis-ci.org/kevalpatel2106/PasscodeView) [ ![Download](https://api.bintray.com/packages/kevalpatel2106/maven/PasscodeView/images/download.svg) ](https://bintray.com/kevalpatel2106/maven/PasscodeView/_latestVersion) [![API](https://img.shields.io/badge/API-16%2B-orange.svg?style=flat)](https://android-arsenal.com/api?level=16)  <a href="https://www.paypal.me/kevalpatel2106"> <img src="https://img.shields.io/badge/paypal-donate-yellow.svg" /></a>
 
-##### PasscodeView is an Android Library to easily and securely authenticate user with PIN code or using the fingerprint scanner.
+
+##### PasscodeView is an Android Library to easily and securely authenticate the user with the PIN code or using the fingerprint scanner.
 
 
 ## Why❓
-- Secure authentication is the key factor in many application (e.g. financial applications). Many application uses PIN based authentication. 
-- But Android System doesn't provide any easy to set view for PIN based authentication which can tightly integrate and take advantage of fingerprint API introduced in newer versions of android. This limitation led me to work on this project.
+- Secure authentication is the key factor in many application (e.g. financial applications). Many application uses PIN-based authentication. 
+- But Android System doesn't provide any easy to set the view for PIN-based authentication which can tightly integrate and take advantage of fingerprint API introduced in newer versions of android. This limitation led me to work on this project.
 
-- With use of *PasscodeView* you can easily integrate PIN & Fingerprint based authentication in your application. 
+- With the use of *PasscodeView* you can easily integrate PIN & Fingerprint based authentication in your application. 
 
 
 ## Features:
 This library provide easy and secure PIN authentication view, which
-- provides access to built in fingerprint based authentication. This handles all the complexities of imtegrating the fingerprint API with your application.
+- provides access to built-in fingerprint-based authentication. This handles all the complexities of integrating the fingerprint API with your application.
 - provide error feedback when PIN entered is wrong.
-- is highly customisable. So that you can match it with your application them. It provides you control over,
+- is highly customizable. So that you can match it with your application them. It provides you control over,
   * shape of the each key.
   * color and shape of each key.
   * localized name of each key in pin keyboard. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names)
