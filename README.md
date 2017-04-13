@@ -17,9 +17,10 @@ This library provide easy and secure PIN authentication view, which
 - provide error feedback when PIN entered is wrong.
 - is highly customisable. So that you can match it with your application them. It provides you control over,
   - shape of the each key.
-  - color of the key and pin indicators.
-  - size of the each single key.
-  
+  - color and shape of each key.
+  - localised name of each key in pin keyboard.
+  - size of the each single key.
+  - color and shape of pin indicators.  
 
 ## How to use this library?
 - ### Gradle Dependency:
