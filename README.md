@@ -20,8 +20,8 @@ This library provide easy and secure PIN authentication view, which
   - color and shape of each key.
   - localized name of each key in pin keyboard. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names)
   - size of the each single key.
-  - color and shape of pin indicators.  
-
+  - color and shape of pin indicators.👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators)
+ 
 ## How to use this library?
 - ### Gradle Dependency:
   Add below lines to `app/build.gradle` file of your project.
