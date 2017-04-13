@@ -16,11 +16,11 @@ This library provide easy and secure PIN authentication view, which
 - provides access to built in fingerprint based authentication. This handles all the complexities of imtegrating the fingerprint API with your application.
 - provide error feedback when PIN entered is wrong.
 - is highly customisable. So that you can match it with your application them. It provides you control over,
-  - shape of the each key.
-  - color and shape of each key.
-  - localized name of each key in pin keyboard. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names)
-  - size of the each single key.
-  - color and shape of pin indicators.👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators)
+  * shape of the each key.
+  * color and shape of each key.
+  * localized name of each key in pin keyboard. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names)
+  * size of the each single key.
+  * color and shape of pin indicators.👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators)
  
 ## How to use this library?
 - ### Gradle Dependency:
