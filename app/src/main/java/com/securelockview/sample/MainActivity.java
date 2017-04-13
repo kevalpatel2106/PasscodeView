@@ -24,7 +24,6 @@ import com.kevalpatel.passcodeview.AuthenticationListener;
 import com.kevalpatel.passcodeview.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.indicators.CircleIndicator;
-import com.kevalpatel.passcodeview.indicators.DotIndicator;
 import com.kevalpatel.passcodeview.keys.RoundKey;
 
 /**
@@ -57,11 +56,11 @@ public class MainActivity extends AppCompatActivity {
 
         //Build the desired indicator shape and pass the theme attributes.
         //REQUIRED
-        pinView.setIndicator(new DotIndicator.Builder(pinView)
+        pinView.setIndicator(new CircleIndicator.Builder(pinView)
                 .setIndicatorRadius(R.dimen.indicator_radius)
                 .setIndicatorFilledColorResource(R.color.colorAccent)
-                .setIndicatorStrokeColorResource(R.color.colorPrimaryDark)
-//                .setIndicatorStrokeWidth(R.dimen.indicator_stroke_width)
+                .setIndicatorStrokeColorResource(R.color.colorAccent)
+                .setIndicatorStrokeWidth(R.dimen.indicator_stroke_width)
                 .build());
 
         //Set the name of the keys based on your locale.
