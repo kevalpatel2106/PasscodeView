@@ -35,14 +35,15 @@ import java.util.ArrayList;
  */
 
 final class BoxTitleIndicator extends Box {
-    private int mPintCodeLength;
+    static final String DEF_TITLE_TEXT = "Enter PIN";
+    private int mPinLength;
+    private int mTypedPinLength;
 
     @ColorInt
     private int mTitleColor;                        //Title text color
     private String mTitle;                          //Title color
     private Paint mTitlePaint;                      //Solid indicator color
 
-    private String mPinTyped = "";                  //Characters of the PIN typed. Whenever user types pin update it using onValueEntered().
     private ArrayList<Indicator> mIndicators;
 
     private Rect mDotsIndicatorBound;
@@ -55,7 +56,7 @@ final class BoxTitleIndicator extends Box {
     @SuppressWarnings("deprecation")
     @Override
     void setDefaults() {
-        mTitle = Constants.DEF_TITLE_TEXT;
+        mTitle = DEF_TITLE_TEXT;
         mTitleColor = getContext().getResources().getColor(R.color.lib_key_default_color);
     }
 
@@ -93,8 +94,8 @@ final class BoxTitleIndicator extends Box {
                 mDotsIndicatorBound.top - (int) getContext().getResources().getDimension(R.dimen.lib_divider_vertical_margin),
                 mTitlePaint);
 
-        for (int i = 0; i < mPintCodeLength; i++)
-            mIndicators.get(i).draw(canvas, i < mPinTyped.length());
+        for (int i = 0; i < mPinLength; i++)
+            mIndicators.get(i).draw(canvas, i < mTypedPinLength);
     }
 
     /**
@@ -122,7 +123,7 @@ final class BoxTitleIndicator extends Box {
     void measure(@NonNull Rect rootViewBounds) {
 
         int indicatorWidth = (int) (mIndicatorBuilder.getIndicatorWidth() + 2 * getContext().getResources().getDimension(R.dimen.lib_indicator_padding));
-        int totalSpace = indicatorWidth * mPintCodeLength;
+        int totalSpace = indicatorWidth * mPinLength;
 
         //Dots indicator
         mDotsIndicatorBound = new Rect();
@@ -134,7 +135,7 @@ final class BoxTitleIndicator extends Box {
         mDotsIndicatorBound.top = mDotsIndicatorBound.bottom - indicatorWidth;
 
         mIndicators = new ArrayList<>();
-        for (int i = 0; i < mPintCodeLength; i++) {
+        for (int i = 0; i < mPinLength; i++) {
             Rect rect = new Rect();
             rect.left = mDotsIndicatorBound.left + i * indicatorWidth;
             rect.right = rect.left + indicatorWidth;
@@ -153,13 +154,12 @@ final class BoxTitleIndicator extends Box {
         mTitlePaint.setTextSize(getContext().getResources().getDimension(R.dimen.lib_title_text_size));
     }
 
-    @Override
-    void onValueEntered(@NonNull String newValue) {
-        mPinTyped = newValue;
+    void onPinDigitEntered(int newLength) {
+        mTypedPinLength = newLength;
     }
 
-    void setPintCodeLength(int pintCodeLength) {
-        this.mPintCodeLength = pintCodeLength;
+    void setPinLength(int pinLength) {
+        mPinLength = pinLength;
     }
 
     String getTitle() {
@@ -179,11 +179,11 @@ final class BoxTitleIndicator extends Box {
         preparePaint();
     }
 
-    public Indicator.Builder getIndicatorBuilder() {
+    Indicator.Builder getIndicatorBuilder() {
         return mIndicatorBuilder;
     }
 
-    public void setIndicatorBuilder(@NonNull Indicator.Builder mIndicatorBuilder) {
+    void setIndicatorBuilder(@NonNull Indicator.Builder mIndicatorBuilder) {
         this.mIndicatorBuilder = mIndicatorBuilder;
     }
 }

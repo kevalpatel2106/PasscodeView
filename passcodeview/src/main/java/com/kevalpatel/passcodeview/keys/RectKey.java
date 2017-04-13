@@ -32,7 +32,7 @@ import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.view.animation.CycleInterpolator;
 
-import com.kevalpatel.passcodeview.Constants;
+import com.kevalpatel.passcodeview.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.R;
 
@@ -113,7 +113,7 @@ public final class RectKey extends Key {
                 mBounds.bottom - mBuilder.getKeyPadding(),
                 mBuilder.getKeyPaint());
 
-        if (getDigit().equals(Constants.BACKSPACE_TITLE)) {  //Backspace key
+        if (getDigit().equals(KeyNamesBuilder.BACKSPACE_TITLE)) {  //Backspace key
             Drawable d = mPinView.getContext().getResources().getDrawable(R.drawable.ic_back_space);
             d.setBounds((int) (mBounds.exactCenterX() - Math.min(mBounds.height(), mBounds.width()) / 3),
                     (int) (mBounds.exactCenterY() - Math.min(mBounds.height(), mBounds.width()) / 3),
@@ -197,13 +197,13 @@ public final class RectKey extends Key {
             return mKeyPadding;
         }
 
-        public Builder setKeyPadding(@Dimension float keyPadding) {
-            mKeyPadding = keyPadding;
+        public Builder setKeyPadding(@DimenRes int keyPaddingRes) {
+            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
             return this;
         }
 
-        public Builder setKeyPadding(@DimenRes int keyPaddingRes) {
-            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
+        public Builder setKeyPadding(@Dimension float keyPadding) {
+            mKeyPadding = keyPadding;
             return this;
         }
 
@@ -211,13 +211,13 @@ public final class RectKey extends Key {
             return mKeyTextSize;
         }
 
-        public Builder setKeyTextSize(float keyTextSize) {
-            mKeyTextSize = keyTextSize;
+        public Builder setKeyTextSize(@DimenRes int keyTextSize) {
+            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
             return this;
         }
 
-        public Builder setKeyTextSize(@DimenRes int keyTextSize) {
-            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
+        public Builder setKeyTextSize(float keyTextSize) {
+            mKeyTextSize = keyTextSize;
             return this;
         }
 
@@ -226,14 +226,14 @@ public final class RectKey extends Key {
         }
 
         @Dimension
-        public Builder setKeyStrokeWidth(float keyStrokeWidth) {
-            mKeyStrokeWidth = keyStrokeWidth;
+        public Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
+            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
             return this;
         }
 
         @Dimension
-        public Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
-            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
+        public Builder setKeyStrokeWidth(float keyStrokeWidth) {
+            mKeyStrokeWidth = keyStrokeWidth;
             return this;
         }
 

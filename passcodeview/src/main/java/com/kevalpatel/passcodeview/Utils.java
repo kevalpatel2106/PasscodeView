@@ -32,9 +32,9 @@ import android.support.annotation.RequiresPermission;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public final class FingerPrintUtils {
+public final class Utils {
 
-    private FingerPrintUtils() {
+    private Utils() {
     }
 
     /**
@@ -73,5 +73,9 @@ public final class FingerPrintUtils {
         } else {
             return false;
         }
+    }
+
+    static boolean isValidPin(String pinToCheck) {
+        return pinToCheck.matches("[0-9]+");
     }
 }

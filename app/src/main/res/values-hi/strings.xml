@@ -15,15 +15,14 @@
   -->
 
 <resources>
-    <string name="app_name">SecureLockView</string>
-    <string name="key_1">1</string>
-    <string name="key_2">2</string>
-    <string name="key_3">3</string>
-    <string name="key_4">4</string>
-    <string name="key_5">5</string>
-    <string name="key_6">6</string>
-    <string name="key_7">7</string>
-    <string name="key_8">8</string>
-    <string name="key_9">9</string>
-    <string name="key_0">0</string>
+    <string name="key_1">१</string>
+    <string name="key_2">२</string>
+    <string name="key_3">३</string>
+    <string name="key_4">४</string>
+    <string name="key_5">५</string>
+    <string name="key_6">६</string>
+    <string name="key_7">७</string>
+    <string name="key_8">८</string>
+    <string name="key_9">९</string>
+    <string name="key_0">०</string>
 </resources>

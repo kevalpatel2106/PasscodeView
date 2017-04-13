@@ -56,6 +56,4 @@ abstract class Box {
     abstract void measure(@NonNull Rect rootViewBounds);
 
     abstract void preparePaint();
-
-    abstract void onValueEntered(@NonNull String newValue);
 }

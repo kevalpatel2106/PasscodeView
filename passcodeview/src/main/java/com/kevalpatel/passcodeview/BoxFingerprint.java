@@ -63,7 +63,7 @@ final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPr
 
     BoxFingerprint(@NonNull PinView view) {
         super(view);
-        isFingerPrintBoxVisible = FingerPrintUtils.isFingerPrintEnrolled(getContext());
+        isFingerPrintBoxVisible = Utils.isFingerPrintEnrolled(getContext());
 
         enableFingerprintScanner();
     }
@@ -134,11 +134,6 @@ final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPr
         mStatusTextPaint.setTextAlign(Paint.Align.CENTER);
         mStatusTextPaint.setTextSize(mStatusTextSize);
         mStatusTextPaint.setColor(mStatusTextColor);
-    }
-
-    @Override
-    void onValueEntered(@NonNull String newValue) {
-        //Do nothing
     }
 
     @Override
@@ -247,10 +242,10 @@ final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPr
     }
 
     void setFingerPrintEnable(boolean isEnable) {
-        this.isFingerPrintBoxVisible = isEnable && FingerPrintUtils.isFingerPrintEnrolled(getContext());
+        this.isFingerPrintBoxVisible = isEnable && Utils.isFingerPrintEnrolled(getContext());
     }
 
-    void setAuthListener(AuthenticationListener authListener) {
+    void setAuthListener(@NonNull AuthenticationListener authListener) {
         this.mAuthListener = authListener;
     }
 }

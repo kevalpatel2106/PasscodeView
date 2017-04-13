@@ -24,9 +24,10 @@ package com.kevalpatel.passcodeview;
 
 public final class Constants {
 
-    public static final String BACKSPACE_TITLE = "-1";
+    public static final int NO_OF_COLUMNS = 3;
+    public static final int NO_OF_ROWS = 4;
+
     static final int DEF_PIN_LENGTH = 4;
-    static final String DEF_TITLE_TEXT = "Enter PIN";
 
     private Constants() {
     }

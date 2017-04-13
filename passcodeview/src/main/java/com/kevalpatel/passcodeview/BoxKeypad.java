@@ -20,6 +20,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.Size;
 
 import com.kevalpatel.passcodeview.keys.Key;
 
@@ -34,9 +35,9 @@ import java.util.ArrayList;
 final class BoxKeypad extends Box {
     static final float KEY_BOARD_BOTTOM_WEIGHT = 0.14F;
     static final float KEY_BOARD_TOP_WEIGHT = 0.2F;
-    private static final int NO_OF_COLUMNS = 3;
-    private static final int NO_OF_ROWS = 4;
-    private static final String[] KEY_VALUES = new String[]{"1", "4", "7", "", "2", "5", "8", "0", "3", "6", "9", Constants.BACKSPACE_TITLE};
+
+    @Size(Constants.NO_OF_ROWS * Constants.NO_OF_COLUMNS)
+    private static String[][] mKeyNames;
 
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
     private ArrayList<Key> mKeys;
@@ -51,7 +52,23 @@ final class BoxKeypad extends Box {
      */
     BoxKeypad(@NonNull PinView pinView) {
         super(pinView);
-        isFingerPrintEnable = FingerPrintUtils.isFingerPrintEnrolled(getContext());
+        mKeyNames = new KeyNamesBuilder(getContext()).build();
+        isFingerPrintEnable = Utils.isFingerPrintEnrolled(getContext());
+    }
+
+    /**
+     * Set the name of the different keys based on the locale.
+     * This method and {@link #mKeyNames} are static to avoid duplicate object creation.
+     *
+     * @param keyNames String with the names of the key.
+     */
+    static void setKeyNames(@Size(Constants.NO_OF_ROWS * Constants.NO_OF_COLUMNS) String[][] keyNames) {
+        if (keyNames.length != Constants.NO_OF_ROWS * Constants.NO_OF_COLUMNS
+                && !keyNames[Constants.NO_OF_COLUMNS - 1][Constants.NO_OF_ROWS - 1].equals(KeyNamesBuilder.BACKSPACE_TITLE)) {
+            throw new IllegalArgumentException("Invalid key values. Use KeyNameBuilder to build key names.");
+        }
+
+        mKeyNames = keyNames;
     }
 
     /**
@@ -92,19 +109,19 @@ final class BoxKeypad extends Box {
         mKeyBoxBound.bottom = (int) (rootViewBound.bottom -
                 rootViewBound.height() * (isFingerPrintEnable ? KEY_BOARD_BOTTOM_WEIGHT : 0));
 
-        float singleKeyHeight = mKeyBoxBound.height() / NO_OF_ROWS;
-        float singleKeyWidth = mKeyBoxBound.width() / NO_OF_COLUMNS;
+        float singleKeyHeight = mKeyBoxBound.height() / Constants.NO_OF_ROWS;
+        float singleKeyWidth = mKeyBoxBound.width() / Constants.NO_OF_COLUMNS;
 
         mKeys = new ArrayList<>();
-        for (int colNo = 0; colNo < NO_OF_COLUMNS; colNo++) {
+        for (int colNo = 0; colNo < Constants.NO_OF_COLUMNS; colNo++) {
 
-            for (int rowNo = 0; rowNo < NO_OF_ROWS; rowNo++) {
+            for (int rowNo = 0; rowNo < Constants.NO_OF_ROWS; rowNo++) {
                 Rect keyBound = new Rect();
                 keyBound.left = (int) ((colNo * singleKeyWidth) + mKeyBoxBound.left);
                 keyBound.right = (int) (keyBound.left + singleKeyWidth);
                 keyBound.top = (int) ((rowNo * singleKeyHeight) + mKeyBoxBound.top);
                 keyBound.bottom = (int) (keyBound.top + singleKeyHeight);
-                mKeys.add(mKeyBuilder.getKey(KEY_VALUES[mKeys.size()], keyBound));
+                mKeys.add(mKeyBuilder.getKey(mKeyNames[colNo][rowNo], keyBound));
             }
         }
     }
@@ -112,11 +129,6 @@ final class BoxKeypad extends Box {
     @Override
     void preparePaint() {
 
-    }
-
-    @Override
-    void onValueEntered(@NonNull String newValue) {
-        //Do nothing
     }
 
     /**
@@ -143,7 +155,7 @@ final class BoxKeypad extends Box {
     }
 
     /**
-     * Draw keyboard on the canvas. This will draw all the {@link #KEY_VALUES} on the canvas.
+     * Draw keyboard on the canvas. This will draw all the {@link #mKeyNames} on the canvas.
      *
      * @param canvas canvas on which the keyboard will be drawn.
      */
@@ -154,6 +166,8 @@ final class BoxKeypad extends Box {
             key.draw(canvas);
         }
     }
+
+    ///////////////// SETTERS/GETTERS //////////////
 
     /**
      * Find which key is pressed based on the ACTION_DOWN and ACTION_UP coordinates.
@@ -177,8 +191,6 @@ final class BoxKeypad extends Box {
         return null;
     }
 
-    ///////////////// SETTERS/GETTERS //////////////
-
     ArrayList<Key> getKeys() {
         return mKeys;
     }
@@ -196,7 +208,7 @@ final class BoxKeypad extends Box {
     }
 
     void setFingerPrintEnable(boolean fingerPrintEnable) {
-        isFingerPrintEnable = fingerPrintEnable && FingerPrintUtils.isFingerPrintEnrolled(getContext());
+        isFingerPrintEnable = fingerPrintEnable && Utils.isFingerPrintEnrolled(getContext());
     }
 
     Key.Builder getKeyBuilder() {

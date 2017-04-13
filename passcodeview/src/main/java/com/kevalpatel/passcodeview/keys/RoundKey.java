@@ -35,7 +35,7 @@ import android.text.TextPaint;
 import android.view.View;
 import android.view.animation.CycleInterpolator;
 
-import com.kevalpatel.passcodeview.Constants;
+import com.kevalpatel.passcodeview.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.R;
 
@@ -184,7 +184,7 @@ public final class RoundKey extends Key {
                 mKeyRadius,
                 mBuilder.getKeyPaint());
 
-        if (getDigit().equals(Constants.BACKSPACE_TITLE)) {  //Backspace key
+        if (getDigit().equals(KeyNamesBuilder.BACKSPACE_TITLE)) {  //Backspace key
             Drawable d = Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ?
                     mView.getContext().getResources().getDrawable(R.drawable.ic_back_space) :
                     mView.getContext().getDrawable(R.drawable.ic_back_space);
@@ -281,13 +281,13 @@ public final class RoundKey extends Key {
             return mKeyPadding;
         }
 
-        public RoundKey.Builder setKeyPadding(@Dimension float keyPadding) {
-            mKeyPadding = keyPadding;
+        public RoundKey.Builder setKeyPadding(@DimenRes int keyPaddingRes) {
+            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
             return this;
         }
 
-        public RoundKey.Builder setKeyPadding(@DimenRes int keyPaddingRes) {
-            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
+        public RoundKey.Builder setKeyPadding(@Dimension float keyPadding) {
+            mKeyPadding = keyPadding;
             return this;
         }
 
@@ -295,13 +295,13 @@ public final class RoundKey extends Key {
             return mKeyTextSize;
         }
 
-        public RoundKey.Builder setKeyTextSize(float keyTextSize) {
-            mKeyTextSize = keyTextSize;
+        public RoundKey.Builder setKeyTextSize(@DimenRes int keyTextSize) {
+            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
             return this;
         }
 
-        public RoundKey.Builder setKeyTextSize(@DimenRes int keyTextSize) {
-            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
+        public RoundKey.Builder setKeyTextSize(float keyTextSize) {
+            mKeyTextSize = keyTextSize;
             return this;
         }
 
@@ -310,14 +310,14 @@ public final class RoundKey extends Key {
         }
 
         @Dimension
-        public RoundKey.Builder setKeyStrokeWidth(float keyStrokeWidth) {
-            mKeyStrokeWidth = keyStrokeWidth;
+        public RoundKey.Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
+            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
             return this;
         }
 
         @Dimension
-        public RoundKey.Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
-            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
+        public RoundKey.Builder setKeyStrokeWidth(float keyStrokeWidth) {
+            mKeyStrokeWidth = keyStrokeWidth;
             return this;
         }
 

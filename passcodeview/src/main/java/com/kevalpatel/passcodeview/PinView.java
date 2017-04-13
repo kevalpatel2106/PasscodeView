@@ -27,6 +27,7 @@ import android.support.annotation.DimenRes;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.Size;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -43,14 +44,12 @@ import com.kevalpatel.passcodeview.keys.Key;
 
 public class PinView extends View {
     private Context mContext;
-    private float mDownKeyX;                                    //X coordinate of the ACTION_DOWN point
-    private float mDownKeyY;                                    //Y coordinate of the ACTION_DOWN point
-    private int mPinCodeLength;                                 //PIN code length
+    private float mDownKeyX;                                        //X coordinate of the ACTION_DOWN point
+    private float mDownKeyY;                                        //Y coordinate of the ACTION_DOWN point
 
-    private AuthenticationListener mAuthenticationListener;     //Callback listener for application to get notify when authentication successful.
-    private String mPinToCheck;                                 //Current PIN with witch entered PIN will check.
-    @NonNull
-    private String mPinTyped = "";                              //PIN typed.
+    private AuthenticationListener mAuthenticationListener;         //Callback listener for application to get notify when authentication successful.
+    private String mPinToCheck;                                      //Current PIN with witch entered PIN will check.
+    private String mPinTyped = "";                                        //PIN typed.
 
     //Rectangle bounds
     private Rect mRootViewBound = new Rect();
@@ -108,8 +107,6 @@ public class PinView extends View {
         if (attrs != null) {    //Parse all the params from the arguments.
             parseTypeArr(attrs);
         } else {        //Nothing's provided in XML. Set default for now.
-            mPinCodeLength = Constants.DEF_PIN_LENGTH;
-
             mDividerColor = getResources().getColor(R.color.lib_divider_color);
 
             mBoxIndicator.setDefaults();
@@ -128,12 +125,9 @@ public class PinView extends View {
     private void parseTypeArr(@Nullable AttributeSet attrs) {
         TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.PinView, 0, 0);
         try {
-            mPinCodeLength = (a.getInteger(R.styleable.PinView_pinLength,
-                    Constants.DEF_PIN_LENGTH));
-
             //Parse title params
             mBoxIndicator.setTitle(a.hasValue(R.styleable.PinView_titleText) ?
-                    a.getString(R.styleable.PinView_titleText) : Constants.DEF_TITLE_TEXT);
+                    a.getString(R.styleable.PinView_titleText) : BoxTitleIndicator.DEF_TITLE_TEXT);
             mBoxIndicator.setTitleColor(a.getColor(R.styleable.PinView_titleTextColor,
                     mContext.getResources().getColor(R.color.lib_key_default_color)));
 
@@ -254,8 +248,8 @@ public class PinView extends View {
 
     /**
      * Handle the newly added key digit. Append the digit to {@link #mPinTyped}.
-     * If the new digit is {@link Constants#BACKSPACE_TITLE}, remove the last digit of the {@link #mPinTyped}.
-     * If the {@link #mPinTyped} has length of {@link #mPinCodeLength} and equals to {@link #mPinToCheck}
+     * If the new digit is {@link KeyNamesBuilder#BACKSPACE_TITLE}, remove the last digit of the {@link #mPinTyped}.
+     * If the {@link #mPinTyped} has length of {@link #mPinToCheck} and equals to {@link #mPinToCheck}
      * notify application as authenticated.
      *
      * @param newDigit newly pressed digit
@@ -266,21 +260,20 @@ public class PinView extends View {
         //Check for the state
         if (mAuthenticationListener == null) {
             throw new IllegalStateException("Set AuthenticationListener to receive callbacks.");
-        } else if (mPinToCheck.isEmpty() || mPinToCheck.length() != mPinCodeLength) {
+        } else if (mPinToCheck == null || mPinToCheck.length() == 0) {
             throw new IllegalStateException("Please set current PIN to check with the entered value.");
         }
 
-        if (newDigit.equals(Constants.BACKSPACE_TITLE)) {
-            if (!mPinTyped.isEmpty()) mPinTyped = mPinTyped.substring(0, mPinTyped.length() - 1);
+        if (newDigit.equals(KeyNamesBuilder.BACKSPACE_TITLE)) {
+            if (mPinTyped.length() > 0) mPinTyped = mPinTyped.substring(0, mPinTyped.length() - 1);
         } else {
             mPinTyped = mPinTyped + newDigit;
         }
 
-        mBoxIndicator.onValueEntered(mPinTyped);
+        mBoxIndicator.onPinDigitEntered(mPinTyped.length());
         invalidate();
 
-        if (mPinTyped.length() == mPinCodeLength) {
-
+        if (mPinToCheck.length() == mPinTyped.length()) {
             if (mPinToCheck.equals(mPinTyped)) {
                 mAuthenticationListener.onAuthenticationSuccessful();
                 mBoxKeypad.onAuthenticationSuccess();
@@ -308,13 +301,15 @@ public class PinView extends View {
      */
     public void reset() {
         mPinTyped = "";
-        mBoxIndicator.onValueEntered(mPinTyped);
+        mBoxIndicator.onPinDigitEntered(mPinTyped.length());
         invalidate();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+
+        //Stop scanning fingerprint
         mBoxFingerprint.stopFingerprintScanner();
     }
 
@@ -332,15 +327,20 @@ public class PinView extends View {
         invalidate();
     }
 
-    @Nullable
-    public String getPinToCheck() {
-        return mPinToCheck;
-    }
-
     public void setPinToCheck(@NonNull String pinToCheck) {
+        //Validate the pin
+        if (!Utils.isValidPin(pinToCheck)) {
+            throw new IllegalArgumentException("Invalid PIN.");
+        }
+
+//        mPinToCheck = new int[pinToCheck.length()];
+//        char[] charArray = pinToCheck.toCharArray();
+//        for (int i = 0; i < charArray.length; i++) {
+//            Character character = charArray[i];
+//            mPinToCheck[i] = Integer.parseInt(character.toString());
+//        }
         mPinToCheck = pinToCheck;
-        mPinCodeLength = mPinToCheck.length();
-        mBoxIndicator.setPintCodeLength(mPinCodeLength);
+        mBoxIndicator.setPinLength(mPinToCheck.length());
         invalidate();
     }
 
@@ -418,13 +418,13 @@ public class PinView extends View {
         return mBoxFingerprint.getStatusTextSize();
     }
 
-    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
+    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(statusTextSize);
         invalidate();
     }
 
-    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(statusTextSize);
+    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
         invalidate();
     }
 
@@ -455,6 +455,11 @@ public class PinView extends View {
 
     public void setKey(@NonNull Key.Builder keyBuilder) {
         mBoxKeypad.setKeyBuilder(keyBuilder);
+        invalidate();
+    }
+
+    public void setKeyNames(@Size(Constants.NO_OF_ROWS * Constants.NO_OF_COLUMNS) String[][] keyNames) {
+        BoxKeypad.setKeyNames(keyNames);
         invalidate();
     }
 }
