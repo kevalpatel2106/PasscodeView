@@ -18,7 +18,7 @@ This library provide easy and secure PIN authentication view, which
 - is highly customisable. So that you can match it with your application them. It provides you control over,
   - shape of the each key.
   - color and shape of each key.
-  - localised name of each key in pin keyboard.
+  - localized name of each key in pin keyboard. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names)
   - size of the each single key.
   - color and shape of pin indicators.  
 
