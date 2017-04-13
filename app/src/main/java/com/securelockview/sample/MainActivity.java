@@ -38,11 +38,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        PinView pinView = (PinView) findViewById(R.id.pin_view);
+        final PinView pinView = (PinView) findViewById(R.id.pin_view);
 
         //Set the correct pin code.
         //REQUIRED
-        pinView.setPinToCheck("1234");
+        pinView.setCorrectPin(new int[]{1, 2, 3, 4});
 
         //Build the desired key shape and pass the theme parameters.
         //REQUIRED
@@ -65,18 +65,17 @@ public class MainActivity extends AppCompatActivity {
 
         //Set the name of the keys based on your locale.
         //OPTIONAL. If not passed key names will be displayed based on english locale.
-        pinView.setKeyNames(new KeyNamesBuilder(this)
-                .setKeyOne(R.string.key_1)
-                .setKeyTwo(R.string.key_2)
-                .setKeyThree(R.string.key_3)
-                .setKeyFour(R.string.key_4)
-                .setKeyFive(R.string.key_5)
-                .setKeySix(R.string.key_6)
-                .setKeySeven(R.string.key_7)
-                .setKeyEight(R.string.key_8)
-                .setKeyNine(R.string.key_9)
-                .setKeyZero(R.string.key_0)
-                .build());
+        pinView.setKeyNames(new KeyNamesBuilder()
+                .setKeyOne(this, R.string.key_1)
+                .setKeyTwo(this, R.string.key_2)
+                .setKeyThree(this, R.string.key_3)
+                .setKeyFour(this, R.string.key_4)
+                .setKeyFive(this, R.string.key_5)
+                .setKeySix(this, R.string.key_6)
+                .setKeySeven(this, R.string.key_7)
+                .setKeyEight(this, R.string.key_8)
+                .setKeyNine(this, R.string.key_9)
+                .setKeyZero(this, R.string.key_0));
 
         pinView.setAuthenticationListener(new AuthenticationListener() {
             @Override

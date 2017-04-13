@@ -41,19 +41,12 @@ public final class KeyNamesBuilder {
     private String mKeyNine = "9";
     private String mKeyZero = "0";
 
-    private Context mContext;
 
-    public KeyNamesBuilder(@NonNull Context context) {
-        mContext = context;
+    public KeyNamesBuilder() {
     }
 
     public String getKeyOne() {
         return mKeyOne;
-    }
-
-    public KeyNamesBuilder setKeyOne(@StringRes int keyOne) {
-        mKeyOne = mContext.getString(keyOne);
-        return this;
     }
 
     public KeyNamesBuilder setKeyOne(@NonNull String keyOne) {
@@ -61,13 +54,13 @@ public final class KeyNamesBuilder {
         return this;
     }
 
-    public String getKeyTwo() {
-        return mKeyTwo;
+    public KeyNamesBuilder setKeyOne(@NonNull Context context, @StringRes int keyOne) {
+        mKeyOne = context.getString(keyOne);
+        return this;
     }
 
-    public KeyNamesBuilder setKeyTwo(@StringRes int keyTwo) {
-        mKeyTwo = mContext.getString(keyTwo);
-        return this;
+    public String getKeyTwo() {
+        return mKeyTwo;
     }
 
     public KeyNamesBuilder setKeyTwo(@NonNull String keyTwo) {
@@ -75,13 +68,13 @@ public final class KeyNamesBuilder {
         return this;
     }
 
-    public String getKeyThree() {
-        return mKeyThree;
+    public KeyNamesBuilder setKeyTwo(@NonNull Context context, @StringRes int keyTwo) {
+        mKeyTwo = context.getString(keyTwo);
+        return this;
     }
 
-    public KeyNamesBuilder setKeyThree(@StringRes int keyThree) {
-        mKeyThree = mContext.getString(keyThree);
-        return this;
+    public String getKeyThree() {
+        return mKeyThree;
     }
 
     public KeyNamesBuilder setKeyThree(@NonNull String keyThree) {
@@ -89,17 +82,22 @@ public final class KeyNamesBuilder {
         return this;
     }
 
+    public KeyNamesBuilder setKeyThree(@NonNull Context context, @StringRes int keyThree) {
+        mKeyThree = context.getString(keyThree);
+        return this;
+    }
+
     public String getmKeyFour() {
         return mKeyFour;
     }
 
-    public KeyNamesBuilder setKeyFour(String keyFour) {
+    public KeyNamesBuilder setKeyFour(@NonNull String keyFour) {
         mKeyFour = keyFour;
         return this;
     }
 
-    public KeyNamesBuilder setKeyFour(@StringRes int keyFour) {
-        mKeyFour = mContext.getString(keyFour);
+    public KeyNamesBuilder setKeyFour(@NonNull Context context, @StringRes int keyFour) {
+        mKeyFour = context.getString(keyFour);
         return this;
     }
 
@@ -107,13 +105,13 @@ public final class KeyNamesBuilder {
         return mKeyFive;
     }
 
-    public KeyNamesBuilder setKeyFive(@StringRes int keyFive) {
-        mKeyFive = mContext.getString(keyFive);
+    public KeyNamesBuilder setKeyFive(@NonNull String keyFive) {
+        mKeyFive = keyFive;
         return this;
     }
 
-    public KeyNamesBuilder setKeyFive(@NonNull String keyFive) {
-        mKeyFive = keyFive;
+    public KeyNamesBuilder setKeyFive(@NonNull Context context, @StringRes int keyFive) {
+        mKeyFive = context.getString(keyFive);
         return this;
     }
 
@@ -121,13 +119,13 @@ public final class KeyNamesBuilder {
         return mKeySix;
     }
 
-    public KeyNamesBuilder setKeySix(@StringRes int keySix) {
-        mKeySix = mContext.getString(keySix);
+    public KeyNamesBuilder setKeySix(@NonNull String keySix) {
+        mKeySix = keySix;
         return this;
     }
 
-    public KeyNamesBuilder setKeySix(@NonNull String keySix) {
-        mKeySix = keySix;
+    public KeyNamesBuilder setKeySix(@NonNull Context context, @StringRes int keySix) {
+        mKeySix = context.getString(keySix);
         return this;
     }
 
@@ -135,13 +133,13 @@ public final class KeyNamesBuilder {
         return mKeySeven;
     }
 
-    public KeyNamesBuilder setKeySeven(@StringRes int keySeven) {
-        mKeySeven = mContext.getString(keySeven);
+    public KeyNamesBuilder setKeySeven(@NonNull String keySeven) {
+        mKeySeven = keySeven;
         return this;
     }
 
-    public KeyNamesBuilder setKeySeven(@NonNull String keySeven) {
-        mKeySeven = keySeven;
+    public KeyNamesBuilder setKeySeven(@NonNull Context context, @StringRes int keySeven) {
+        mKeySeven = context.getString(keySeven);
         return this;
     }
 
@@ -149,13 +147,13 @@ public final class KeyNamesBuilder {
         return mKeyEight;
     }
 
-    public KeyNamesBuilder setKeyEight(@StringRes int keyEight) {
-        mKeyEight = mContext.getString(keyEight);
+    public KeyNamesBuilder setKeyEight(@NonNull String keyEight) {
+        mKeyEight = keyEight;
         return this;
     }
 
-    public KeyNamesBuilder setKeyEight(@NonNull String keyEight) {
-        mKeyEight = keyEight;
+    public KeyNamesBuilder setKeyEight(@NonNull Context context, @StringRes int keyEight) {
+        mKeyEight = context.getString(keyEight);
         return this;
     }
 
@@ -163,13 +161,13 @@ public final class KeyNamesBuilder {
         return mKeyNine;
     }
 
-    public KeyNamesBuilder setKeyNine(@StringRes int keyNine) {
-        mKeyNine = mContext.getString(keyNine);
+    public KeyNamesBuilder setKeyNine(@NonNull String keyNine) {
+        mKeyNine = keyNine;
         return this;
     }
 
-    public KeyNamesBuilder setKeyNine(@NonNull String keyNine) {
-        mKeyNine = keyNine;
+    public KeyNamesBuilder setKeyNine(@NonNull Context context, @StringRes int keyNine) {
+        mKeyNine = context.getString(keyNine);
         return this;
     }
 
@@ -177,25 +175,25 @@ public final class KeyNamesBuilder {
         return mKeyZero;
     }
 
-    public KeyNamesBuilder setKeyZero(@StringRes int keyZero) {
-        mKeyZero = mContext.getString(keyZero);
-        return this;
-    }
-
     public KeyNamesBuilder setKeyZero(@NonNull String keyZero) {
         mKeyZero = keyZero;
         return this;
     }
 
+    public KeyNamesBuilder setKeyZero(@NonNull Context context, @StringRes int keyZero) {
+        mKeyZero = context.getString(keyZero);
+        return this;
+    }
+
     @SuppressWarnings("Range")
     @Size(Constants.NO_OF_ROWS * Constants.NO_OF_COLUMNS)
-    public String[][] build() {
+    String[][] build() {
         return new String[][]{{mKeyOne, mKeyFour, mKeySeven, ""},
                 {mKeyTwo, mKeyFive, mKeyEight, mKeyZero},
                 {mKeyThree, mKeySix, mKeyNine, BACKSPACE_TITLE}};
     }
 
-    public int getValueOfKey(@NonNull String keyName) {
+    int getValueOfKey(@NonNull String keyName) {
         if (keyName.equals(mKeyOne)) return 1;
         else if (keyName.equals(mKeyTwo)) return 2;
         else if (keyName.equals(mKeyThree)) return 3;

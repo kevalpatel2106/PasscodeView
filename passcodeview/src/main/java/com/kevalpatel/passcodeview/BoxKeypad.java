@@ -37,7 +37,8 @@ final class BoxKeypad extends Box {
     static final float KEY_BOARD_TOP_WEIGHT = 0.2F;
 
     @Size(Constants.NO_OF_ROWS * Constants.NO_OF_COLUMNS)
-    private static String[][] mKeyNames;
+    private static String[][] sKeyNames;
+    private static KeyNamesBuilder sKeyNamesBuilder;
 
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
     private ArrayList<Key> mKeys;
@@ -52,23 +53,24 @@ final class BoxKeypad extends Box {
      */
     BoxKeypad(@NonNull PinView pinView) {
         super(pinView);
-        mKeyNames = new KeyNamesBuilder(getContext()).build();
+        sKeyNamesBuilder = new KeyNamesBuilder();
+        sKeyNames = sKeyNamesBuilder.build();
         isFingerPrintEnable = Utils.isFingerPrintEnrolled(getContext());
     }
 
     /**
      * Set the name of the different keys based on the locale.
-     * This method and {@link #mKeyNames} are static to avoid duplicate object creation.
+     * This method and {@link #sKeyNames} are static to avoid duplicate object creation.
      *
      * @param keyNames String with the names of the key.
      */
-    static void setKeyNames(@Size(Constants.NO_OF_ROWS * Constants.NO_OF_COLUMNS) String[][] keyNames) {
-        if (keyNames.length != Constants.NO_OF_ROWS * Constants.NO_OF_COLUMNS
-                && !keyNames[Constants.NO_OF_COLUMNS - 1][Constants.NO_OF_ROWS - 1].equals(KeyNamesBuilder.BACKSPACE_TITLE)) {
-            throw new IllegalArgumentException("Invalid key values. Use KeyNameBuilder to build key names.");
-        }
+    static void setKeyNames(@NonNull KeyNamesBuilder keyNames) {
+        sKeyNamesBuilder = keyNames;
+        sKeyNames = keyNames.build();
+    }
 
-        mKeyNames = keyNames;
+    KeyNamesBuilder getKeyNameBuilder() {
+        return sKeyNamesBuilder;
     }
 
     /**
@@ -121,7 +123,7 @@ final class BoxKeypad extends Box {
                 keyBound.right = (int) (keyBound.left + singleKeyWidth);
                 keyBound.top = (int) ((rowNo * singleKeyHeight) + mKeyBoxBound.top);
                 keyBound.bottom = (int) (keyBound.top + singleKeyHeight);
-                mKeys.add(mKeyBuilder.getKey(mKeyNames[colNo][rowNo], keyBound));
+                mKeys.add(mKeyBuilder.getKey(sKeyNames[colNo][rowNo], keyBound));
             }
         }
     }
@@ -155,7 +157,7 @@ final class BoxKeypad extends Box {
     }
 
     /**
-     * Draw keyboard on the canvas. This will draw all the {@link #mKeyNames} on the canvas.
+     * Draw keyboard on the canvas. This will draw all the {@link #sKeyNames} on the canvas.
      *
      * @param canvas canvas on which the keyboard will be drawn.
      */

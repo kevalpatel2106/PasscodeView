@@ -149,7 +149,7 @@ public final class DotIndicator extends Indicator {
         }
 
         @NonNull
-        public DotIndicator.Builder setIndicatorStrokeColorResource(@ColorRes int indicatorStrokeColor) {
+        public DotIndicator.Builder setIndicatorEmptyColorResource(@ColorRes int indicatorStrokeColor) {
             mIndicatorStrokeColor = getContext().getResources().getColor(indicatorStrokeColor);
             return this;
         }
@@ -177,14 +177,14 @@ public final class DotIndicator extends Indicator {
         }
 
         @NonNull
-        public DotIndicator.Builder setIndicatorRadius(@DimenRes int indicatorRadius) {
-            mIndicatorRadius = getContext().getResources().getDimension(indicatorRadius);
+        public DotIndicator.Builder setIndicatorRadius(@Dimension float indicatorRadius) {
+            mIndicatorRadius = indicatorRadius;
             return this;
         }
 
         @NonNull
-        public DotIndicator.Builder setIndicatorRadius(@Dimension float indicatorRadius) {
-            mIndicatorRadius = indicatorRadius;
+        public DotIndicator.Builder setIndicatorRadius(@DimenRes int indicatorRadius) {
+            mIndicatorRadius = getContext().getResources().getDimension(indicatorRadius);
             return this;
         }
 

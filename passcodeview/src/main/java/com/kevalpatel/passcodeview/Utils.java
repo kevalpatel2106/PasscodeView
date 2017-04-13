@@ -26,6 +26,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.RequiresPermission;
 
+import java.util.ArrayList;
+
 /**
  * Created by Keval on 07-Oct-16.
  *
@@ -75,7 +77,14 @@ public final class Utils {
         }
     }
 
-    static boolean isValidPin(String pinToCheck) {
-        return pinToCheck.matches("[0-9]+");
+    static boolean isValidPin(int[] pinToCheck) {
+        for (int i : pinToCheck) if (i > 9 && i < 0) return false;
+        return true;
+    }
+
+    static boolean isPINMatched(int[] correctPin, ArrayList<Integer> pinToCheck) {
+        for (int i = 0; i < correctPin.length; i++)
+            if (correctPin[i] != pinToCheck.get(i)) return false;
+        return correctPin.length == pinToCheck.size();
     }
 }
