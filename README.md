@@ -21,6 +21,7 @@ This library provide easy and secure PIN authentication view, which
   * localized name of each key in pin keyboard. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names)
   * size of the each single key.
   * color and shape of pin indicators.👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators)
+
  
 ## How to use this library?
 - ### Gradle Dependency:
@@ -32,7 +33,7 @@ This library provide easy and secure PIN authentication view, which
   ```
   
 - ### Add `PinView` in your layout file.
-  ```
+  ```java
   <com.kevalpatel.passcodeview.PinView
           android:id="@+id/pin_view"
           android:layout_width="match_parent"
@@ -43,21 +44,11 @@ This library provide easy and secure PIN authentication view, which
           app:fingerprintEnable="true"
           app:fingerprintTextColor="@color/colorAccent"
           app:fingerprintTextSize="@dimen/finger_print_text_size"
-          app:indicatorRadius="@dimen/indicator_radius"
-          app:indicatorSolidColor="@color/colorAccent"
-          app:indicatorStrokeColor="@color/colorAccent"
-          app:indicatorStrokeWidth="@dimen/indicator_stroke_width"
-          app:keyShape="circle"
-          app:keyStrokeColor="@color/colorAccent"
-          app:keyStrokeWidth="@dimen/lib_key_stroke_width"
-          app:keyTextColor="@color/colorAccent"
-          app:keyTextSize="@dimen/lib_key_text_size"
-          app:pinLength="4"
           app:titleTextColor="@android:color/white"/>
   ```
   
 - ### Set the correct pin code to authenticate the user in your activity/fragment.
-  ```
+  ```java
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -65,51 +56,153 @@ This library provide easy and secure PIN authentication view, which
     //...
           
     PinView pinView = (PinView) findViewById(R.id.pin_view);
-    pinView.setPinToCheck("1234");
+    pinView.setCorrectPin(new int[]{1, 2, 3, 4});
     //...
   }
   ```
 
+- ### Set the shape of the key you want to use. 
+  - There are two built in key shapes. 
+    * Round key
+    * Rectangle key
+  - Here is the example for the round keys.
+  ```java
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      //....
+      //...
+            
+      PinView pinView = (PinView) findViewById(R.id.pin_view);
+      pinView.setCorrectPin(new int[]{1, 2, 3, 4});
+    
+      //Build the desired key shape and pass the theme parameters.
+      //REQUIRED
+      pinView.setKey(new RoundKey.Builder(pinView)
+              .setKeyPadding(R.dimen.key_padding)
+              .setKeyStrokeColorResource(R.color.colorAccent)
+              .setKeyStrokeWidth(R.dimen.key_stroke_width)
+              .setKeyTextColorResource(R.color.colorAccent)
+              .setKeyTextSize(R.dimen.key_text_size)
+              .build());
+      
+      //...
+    }
+    ```
+
+- ### Set the shape of the pin indicators you want to use. 
+  - There are two built in key shapes. 
+    * Round indicator
+    * Dot indicator
+  - Here is the example for the round indicator. You can learn more about other indicators from [here](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators).
+  ```java
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      //....
+      //...
+            
+      PinView pinView = (PinView) findViewById(R.id.pin_view);
+      pinView.setCorrectPin(new int[]{1, 2, 3, 4});
+      pinView.setKey(...);
+            
+      //Build the desired indicator shape and pass the theme attributes.
+      //REQUIRED
+      pinView.setIndicator(new CircleIndicator.Builder(pinView)
+              .setIndicatorRadius(R.dimen.indicator_radius)
+              .setIndicatorFilledColorResource(R.color.colorAccent)
+              .setIndicatorStrokeColorResource(R.color.colorAccent)
+              .setIndicatorStrokeWidth(R.dimen.indicator_stroke_width)
+              .build());
+      
+      //...
+    }
+    ```
+
+- ### Set key names.
+  - Set the texts to display on different keys. This is optional step. If you don't set the key names, by default `PINView` will display English locale digits.
+  - If you want to learn more about key name localization visit [here](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names).
+  ```java
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      //....
+      //...
+            
+      PinView pinView = (PinView) findViewById(R.id.pin_view);
+      pinView.setCorrectPin(new int[]{1, 2, 3, 4});
+      pinView.setKey(...);
+      pinView.setIndicator(...);
+      
+      //Set the name of the keys based on your locale.
+      //OPTIONAL. If not passed key names will be displayed based on english locale.
+      pinView.setKeyNames(new KeyNamesBuilder()
+            .setKeyOne(this, R.string.key_1)
+            .setKeyTwo(this, R.string.key_2)
+            .setKeyThree(this, R.string.key_3)
+            .setKeyFour(this, R.string.key_4)
+            .setKeyFive(this, R.string.key_5)
+            .setKeySix(this, R.string.key_6)
+            .setKeySeven(this, R.string.key_7)
+            .setKeyEight(this, R.string.key_8)
+            .setKeyNine(this, R.string.key_9)
+            .setKeyZero(this, R.string.key_0));
+
+      //...
+    }
+    ```
+  
 - ### Set callback listener to get callbacks when user is authenticated or authentication fails.
+  ```java
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      //....
+      //...
+            
+      PinView pinView = (PinView) findViewById(R.id.pin_view);
+      pinView.setCorrectPin(new int[]{1, 2, 3, 4});
+      pinView.setKey(...);            //REQUIRED
+      pinView.setIndicator(...);      //REQUIRED
+      pinView.setKeyNames(...)        //OPTIONAL
+
+      pinView.setAuthenticationListener(new AuthenticationListener() {
+                 @Override
+                 public void onAuthenticationSuccessful() {
+                     //User authenticated successfully.
+                     //Navigate to next screens.
+                 }
+     
+                 @Override
+                 public void onAuthenticationFailed() {
+                     //Calls whenever authentication is failed or user is unauthorized.
+                     //Do something if you want to handle unauthorized user.
+                 }
+             });
+             
+      //...
+    }
   ```
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    //....
-    //...
-          
-    PinView pinView = (PinView) findViewById(R.id.pin_view);
-    pinView.setPinToCheck("1234");
-    pinView.setAuthenticationListener(new AuthenticationListener() {
-               @Override
-               public void onAuthenticationSuccessful() {
-                   //User authenticated successfully.
-                   //Navigate to next screens.
-               }
-   
-               @Override
-               public void onAuthenticationFailed() {
-                   //Calls whenever authentication is failed or user is unauthorized.
-                   //Do something if you want to handle unauthorized user.
-               }
-           });
-           
-    //...
-  }
-  ```
+
 
 ## Demo: 
 **Authentication using PIN**
 
-|<font color="green">Success</font>|<font color="red">Fail</font>|
+|Success|Fail|
 |:---:|:---:|
-|![PIN Success](/resource/pin_success.gif)|![PIN Failed](/resource/pin_failed.gif):|
+|![PIN Success](/resource/pin_success.gif)|![PIN Failed](/resource/pin_failed.gif)|
 
 **Authentication using fingerprint**
 
-|<font color="green">Success</font>|<font color="red">Fail</font>|
+|Success|Fail|
 |:---:|:---:|
-|![Fingerprint Success](/resource/fingerprint_success.gif)|![Fingerprint Failed](/resource/fingerprint_failed.gif):|
+|![Fingerprint Success](/resource/fingerprint_success.gif)|![Fingerprint Failed](/resource/fingerprint_failed.gif)|
+
+**Localized Texts**
+
+|English|Hindi|
+|:---:|:---:|
+|![Locale English](/resource/locale_en.png)|![Locale Hindi](/resource/locale_hn.png)|
 
 *Here is the link of the demo application. 👉 [Demo](resource/sample.apk)*
 
