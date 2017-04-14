@@ -33,6 +33,8 @@ import android.support.annotation.Nullable;
 import android.text.TextPaint;
 import android.view.animation.CycleInterpolator;
 
+import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
+
 /**
  * Created by Keval on 07-Apr-17.
  *

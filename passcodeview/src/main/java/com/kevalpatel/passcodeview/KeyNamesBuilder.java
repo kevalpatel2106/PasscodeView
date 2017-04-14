@@ -23,6 +23,9 @@ import android.support.annotation.StringRes;
 
 /**
  * Created by Keval Patel on 13/04/17.
+ * This is the builder class to set the names to display on each key. The keys name should be appropriate
+ * to their value. By using this you can localize the key names based on users device's current locale.
+ * {@link "https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names"}
  *
  * @author 'https://github.com/kevalpatel2106'
  */
@@ -43,6 +46,7 @@ public final class KeyNamesBuilder {
 
 
     public KeyNamesBuilder() {
+        //Do nothing
     }
 
     public String getKeyOne() {

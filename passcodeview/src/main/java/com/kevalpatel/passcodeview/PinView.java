@@ -33,9 +33,8 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.kevalpatel.passcodeview.indicators.Indicator;
+import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 import com.kevalpatel.passcodeview.keys.Key;
-
-import java.util.ArrayList;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -43,17 +42,17 @@ import java.util.ArrayList;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class PinView extends View {
+public class PinView extends View implements InteractiveArrayList.ChangeListener {
     private Context mContext;
     private float mDownKeyX;                                        //X coordinate of the ACTION_DOWN point
     private float mDownKeyY;                                        //Y coordinate of the ACTION_DOWN point
 
     private AuthenticationListener mAuthenticationListener;         //Callback listener for application to get notify when authentication successful.
     private int[] mCorrectPin;                                      //Current PIN with witch entered PIN will check.
-    private ArrayList<Integer> mPinTyped = new ArrayList<>();       //PIN typed.
+    private InteractiveArrayList<Integer> mPinTyped = new InteractiveArrayList<>();       //PIN typed.
 
     //Rectangle bounds
-    private Rect mRootViewBound = new Rect();
+    private Rect mRootViewBound = new Rect();       //Root bound
     private Rect mDividerBound = new Rect();        //Divider bound
 
     //Theme attributes
@@ -99,6 +98,7 @@ public class PinView extends View {
     @SuppressWarnings("deprecation")
     private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
         mContext = context;
+        mPinTyped.setChangeListner(this);
 
         //Initialize UI boxes.
         mBoxKeypad = new BoxKeypad(this);
@@ -122,6 +122,11 @@ public class PinView extends View {
         mBoxIndicator.preparePaint();
     }
 
+    /**
+     * Parse the theme attribute using the parse array.
+     *
+     * @param attrs theme AttributeSet.
+     */
     @SuppressWarnings("deprecation")
     private void parseTypeArr(@Nullable AttributeSet attrs) {
         TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.PinView, 0, 0);
@@ -152,6 +157,9 @@ public class PinView extends View {
         }
     }
 
+    /**
+     * Create the paint to draw divider.
+     */
     private void prepareDividerPaint() {
         mDividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mDividerPaint.setColor(mDividerColor);
@@ -271,7 +279,6 @@ public class PinView extends View {
             mPinTyped.add(mBoxKeypad.getKeyNameBuilder().getValueOfKey(newDigit));
         }
 
-        mBoxIndicator.onPinDigitEntered(mPinTyped.size());
         invalidate();
 
         if (mCorrectPin.length == mPinTyped.size()) {
@@ -302,7 +309,6 @@ public class PinView extends View {
      */
     public void reset() {
         mPinTyped.clear();
-        mBoxIndicator.onPinDigitEntered(mPinTyped.size());
         invalidate();
     }
 
@@ -338,7 +344,6 @@ public class PinView extends View {
         mBoxIndicator.setPinLength(mCorrectPin.length);
 
         mPinTyped.clear();
-        mBoxIndicator.onPinDigitEntered(mPinTyped.size());
         invalidate();
     }
 
@@ -416,13 +421,13 @@ public class PinView extends View {
         return mBoxFingerprint.getStatusTextSize();
     }
 
-    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
+    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(statusTextSize);
         invalidate();
     }
 
-    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(statusTextSize);
+    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
         invalidate();
     }
 
@@ -462,9 +467,34 @@ public class PinView extends View {
         BoxKeypad.setKeyNames(keyNames);
 
         mPinTyped.clear(); //Need to clear the typed pin, so that change in localization don't affect the pin matching process.
-        mBoxIndicator.onPinDigitEntered(mPinTyped.size());
 
         requestLayout();
         invalidate();
+    }
+
+    public int[] getCurrentTypedPin() {
+        int[] arr = new int[mPinTyped.size()];
+        for (int i = 0; i < mPinTyped.size(); i++) arr[i] = mPinTyped.get(i);
+        return arr;
+    }
+
+    public void setCurrentTypedPin(int[] currentTypedPin) {
+        if (mCorrectPin.length == 0) {
+            throw new IllegalStateException("You must call setCorrectPin() before calling this method.");
+        } else if (currentTypedPin.length > mCorrectPin.length) {
+            throw new IllegalArgumentException("Invalid pin length.");
+        }
+
+        //Add the pin to pin typed
+        mPinTyped.clear();
+        for (int i : currentTypedPin) mPinTyped.add(i);
+
+        requestLayout();
+        invalidate();
+    }
+
+    @Override
+    public void onArrayValueChange(int size) {
+        mBoxIndicator.onPinDigitEntered(size);
     }
 }
