@@ -19,6 +19,7 @@ package com.kevalpatel.passcodeview.keys;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -43,11 +44,12 @@ import com.kevalpatel.passcodeview.R;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-@SuppressWarnings("ALL")
 public final class RectKey extends Key {
     private final Rect mBounds;                         //RoundKey bound.
-    private final PinView mPinView;                           //Pin view
+    private final PinView mPinView;                     //Pin view
     private final Builder mBuilder;
+    private final ValueAnimator mErrorAnimator;
+    private boolean isClickedAnimationRunning = false;
 
     /**
      * Public constructor.
@@ -65,6 +67,18 @@ public final class RectKey extends Key {
         mBounds = bounds;
         mPinView = pinView;
         mBuilder = builder;
+
+        //Error animator
+        mErrorAnimator = ValueAnimator.ofInt(0, 10);
+        mErrorAnimator.setInterpolator(new CycleInterpolator(2));
+        mErrorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mBounds.left += (int) animation.getAnimatedValue();
+                mBounds.right += (int) animation.getAnimatedValue();
+                mPinView.invalidate();
+            }
+        });
     }
 
     /**
@@ -74,7 +88,16 @@ public final class RectKey extends Key {
      */
     @Override
     public void playClickAnimation() {
-        //TODO Click animation
+        isClickedAnimationRunning = true;
+        mPinView.invalidate();
+
+        new android.os.Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                isClickedAnimationRunning = false;
+                mPinView.invalidate();
+            }
+        }, 200);
     }
 
     /**
@@ -82,36 +105,23 @@ public final class RectKey extends Key {
      */
     @Override
     public void onAuthFail() {
-        ValueAnimator goLeftAnimator = ValueAnimator.ofInt(0, 10);
-        goLeftAnimator.setInterpolator(new CycleInterpolator(2));
-        goLeftAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                mBounds.left += (int) animation.getAnimatedValue();
-                mBounds.right += (int) animation.getAnimatedValue();
-                mPinView.invalidate();
-            }
-        });
-        goLeftAnimator.start();
+        mErrorAnimator.start();
     }
 
     /**
      * Draw the key of canvas.
      * Don't change until you know what you are doing. :-)
      *
-     * @param canvas       canvas of the view o which key will be drawn
-     * @param keyPaint     RoundKey background paint
-     * @param keyTextPaint RoundKey text paint
+     * @param canvas canvas of the view o which key will be drawn
      */
     @Override
     public void draw(@NonNull Canvas canvas) {
-
         //Draw circle background
         canvas.drawRect(mBounds.left + mBuilder.getKeyPadding(),
                 mBounds.top + mBuilder.getKeyPadding(),
                 mBounds.right - mBuilder.getKeyPadding(),
                 mBounds.bottom - mBuilder.getKeyPadding(),
-                mBuilder.getKeyPaint());
+                isClickedAnimationRunning ? mBuilder.getClickPaint() : mBuilder.getKeyPaint());
 
         if (getDigit().equals(KeyNamesBuilder.BACKSPACE_TITLE)) {  //Backspace key
             Drawable d = mPinView.getContext().getResources().getDrawable(R.drawable.ic_back_space);
@@ -173,6 +183,7 @@ public final class RectKey extends Key {
         private Paint mKeyPaint;
         @NonNull
         private TextPaint mKeyTextPaint;
+        private Paint mClickPaint;
 
         public Builder(@NonNull PinView pinView) {
             super(pinView);
@@ -183,13 +194,13 @@ public final class RectKey extends Key {
             return mKeyPadding;
         }
 
-        public Builder setKeyPadding(@Dimension float keyPadding) {
-            mKeyPadding = keyPadding;
+        public Builder setKeyPadding(@DimenRes int keyPaddingRes) {
+            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
             return this;
         }
 
-        public Builder setKeyPadding(@DimenRes int keyPaddingRes) {
-            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
+        public Builder setKeyPadding(@Dimension float keyPadding) {
+            mKeyPadding = keyPadding;
             return this;
         }
 
@@ -197,13 +208,13 @@ public final class RectKey extends Key {
             return mKeyTextSize;
         }
 
-        public Builder setKeyTextSize(float keyTextSize) {
-            mKeyTextSize = keyTextSize;
+        public Builder setKeyTextSize(@DimenRes int keyTextSize) {
+            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
             return this;
         }
 
-        public Builder setKeyTextSize(@DimenRes int keyTextSize) {
-            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
+        public Builder setKeyTextSize(float keyTextSize) {
+            mKeyTextSize = keyTextSize;
             return this;
         }
 
@@ -212,14 +223,14 @@ public final class RectKey extends Key {
         }
 
         @Dimension
-        public Builder setKeyStrokeWidth(float keyStrokeWidth) {
-            mKeyStrokeWidth = keyStrokeWidth;
+        public Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
+            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
             return this;
         }
 
         @Dimension
-        public Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
-            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
+        public Builder setKeyStrokeWidth(float keyStrokeWidth) {
+            mKeyStrokeWidth = keyStrokeWidth;
             return this;
         }
 
@@ -269,6 +280,11 @@ public final class RectKey extends Key {
             mKeyTextPaint.setFakeBoldText(true);
             mKeyTextPaint.setTextAlign(Paint.Align.CENTER);
 
+            //Ripple paint
+            mClickPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            mClickPaint.setStyle(Paint.Style.STROKE);
+            mClickPaint.setColor(makeColorDark(mKeyStrokeColor));
+            mClickPaint.setStrokeWidth(mKeyStrokeWidth);
             return this;
         }
 
@@ -294,9 +310,29 @@ public final class RectKey extends Key {
         }
 
         @NonNull
+        protected Paint getClickPaint() {
+            return mClickPaint;
+        }
+
+        @NonNull
         @Override
         public RectKey getKey(@NonNull String digit, @NonNull Rect bound) {
             return new RectKey(super.getPinView(), digit, bound, this);
+        }
+
+        /**
+         * Get the darker version of the given color.
+         *
+         * @param color Normal color.
+         * @return Darker shade of the color.
+         * @see 'http://stackoverflow.com/a/4928826'
+         */
+        @ColorInt
+        private int makeColorDark(@ColorInt int color) {
+            float[] hsv = new float[3];
+            Color.colorToHSV(color, hsv);
+            hsv[2] = 1f - 0.8f * hsv[2]; // value component
+            return Color.HSVToColor(hsv);
         }
     }
 }
