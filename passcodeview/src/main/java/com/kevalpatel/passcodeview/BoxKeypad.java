@@ -42,7 +42,6 @@ final class BoxKeypad extends Box {
 
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
     private ArrayList<Key> mKeys;
-    private boolean isFingerPrintEnable;
     private Rect mKeyBoxBound = new Rect();
     private Key.Builder mKeyBuilder;
 
@@ -55,7 +54,6 @@ final class BoxKeypad extends Box {
         super(pinView);
         sKeyNamesBuilder = new KeyNamesBuilder();
         sKeyNames = sKeyNamesBuilder.build();
-        isFingerPrintEnable = Utils.isFingerPrintEnrolled(getContext());
     }
 
     /**
@@ -109,7 +107,7 @@ final class BoxKeypad extends Box {
         mKeyBoxBound.right = rootViewBound.width();
         mKeyBoxBound.top = (int) (rootViewBound.top + (rootViewBound.height() * KEY_BOARD_TOP_WEIGHT));
         mKeyBoxBound.bottom = (int) (rootViewBound.bottom -
-                rootViewBound.height() * (isFingerPrintEnable ? KEY_BOARD_BOTTOM_WEIGHT : 0));
+                rootViewBound.height() * (getRootView().isFingerPrintEnable() ? KEY_BOARD_BOTTOM_WEIGHT : 0));
 
         float singleKeyHeight = mKeyBoxBound.height() / Constants.NO_OF_ROWS;
         float singleKeyWidth = mKeyBoxBound.width() / Constants.NO_OF_COLUMNS;
@@ -211,9 +209,6 @@ final class BoxKeypad extends Box {
         mIsOneHandOperation = oneHandOperation;
     }
 
-    void setFingerPrintEnable(boolean fingerPrintEnable) {
-        isFingerPrintEnable = fingerPrintEnable && Utils.isFingerPrintEnrolled(getContext());
-    }
 
     Key.Builder getKeyBuilder() {
         return mKeyBuilder;

@@ -58,8 +58,8 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
 
     //Theme attributes
     @ColorInt
-    private int mDividerColor;                      //Horizontal divider color
-    private boolean mIsTactileFeedbackREnabled = true;
+    private int mDividerColor;                              //Horizontal divider color
+    private boolean mIsTactileFeedbackREnabled = true;      //Bool to indicate weather to enable tactile feedback
 
     //Paints
     private Paint mDividerPaint;                    //Horizontal divider paint color
@@ -144,8 +144,6 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
             //Parse divider params
             mDividerColor = a.getColor(R.styleable.PinView_dividerColor,
                     mContext.getResources().getColor(R.color.lib_divider_color));
-
-            mBoxKeypad.setFingerPrintEnable(a.getBoolean(R.styleable.PinView_fingerprintEnable, true));
 
             //Fet fingerprint params
             //noinspection ConstantConditions
@@ -493,23 +491,22 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
         return mBoxFingerprint.getStatusTextSize();
     }
 
-    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(statusTextSize);
-        invalidate();
-    }
-
     public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
         mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
         invalidate();
     }
 
-    public Boolean isFingerPrintEnable() {
-        return mBoxFingerprint.setFingerPrintEnable();
+    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(statusTextSize);
+        invalidate();
     }
 
-    public void isFingerPrintEnable(boolean isEnable) {
+    public Boolean isFingerPrintEnable() {
+        return mBoxFingerprint.isFingerPrintEnable();
+    }
+
+    public void setIsFingerPrintEnable(boolean isEnable) {
         mBoxFingerprint.setFingerPrintEnable(isEnable);
-        mBoxKeypad.setFingerPrintEnable(isEnable);
         invalidate();
     }
 

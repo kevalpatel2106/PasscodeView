@@ -67,20 +67,17 @@ final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPr
         super(view);
         isFingerPrintBoxVisible = Utils.isFingerPrintEnrolled(getContext());
 
-        enableFingerprintScanner();
-    }
-
-    private void enableFingerprintScanner() {
-        if (!isFingerPrintBoxVisible) return;
-
-        mFingerPrintAuthHelper = FingerPrintAuthHelper.getHelper(getContext(), this);
-        mFingerPrintAuthHelper.startAuth();
+        if (isFingerPrintBoxVisible) {
+            mFingerPrintAuthHelper = new FingerPrintAuthHelper(getContext(), this);
+            mFingerPrintAuthHelper.startAuth();
+        }
     }
 
     void stopFingerprintScanner() {
         if (mFingerPrintAuthHelper != null) mFingerPrintAuthHelper.stopAuth();
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     void setDefaults() {
         mStatusTextSize = getContext().getResources().getDimension(R.dimen.lib_fingerprint_status_text_size);
@@ -167,9 +164,11 @@ final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPr
 
     }
 
+    /**
+     * Apply the error animations which will move key left to right and after right to left for two times.
+     */
     private void playErrorAnimation() {
         ValueAnimator goLeftAnimator = ValueAnimator.ofInt(0, 10);
-        goLeftAnimator.setDuration(500);
         goLeftAnimator.setInterpolator(new CycleInterpolator(2));
         goLeftAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -179,8 +178,6 @@ final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPr
                 getRootView().invalidate();
             }
         });
-        goLeftAnimator.start();
-
         goLeftAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -209,6 +206,7 @@ final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPr
 
             }
         });
+        goLeftAnimator.start();
     }
 
     ///////////////// SETTERS/GETTERS //////////////
@@ -239,14 +237,25 @@ final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPr
         this.mStatusTextSize = statusTextSize;
     }
 
-    Boolean setFingerPrintEnable() {
+    Boolean isFingerPrintEnable() {
         return isFingerPrintBoxVisible;
     }
 
+    /**
+     * Enable/Disable finger print scanning programmatically.
+     *
+     * @param isEnable true if the fingerprint scanning is enabled.
+     */
     void setFingerPrintEnable(boolean isEnable) {
         this.isFingerPrintBoxVisible = isEnable && Utils.isFingerPrintEnrolled(getContext());
     }
 
+    /**
+     * Authentication callback listener. If {@link AuthenticationListener} is not set, fingerprint
+     * authentication callbacks won't get call.
+     *
+     * @param authListener {@link AuthenticationListener}
+     */
     void setAuthListener(@NonNull AuthenticationListener authListener) {
         this.mAuthListener = authListener;
     }

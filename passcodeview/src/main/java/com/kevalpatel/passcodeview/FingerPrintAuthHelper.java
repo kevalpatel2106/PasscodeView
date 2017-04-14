@@ -47,6 +47,7 @@ import javax.crypto.SecretKey;
 /**
  * Created by Keval on 07-Oct-16.<p>
  * This class will authenticate user with finger print.
+ * This class is the extended version of {@link 'https://github.com/multidots/android-fingerprint-authentication/blob/master/fingerprint-auth/src/main/java/com/multidots/fingerprintauth/FingerPrintAuthHelper.java'}
  *
  * @author 'https://github.com/kevalpatel2106'
  */
@@ -56,7 +57,7 @@ final class FingerPrintAuthHelper {
      * The help string is provided to give the user guidance for what went wrong, such as "Sensor dirty, please clean it."
      * This error can be fixed by the user. Developer should display the error message to the screen to guide
      * user how to fix the error.
-     *
+     * <p>
      * See:'https://developer.android.com/reference/android/hardware/fingerprint/FingerprintManager.AuthenticationCallback.html#onAuthenticationHelp(int, java.lang.CharSequence)'
      */
     static final int RECOVERABLE_ERROR = 843;
@@ -66,18 +67,18 @@ final class FingerPrintAuthHelper {
      * No further callbacks will be made on this object.
      * Developer can stop the finger print scanning whenever this error occur and display the message received in callback.
      * Developer should use any other way of authenticating the user, like pin or password to authenticate the user.
-     *
+     * <p>
      * See:'https://developer.android.com/reference/android/hardware/fingerprint/FingerprintManager.AuthenticationCallback.html#onAuthenticationError(int, java.lang.CharSequence)'
      */
     static final int NON_RECOVERABLE_ERROR = 566;
 
     /**
      * Called when a fingerprint is valid but not recognized.
-     *
+     * <p>
      * See:'https://developer.android.com/reference/android/hardware/fingerprint/FingerprintManager.AuthenticationCallback.html#onAuthenticationError(int, java.lang.CharSequence)'
      */
     static final int CANNOT_RECOGNIZE_ERROR = 456;
-    
+
     private static final String KEY_NAME = UUID.randomUUID().toString();
 
     //error messages
@@ -108,9 +109,12 @@ final class FingerPrintAuthHelper {
     private boolean isScanning;
 
     /**
-     * Private constructor.
+     * Public constructor.
+     *
+     * @param context  instance of the caller.
+     * @param callback {@link FingerPrintAuthCallback} to get notify whenever authentication success/fails.
      */
-    private FingerPrintAuthHelper(@NonNull Context context, @NonNull FingerPrintAuthCallback callback) {
+    FingerPrintAuthHelper(@NonNull Context context, @NonNull FingerPrintAuthCallback callback) {
         mCallback = callback;
         mContext = context;
     }
@@ -119,25 +123,6 @@ final class FingerPrintAuthHelper {
      * Private constructor.
      */
     private FingerPrintAuthHelper() {
-        throw new RuntimeException("Use getHelper() to initialize FingerPrintAuthHelper.");
-    }
-
-    /**
-     * Get the {@link FingerPrintAuthHelper}
-     *
-     * @param context  instance of the caller.
-     * @param callback {@link FingerPrintAuthCallback} to get notify whenever authentication success/fails.
-     * @return {@link FingerPrintAuthHelper}
-     */
-    @SuppressWarnings("ConstantConditions")
-    public static FingerPrintAuthHelper getHelper(@NonNull Context context, @NonNull FingerPrintAuthCallback callback) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context cannot be null.");
-        } else if (callback == null) {
-            throw new IllegalArgumentException("FingerPrintAuthCallback cannot be null.");
-        }
-
-        return new FingerPrintAuthHelper(context, callback);
     }
 
     /**
@@ -166,11 +151,11 @@ final class FingerPrintAuthHelper {
     }
 
     /**
-     * Generate authentication key.
+     * Generate authentication key. This is for API @3 or above only.
      *
      * @return true if the key generated successfully.
      */
-    @TargetApi(23)
+    @TargetApi(Build.VERSION_CODES.M)
     private boolean generateKey() {
         mKeyStore = null;
         KeyGenerator keyGenerator;
@@ -210,11 +195,11 @@ final class FingerPrintAuthHelper {
     }
 
     /**
-     * Initialize the cipher.
+     * Initialize the cipher. This is for API @3 or above only.
      *
      * @return true if the initialization is successful.
      */
-    @TargetApi(23)
+    @TargetApi(Build.VERSION_CODES.M)
     private boolean cipherInit() {
         boolean isKeyGenerated = generateKey();
 
@@ -250,7 +235,7 @@ final class FingerPrintAuthHelper {
         }
     }
 
-    @TargetApi(23)
+    @TargetApi(Build.VERSION_CODES.M)
     @Nullable
     private FingerprintManager.CryptoObject getCryptoObject() {
         return cipherInit() ? new FingerprintManager.CryptoObject(mCipher) : null;
@@ -262,7 +247,7 @@ final class FingerPrintAuthHelper {
      * in onPause() of the activity/fragment.
      */
     @TargetApi(Build.VERSION_CODES.M)
-    public void startAuth() {
+    void startAuth() {
         if (isScanning) stopAuth();
 
         //check if the device supports the finger print hardware?
@@ -307,7 +292,7 @@ final class FingerPrintAuthHelper {
      * Stop the finger print authentication.
      */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public void stopAuth() {
+    void stopAuth() {
         if (mCancellationSignal != null) {
             isScanning = true;
             mCancellationSignal.cancel();
@@ -323,12 +308,8 @@ final class FingerPrintAuthHelper {
     }
 
     /**
-     * Created by Keval on 07-Oct-16.
      * This is the callback listener to notify the finger print authentication result to the parent.
-     *
-     * @author 'https://github.com/kevalpatel2106'
      */
-
     interface FingerPrintAuthCallback {
         /**
          * This method will occur whenever  user authentication is successful.
@@ -341,8 +322,8 @@ final class FingerPrintAuthHelper {
          * This method will execute whenever any error occurs during the authentication.
          *
          * @param errorCode    Error code for the error occurred. These error code will be from error codes.
-         * @param errorMessage A human-readable error string that can be shown in UI
+         * @param errorMessage A human-readable error string that can be shown in UI. This may be null.
          */
-        void onFingerprintAuthFailed(int errorCode, String errorMessage);
+        void onFingerprintAuthFailed(int errorCode, @Nullable String errorMessage);
     }
 }

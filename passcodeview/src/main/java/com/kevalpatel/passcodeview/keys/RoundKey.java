@@ -56,6 +56,8 @@ public final class RoundKey extends Key {
     private Builder mBuilder;
 
     private ValueAnimator mRippleValueAnimator;         //Ripple animator
+    private ValueAnimator mErrorAnimator;               //Left-Right animator
+
     private boolean isRippleEffectRunning = false;      //Bool to indicate if the ripple effect is currently running?
     private int mCurrentRippleRadius = 0;               //Current ripple radius
     private int mCurrentAlpha;                          //Current ripple alpha.
@@ -122,6 +124,18 @@ public final class RoundKey extends Key {
 
             }
         });
+
+        //Error animator
+        mErrorAnimator = ValueAnimator.ofInt(0, 10);
+        mErrorAnimator.setInterpolator(new CycleInterpolator(2));
+        mErrorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mBounds.left += (int) animation.getAnimatedValue();
+                mBounds.right += (int) animation.getAnimatedValue();
+                mView.invalidate();
+            }
+        });
     }
 
     /**
@@ -150,17 +164,7 @@ public final class RoundKey extends Key {
      */
     @Override
     public void onAuthFail() {
-        ValueAnimator goLeftAnimator = ValueAnimator.ofInt(0, 10);
-        goLeftAnimator.setInterpolator(new CycleInterpolator(2));
-        goLeftAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                mBounds.left += (int) animation.getAnimatedValue();
-                mBounds.right += (int) animation.getAnimatedValue();
-                mView.invalidate();
-            }
-        });
-        goLeftAnimator.start();
+        mErrorAnimator.start();
     }
 
     @Override
@@ -266,13 +270,13 @@ public final class RoundKey extends Key {
             return mKeyPadding;
         }
 
-        public RoundKey.Builder setKeyPadding(@Dimension float keyPadding) {
-            mKeyPadding = keyPadding;
+        public RoundKey.Builder setKeyPadding(@DimenRes int keyPaddingRes) {
+            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
             return this;
         }
 
-        public RoundKey.Builder setKeyPadding(@DimenRes int keyPaddingRes) {
-            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
+        public RoundKey.Builder setKeyPadding(@Dimension float keyPadding) {
+            mKeyPadding = keyPadding;
             return this;
         }
 
@@ -280,13 +284,13 @@ public final class RoundKey extends Key {
             return mKeyTextSize;
         }
 
-        public RoundKey.Builder setKeyTextSize(float keyTextSize) {
-            mKeyTextSize = keyTextSize;
+        public RoundKey.Builder setKeyTextSize(@DimenRes int keyTextSize) {
+            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
             return this;
         }
 
-        public RoundKey.Builder setKeyTextSize(@DimenRes int keyTextSize) {
-            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
+        public RoundKey.Builder setKeyTextSize(float keyTextSize) {
+            mKeyTextSize = keyTextSize;
             return this;
         }
 
@@ -295,14 +299,14 @@ public final class RoundKey extends Key {
         }
 
         @Dimension
-        public RoundKey.Builder setKeyStrokeWidth(float keyStrokeWidth) {
-            mKeyStrokeWidth = keyStrokeWidth;
+        public RoundKey.Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
+            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
             return this;
         }
 
         @Dimension
-        public RoundKey.Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
-            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
+        public RoundKey.Builder setKeyStrokeWidth(float keyStrokeWidth) {
+            mKeyStrokeWidth = keyStrokeWidth;
             return this;
         }
 
