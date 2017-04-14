@@ -23,3 +23,29 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-dontskipnonpubliclibraryclasses
+-forceprocessing
+-optimizationpasses 5
+-verbose
+
+# Keep name of all the classes
+#-keepnames class ** { *; } #Remove if you don't have to stake trace
+
+#Keep anotations there
+-keepattributes *Annotation*
+
+
+######################## Remove logs
+#remove log class
+-assumenosideeffects class android.util.Log {
+    public static *** d(...);
+    public static *** v(...);
+    public static *** i(...);
+    public static *** w(...);
+    public static *** e(...);
+}
+# Remove sout
+-assumenosideeffects class java.io.PrintStream {
+     public void println(%);
+     public void println(**);
+ }

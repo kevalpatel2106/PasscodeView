@@ -15,6 +15,7 @@
   -->
 
 <resources>
+    <string name="app_name">SecureLockView</string>
     <string name="key_1">१</string>
     <string name="key_2">२</string>
     <string name="key_3">३</string>
