@@ -19,7 +19,6 @@ package com.securelockview.sample;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.kevalpatel.passcodeview.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.PinView;
@@ -96,21 +95,18 @@ public class MainActivity extends AppCompatActivity {
                 //Do something
             }
         });
-        Log.d("onCreate", " complete");
 
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putIntArray(ARG_CURRENT_PIN, mPinView.getCurrentTypedPin());
-        Log.d("save", "");
         super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.d("restore", "");
         mPinView.setCurrentTypedPin(savedInstanceState.getIntArray(ARG_CURRENT_PIN));
     }
 }
