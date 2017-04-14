@@ -21,6 +21,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Vibrator;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
@@ -58,6 +59,7 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
     //Theme attributes
     @ColorInt
     private int mDividerColor;                      //Horizontal divider color
+    private boolean mIsTactileFeedbackREnabled = true;
 
     //Paints
     private Paint mDividerPaint;                    //Horizontal divider paint color
@@ -98,7 +100,7 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
     @SuppressWarnings("deprecation")
     private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
         mContext = context;
-        mPinTyped.setChangeListner(this);
+        mPinTyped.setChangeListener(this);
 
         //Initialize UI boxes.
         mBoxKeypad = new BoxKeypad(this);
@@ -131,6 +133,8 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
     private void parseTypeArr(@Nullable AttributeSet attrs) {
         TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.PinView, 0, 0);
         try {
+            mIsTactileFeedbackREnabled = a.getBoolean(R.styleable.PinView_giveTactileFeedback, true);
+
             //Parse title params
             mBoxIndicator.setTitle(a.hasValue(R.styleable.PinView_titleText) ?
                     a.getString(R.styleable.PinView_titleText) : BoxTitleIndicator.DEF_TITLE_TEXT);
@@ -283,11 +287,13 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
 
         if (mCorrectPin.length == mPinTyped.size()) {
             if (Utils.isPINMatched(mCorrectPin, mPinTyped)) {
+                giveTactileFeedbackForAuthSuccess();
                 mAuthenticationListener.onAuthenticationSuccessful();
                 mBoxKeypad.onAuthenticationSuccess();
                 mBoxIndicator.onAuthenticationSuccess();
                 mBoxFingerprint.onAuthenticationSuccess();
             } else {
+                giveTactileFeedbackForAuthFail();
                 mAuthenticationListener.onAuthenticationFailed();
                 mBoxFingerprint.onAuthenticationFail();
                 mBoxKeypad.onAuthenticationFail();
@@ -301,7 +307,30 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
                     reset();
                 }
             }, 350);
+        } else {
+            giveTactileFeedbackForKeyPress();
         }
+    }
+
+    private void giveTactileFeedbackForKeyPress() {
+        if (!mIsTactileFeedbackREnabled) return;
+
+        Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+        if (v.hasVibrator()) v.vibrate(50);
+    }
+
+    private void giveTactileFeedbackForAuthFail() {
+        if (!mIsTactileFeedbackREnabled) return;
+
+        Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+        if (v.hasVibrator()) v.vibrate(350);
+    }
+
+    private void giveTactileFeedbackForAuthSuccess() {
+        if (!mIsTactileFeedbackREnabled) return;
+
+        Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+        if (v.hasVibrator()) v.vibrate(new long[]{50, 100, 50, 100}, -1);
     }
 
     /**
@@ -310,6 +339,11 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
     public void reset() {
         mPinTyped.clear();
         invalidate();
+    }
+
+    @Override
+    public void onArrayValueChange(int size) {
+        mBoxIndicator.onPinDigitEntered(size);
     }
 
     @Override
@@ -421,13 +455,13 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
         return mBoxFingerprint.getStatusTextSize();
     }
 
-    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(statusTextSize);
+    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
         invalidate();
     }
 
-    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
+    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(statusTextSize);
         invalidate();
     }
 
@@ -493,8 +527,11 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
         invalidate();
     }
 
-    @Override
-    public void onArrayValueChange(int size) {
-        mBoxIndicator.onPinDigitEntered(size);
+    public boolean isTactileFeedbackEnable() {
+        return mIsTactileFeedbackREnabled;
+    }
+
+    public void setTactileFeedback(boolean enable) {
+        mIsTactileFeedbackREnabled = enable;
     }
 }

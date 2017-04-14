@@ -16,6 +16,8 @@
 
 package com.kevalpatel.passcodeview;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 
 /**
@@ -24,11 +26,11 @@ import java.util.ArrayList;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class InteractiveArrayList<E> extends ArrayList<E> {
+final class InteractiveArrayList<E> extends ArrayList<E> {
     private ChangeListener mChangeListener;
 
-    public void setChangeListner(ChangeListener listner) {
-        mChangeListener = listner;
+    void setChangeListener(@NonNull ChangeListener listener) {
+        mChangeListener = listener;
     }
 
     @Override

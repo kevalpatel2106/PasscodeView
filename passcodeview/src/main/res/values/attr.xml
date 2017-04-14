@@ -41,8 +41,7 @@
         <attr name="titleTextColor" format="color" />
         <attr name="titleTextSize" format="color" />
 
-        <!--PIN code length-->
-        <attr name="pinLength" format="integer" />
+        <attr name="giveTactileFeedback" format="boolean"/>
 
         <!--Fingerprint-->
         <attr name="fingerprintEnable" format="boolean" />

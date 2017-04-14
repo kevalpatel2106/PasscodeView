@@ -47,7 +47,7 @@
         app:fingerprintEnable="true"
         app:fingerprintTextColor="@color/colorAccent"
         app:fingerprintTextSize="@dimen/finger_print_text_size"
-        app:pinLength="4"
+        app:giveTactileFeedback="true"
         app:titleTextColor="@android:color/white"/>
 
 </RelativeLayout>

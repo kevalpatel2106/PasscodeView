@@ -22,6 +22,7 @@ This library provide easy and secure PIN authentication view, which
   * localized name of each key in pin keyboard. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names)
   * size of the each single key.
   * color and shape of pin indicators.👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators)
+  * Control over tactile feedback for key press and authentication success/failure events.
 
  
 ## How to use this library?
