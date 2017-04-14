@@ -21,8 +21,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
@@ -33,7 +31,6 @@ import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.view.animation.CycleInterpolator;
 
-import com.kevalpatel.passcodeview.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.R;
 
@@ -46,7 +43,6 @@ import com.kevalpatel.passcodeview.R;
 
 public final class RectKey extends Key {
     private final Rect mBounds;                         //RoundKey bound.
-    private final PinView mPinView;                     //Pin view
     private final Builder mBuilder;
     private final ValueAnimator mErrorAnimator;
     private boolean isClickedAnimationRunning = false;
@@ -65,7 +61,6 @@ public final class RectKey extends Key {
         super(pinView, digit, bounds, builder);
 
         mBounds = bounds;
-        mPinView = pinView;
         mBuilder = builder;
 
         //Error animator
@@ -76,7 +71,7 @@ public final class RectKey extends Key {
             public void onAnimationUpdate(ValueAnimator animation) {
                 mBounds.left += (int) animation.getAnimatedValue();
                 mBounds.right += (int) animation.getAnimatedValue();
-                mPinView.invalidate();
+                getPinView().invalidate();
             }
         });
     }
@@ -89,13 +84,13 @@ public final class RectKey extends Key {
     @Override
     public void playClickAnimation() {
         isClickedAnimationRunning = true;
-        mPinView.invalidate();
+        getPinView().invalidate();
 
         new android.os.Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 isClickedAnimationRunning = false;
-                mPinView.invalidate();
+                getPinView().invalidate();
             }
         }, 200);
     }
@@ -115,7 +110,16 @@ public final class RectKey extends Key {
      * @param canvas canvas of the view o which key will be drawn
      */
     @Override
-    public void draw(@NonNull Canvas canvas) {
+    public void drawText(@NonNull Canvas canvas) {
+        //Draw key text
+        canvas.drawText(getDigit() + "",                //Text to display on key
+                mBounds.exactCenterX(),                 //Set start point at center width of key
+                mBounds.exactCenterY() - (mBuilder.getKeyTextPaint().descent() + mBuilder.getKeyTextPaint().ascent()) / 2,    //center height of key - text height/2
+                mBuilder.getKeyTextPaint());
+    }
+
+    @Override
+    public void drawShape(@NonNull Canvas canvas) {
         //Draw circle background
         canvas.drawRect(mBounds.left + mBuilder.getKeyPadding(),
                 mBounds.top + mBuilder.getKeyPadding(),
@@ -123,21 +127,15 @@ public final class RectKey extends Key {
                 mBounds.bottom - mBuilder.getKeyPadding(),
                 isClickedAnimationRunning ? mBuilder.getClickPaint() : mBuilder.getKeyPaint());
 
-        if (getDigit().equals(KeyNamesBuilder.BACKSPACE_TITLE)) {  //Backspace key
-            Drawable d = mPinView.getContext().getResources().getDrawable(R.drawable.ic_back_space);
-            d.setBounds((int) (mBounds.exactCenterX() - Math.min(mBounds.height(), mBounds.width()) / 3),
-                    (int) (mBounds.exactCenterY() - Math.min(mBounds.height(), mBounds.width()) / 3),
-                    (int) (mBounds.exactCenterX() + Math.min(mBounds.height(), mBounds.width()) / 3),
-                    (int) (mBounds.exactCenterY() + Math.min(mBounds.height(), mBounds.width()) / 3));
-            d.setColorFilter(new PorterDuffColorFilter(mBuilder.getKeyTextColor(), PorterDuff.Mode.SRC_ATOP));
-            d.draw(canvas);
-        } else {
-            //Draw key text
-            canvas.drawText(getDigit() + "",                //Text to display on key
-                    mBounds.exactCenterX(),                 //Set start point at center width of key
-                    mBounds.exactCenterY() - (mBuilder.getKeyTextPaint().descent() + mBuilder.getKeyTextPaint().ascent()) / 2,    //center height of key - text height/2
-                    mBuilder.getKeyTextPaint());
-        }
+    }
+
+    @Override
+    public void drawBackSpace(@NonNull Canvas canvas, @NonNull Drawable backSpaceIcon) {
+        backSpaceIcon.setBounds((int) (mBounds.exactCenterX() - Math.min(mBounds.height(), mBounds.width()) / 3),
+                (int) (mBounds.exactCenterY() - Math.min(mBounds.height(), mBounds.width()) / 3),
+                (int) (mBounds.exactCenterX() + Math.min(mBounds.height(), mBounds.width()) / 3),
+                (int) (mBounds.exactCenterY() + Math.min(mBounds.height(), mBounds.width()) / 3));
+        backSpaceIcon.draw(canvas);
     }
 
     /**
@@ -194,13 +192,13 @@ public final class RectKey extends Key {
             return mKeyPadding;
         }
 
-        public Builder setKeyPadding(@DimenRes int keyPaddingRes) {
-            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
+        public Builder setKeyPadding(@Dimension float keyPadding) {
+            mKeyPadding = keyPadding;
             return this;
         }
 
-        public Builder setKeyPadding(@Dimension float keyPadding) {
-            mKeyPadding = keyPadding;
+        public Builder setKeyPadding(@DimenRes int keyPaddingRes) {
+            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
             return this;
         }
 
@@ -208,13 +206,13 @@ public final class RectKey extends Key {
             return mKeyTextSize;
         }
 
-        public Builder setKeyTextSize(@DimenRes int keyTextSize) {
-            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
+        public Builder setKeyTextSize(float keyTextSize) {
+            mKeyTextSize = keyTextSize;
             return this;
         }
 
-        public Builder setKeyTextSize(float keyTextSize) {
-            mKeyTextSize = keyTextSize;
+        public Builder setKeyTextSize(@DimenRes int keyTextSize) {
+            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
             return this;
         }
 
@@ -223,14 +221,14 @@ public final class RectKey extends Key {
         }
 
         @Dimension
-        public Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
-            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
+        public Builder setKeyStrokeWidth(float keyStrokeWidth) {
+            mKeyStrokeWidth = keyStrokeWidth;
             return this;
         }
 
         @Dimension
-        public Builder setKeyStrokeWidth(float keyStrokeWidth) {
-            mKeyStrokeWidth = keyStrokeWidth;
+        public Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
+            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
             return this;
         }
 

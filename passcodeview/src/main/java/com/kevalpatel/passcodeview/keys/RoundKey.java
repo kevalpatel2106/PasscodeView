@@ -21,11 +21,8 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
@@ -35,7 +32,6 @@ import android.text.TextPaint;
 import android.view.View;
 import android.view.animation.CycleInterpolator;
 
-import com.kevalpatel.passcodeview.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.R;
 
@@ -180,31 +176,21 @@ public final class RoundKey extends Key {
      */
     @SuppressWarnings({"deprecation", "ConstantConditions"})
     @Override
-    public void draw(@NonNull Canvas canvas) {
+    public void drawText(@NonNull Canvas canvas) {
+        //Draw key text
+        canvas.drawText(getDigit() + "",                //Text to display on key
+                mBounds.exactCenterX(),             //Set start point at center width of key
+                mBounds.exactCenterY() - (mBuilder.getKeyTextPaint().descent() + mBuilder.getKeyTextPaint().ascent()) / 2,    //center height of key - text height/2
+                mBuilder.getKeyTextPaint());
+    }
 
+    @Override
+    public void drawShape(@NonNull Canvas canvas) {
         //Draw circle background
         canvas.drawCircle(mBounds.exactCenterX(),   //Set center width of key
                 mBounds.exactCenterY(),             //Set center height of key
                 mKeyRadius,
                 mBuilder.getKeyPaint());
-
-        if (getDigit().equals(KeyNamesBuilder.BACKSPACE_TITLE)) {  //Backspace key
-            Drawable d = Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ?
-                    mView.getContext().getResources().getDrawable(R.drawable.ic_back_space) :
-                    mView.getContext().getDrawable(R.drawable.ic_back_space);
-            d.setBounds((int) (mBounds.exactCenterX() - mKeyRadius / 2),
-                    (int) (mBounds.exactCenterY() - mKeyRadius / 2),
-                    (int) (mBounds.exactCenterX() + mKeyRadius / 2),
-                    (int) (mBounds.exactCenterY() + mKeyRadius / 2));
-            d.setColorFilter(new PorterDuffColorFilter(mBuilder.getKeyTextColor(), PorterDuff.Mode.SRC_ATOP));
-            d.draw(canvas);
-        } else {
-            //Draw key text
-            canvas.drawText(getDigit() + "",                //Text to display on key
-                    mBounds.exactCenterX(),             //Set start point at center width of key
-                    mBounds.exactCenterY() - (mBuilder.getKeyTextPaint().descent() + mBuilder.getKeyTextPaint().ascent()) / 2,    //center height of key - text height/2
-                    mBuilder.getKeyTextPaint());
-        }
 
         //Play ripple effect if the key has ripple effect enabled.
         if (isRippleEffectRunning) {
@@ -214,6 +200,15 @@ public final class RoundKey extends Key {
                     mCurrentRippleRadius,
                     mBuilder.getRipplePaint());
         }
+    }
+
+    @Override
+    public void drawBackSpace(@NonNull Canvas canvas, @NonNull Drawable backSpaceIcon) {
+        backSpaceIcon.setBounds((int) (mBounds.exactCenterX() - mKeyRadius / 2),
+                (int) (mBounds.exactCenterY() - mKeyRadius / 2),
+                (int) (mBounds.exactCenterX() + mKeyRadius / 2),
+                (int) (mBounds.exactCenterY() + mKeyRadius / 2));
+        backSpaceIcon.draw(canvas);
     }
 
     /**
@@ -270,13 +265,13 @@ public final class RoundKey extends Key {
             return mKeyPadding;
         }
 
-        public RoundKey.Builder setKeyPadding(@DimenRes int keyPaddingRes) {
-            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
+        public RoundKey.Builder setKeyPadding(@Dimension float keyPadding) {
+            mKeyPadding = keyPadding;
             return this;
         }
 
-        public RoundKey.Builder setKeyPadding(@Dimension float keyPadding) {
-            mKeyPadding = keyPadding;
+        public RoundKey.Builder setKeyPadding(@DimenRes int keyPaddingRes) {
+            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
             return this;
         }
 
@@ -284,13 +279,13 @@ public final class RoundKey extends Key {
             return mKeyTextSize;
         }
 
-        public RoundKey.Builder setKeyTextSize(@DimenRes int keyTextSize) {
-            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
+        public RoundKey.Builder setKeyTextSize(float keyTextSize) {
+            mKeyTextSize = keyTextSize;
             return this;
         }
 
-        public RoundKey.Builder setKeyTextSize(float keyTextSize) {
-            mKeyTextSize = keyTextSize;
+        public RoundKey.Builder setKeyTextSize(@DimenRes int keyTextSize) {
+            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
             return this;
         }
 
@@ -299,14 +294,14 @@ public final class RoundKey extends Key {
         }
 
         @Dimension
-        public RoundKey.Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
-            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
+        public RoundKey.Builder setKeyStrokeWidth(float keyStrokeWidth) {
+            mKeyStrokeWidth = keyStrokeWidth;
             return this;
         }
 
         @Dimension
-        public RoundKey.Builder setKeyStrokeWidth(float keyStrokeWidth) {
-            mKeyStrokeWidth = keyStrokeWidth;
+        public RoundKey.Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
+            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
             return this;
         }
 

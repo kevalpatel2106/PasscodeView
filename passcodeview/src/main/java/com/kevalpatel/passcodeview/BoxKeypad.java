@@ -17,7 +17,10 @@
 package com.kevalpatel.passcodeview;
 
 import android.graphics.Canvas;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
@@ -155,15 +158,24 @@ final class BoxKeypad extends Box {
     }
 
     /**
-     * Draw keyboard on the canvas. This will draw all the {@link #sKeyNames} on the canvas.
+     * Draw keyboard on the canvas. This will drawText all the {@link #sKeyNames} on the canvas.
      *
      * @param canvas canvas on which the keyboard will be drawn.
      */
     @Override
     void draw(@NonNull Canvas canvas) {
+        Drawable d = getContext().getResources().getDrawable(R.drawable.ic_back_space);
+        d.setColorFilter(new PorterDuffColorFilter(mKeyBuilder.getKeyTextPaint().getColor(), PorterDuff.Mode.SRC_ATOP));
+
         for (Key key : mKeys) {
-            if (key.getDigit().isEmpty()) continue; //Don't draw the empty button
-            key.draw(canvas);
+            if (key.getDigit().isEmpty()) continue; //Don't drawText the empty button
+
+            key.drawShape(canvas);
+            if (key.getDigit().equals(KeyNamesBuilder.BACKSPACE_TITLE)) {
+                key.drawBackSpace(canvas, d);
+            } else {
+                key.drawText(canvas);
+            }
         }
     }
 

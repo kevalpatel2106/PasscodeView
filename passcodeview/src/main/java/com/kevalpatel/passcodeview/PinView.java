@@ -160,7 +160,7 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
     }
 
     /**
-     * Create the paint to draw divider.
+     * Create the paint to drawText divider.
      */
     private void prepareDividerPaint() {
         mDividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -491,13 +491,13 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
         return mBoxFingerprint.getStatusTextSize();
     }
 
-    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
+    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(statusTextSize);
         invalidate();
     }
 
-    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(statusTextSize);
+    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
         invalidate();
     }
 

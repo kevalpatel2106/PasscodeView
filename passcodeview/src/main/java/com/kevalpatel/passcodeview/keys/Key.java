@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 
 import com.kevalpatel.passcodeview.PinView;
@@ -31,6 +32,8 @@ import com.kevalpatel.passcodeview.PinView;
  */
 @SuppressWarnings("ALL")
 public abstract class Key {
+    @NonNull
+    private PinView mView;
     private String mDigit;                        //RoundKey title.
 
     private Key() {
@@ -40,13 +43,28 @@ public abstract class Key {
                   @NonNull String digit,
                   @NonNull Rect bounds,
                   @NonNull Key.Builder builder) {
+        mView = view;
         mDigit = digit;
     }
 
-    public abstract void draw(@NonNull Canvas canvas);
+    public abstract void drawText(@NonNull Canvas canvas);
+
+    public abstract void drawShape(@NonNull Canvas canvas);
+
+    public abstract void drawBackSpace(@NonNull Canvas canvas, @NonNull Drawable backSpaceIcon);
 
     public final String getDigit() {
         return mDigit;
+    }
+
+    @NonNull
+    public final PinView getPinView() {
+        return mView;
+    }
+
+    @NonNull
+    public final Context getContext() {
+        return mView.getContext();
     }
 
     public abstract void onAuthFail();
