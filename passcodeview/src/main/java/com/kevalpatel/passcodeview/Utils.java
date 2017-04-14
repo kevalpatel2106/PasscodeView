@@ -19,9 +19,11 @@ package com.kevalpatel.passcodeview;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.provider.Settings;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.RequiresPermission;
@@ -86,5 +88,20 @@ public final class Utils {
         for (int i = 0; i < correctPin.length; i++)
             if (correctPin[i] != pinToCheck.get(i)) return false;
         return correctPin.length == pinToCheck.size();
+    }
+
+    /**
+     * Get the darker version of the given color.
+     *
+     * @param color Normal color.
+     * @return Darker shade of the color.
+     * @see 'http://stackoverflow.com/a/4928826'
+     */
+    @ColorInt
+    public static int makeColorDark(@ColorInt int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] = 1f - 0.8f * hsv[2]; // value component
+        return Color.HSVToColor(hsv);
     }
 }

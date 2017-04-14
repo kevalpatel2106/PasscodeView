@@ -19,7 +19,6 @@ package com.kevalpatel.passcodeview.keys;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -33,6 +32,7 @@ import android.view.animation.CycleInterpolator;
 
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.R;
+import com.kevalpatel.passcodeview.Utils;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -192,13 +192,13 @@ public final class RectKey extends Key {
             return mKeyPadding;
         }
 
-        public Builder setKeyPadding(@Dimension float keyPadding) {
-            mKeyPadding = keyPadding;
+        public Builder setKeyPadding(@DimenRes int keyPaddingRes) {
+            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
             return this;
         }
 
-        public Builder setKeyPadding(@DimenRes int keyPaddingRes) {
-            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
+        public Builder setKeyPadding(@Dimension float keyPadding) {
+            mKeyPadding = keyPadding;
             return this;
         }
 
@@ -206,13 +206,13 @@ public final class RectKey extends Key {
             return mKeyTextSize;
         }
 
-        public Builder setKeyTextSize(float keyTextSize) {
-            mKeyTextSize = keyTextSize;
+        public Builder setKeyTextSize(@DimenRes int keyTextSize) {
+            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
             return this;
         }
 
-        public Builder setKeyTextSize(@DimenRes int keyTextSize) {
-            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
+        public Builder setKeyTextSize(float keyTextSize) {
+            mKeyTextSize = keyTextSize;
             return this;
         }
 
@@ -221,14 +221,14 @@ public final class RectKey extends Key {
         }
 
         @Dimension
-        public Builder setKeyStrokeWidth(float keyStrokeWidth) {
-            mKeyStrokeWidth = keyStrokeWidth;
+        public Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
+            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
             return this;
         }
 
         @Dimension
-        public Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
-            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
+        public Builder setKeyStrokeWidth(float keyStrokeWidth) {
+            mKeyStrokeWidth = keyStrokeWidth;
             return this;
         }
 
@@ -281,7 +281,7 @@ public final class RectKey extends Key {
             //Ripple paint
             mClickPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mClickPaint.setStyle(Paint.Style.STROKE);
-            mClickPaint.setColor(makeColorDark(mKeyStrokeColor));
+            mClickPaint.setColor(Utils.makeColorDark(mKeyStrokeColor));
             mClickPaint.setStrokeWidth(mKeyStrokeWidth);
             return this;
         }
@@ -316,21 +316,6 @@ public final class RectKey extends Key {
         @Override
         public RectKey getKey(@NonNull String digit, @NonNull Rect bound) {
             return new RectKey(super.getPinView(), digit, bound, this);
-        }
-
-        /**
-         * Get the darker version of the given color.
-         *
-         * @param color Normal color.
-         * @return Darker shade of the color.
-         * @see 'http://stackoverflow.com/a/4928826'
-         */
-        @ColorInt
-        private int makeColorDark(@ColorInt int color) {
-            float[] hsv = new float[3];
-            Color.colorToHSV(color, hsv);
-            hsv[2] = 1f - 0.8f * hsv[2]; // value component
-            return Color.HSVToColor(hsv);
         }
     }
 }
