@@ -183,9 +183,11 @@ final class BoxKeypad extends Box {
     String findKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY) {
         //figure out down key.
         for (Key key : mKeys) {
+            if (key.getDigit().isEmpty()) continue;  //Empty key
 
-            //Update the typed passcode
-            if (key.checkKeyPressed(downEventX, downEventY, upEventX, upEventY)) {
+            //Update the typed passcode if the ACTION_DOWN and ACTION_UP keys are same.
+            //Prevent swipe gestures to trigger false key press event.
+            if (key.isKeyPressed(downEventX, downEventY) && key.isKeyPressed(upEventX, upEventY)) {
                 key.playClickAnimation();
                 return key.getDigit();
             }

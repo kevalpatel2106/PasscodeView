@@ -131,35 +131,21 @@ public final class RectKey extends Key {
     }
 
     /**
-     * Check if the key is pressed or not? It will check if the touch x & y coordinates are inside
-     * thw key bound or not?
+     * Check if the key is pressed or not for given touch coordinates?
      *
-     * @param downEventX ACTION_DOWN event X coordinate
-     * @param downEventY ACTION_DOWN event Y coordinate
-     * @param upEventX   ACTION_UP event X coordinate
-     * @param upEventY   ACTION_UP event Y coordinate
+     * @param touchX touch X coordinate
+     * @param touchY touch Y coordinate
      * @return true if the key is pressed else false.
      */
     @Override
-    public boolean checkKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY) {
-        if (getDigit().isEmpty()) return false;  //Empty key
+    public boolean isKeyPressed(float touchX, float touchY) {
 
         //Check if the click is between the width bounds
-        if (downEventX > mBounds.left && downEventX < mBounds.right) {
+        if (touchX > mBounds.left && touchX < mBounds.right) {
 
             //Check if the click is between the height bounds
-            if (downEventY > mBounds.top && downEventY < mBounds.bottom) {
-
-                //Check if the click is between the width bounds
-                if (upEventX > mBounds.left && upEventX < mBounds.right) {
-
-                    //Check if the click is between the height bounds
-                    if (upEventY > mBounds.top && upEventY < mBounds.bottom) {
-
-                        playClickAnimation();
-                        return true;
-                    }
-                }
+            if (touchY > mBounds.top && touchY < mBounds.bottom) {
+                return true;
             }
         }
         return false;
@@ -197,13 +183,13 @@ public final class RectKey extends Key {
             return mKeyPadding;
         }
 
-        public Builder setKeyPadding(@DimenRes int keyPaddingRes) {
-            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
+        public Builder setKeyPadding(@Dimension float keyPadding) {
+            mKeyPadding = keyPadding;
             return this;
         }
 
-        public Builder setKeyPadding(@Dimension float keyPadding) {
-            mKeyPadding = keyPadding;
+        public Builder setKeyPadding(@DimenRes int keyPaddingRes) {
+            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
             return this;
         }
 
@@ -211,13 +197,13 @@ public final class RectKey extends Key {
             return mKeyTextSize;
         }
 
-        public Builder setKeyTextSize(@DimenRes int keyTextSize) {
-            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
+        public Builder setKeyTextSize(float keyTextSize) {
+            mKeyTextSize = keyTextSize;
             return this;
         }
 
-        public Builder setKeyTextSize(float keyTextSize) {
-            mKeyTextSize = keyTextSize;
+        public Builder setKeyTextSize(@DimenRes int keyTextSize) {
+            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
             return this;
         }
 
@@ -226,14 +212,14 @@ public final class RectKey extends Key {
         }
 
         @Dimension
-        public Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
-            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
+        public Builder setKeyStrokeWidth(float keyStrokeWidth) {
+            mKeyStrokeWidth = keyStrokeWidth;
             return this;
         }
 
         @Dimension
-        public Builder setKeyStrokeWidth(float keyStrokeWidth) {
-            mKeyStrokeWidth = keyStrokeWidth;
+        public Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
+            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
             return this;
         }
 

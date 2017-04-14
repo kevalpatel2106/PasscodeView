@@ -277,24 +277,36 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
             throw new IllegalStateException("Please set current PIN to check with the entered value.");
         }
 
-        if (newDigit.equals(KeyNamesBuilder.BACKSPACE_TITLE)) {
-            if (mPinTyped.size() > 0) mPinTyped.remove(mPinTyped.size() - 1);
+        if (newDigit.equals(KeyNamesBuilder.BACKSPACE_TITLE)) { //Back space key is pressed.
+            if (mPinTyped.size() > 0) mPinTyped.remove(mPinTyped.size() - 1);   //Remove last digit.
         } else {
+
+            //Add new digit
             mPinTyped.add(mBoxKeypad.getKeyNameBuilder().getValueOfKey(newDigit));
         }
 
         invalidate();
 
-        if (mCorrectPin.length == mPinTyped.size()) {
+        if (mCorrectPin.length == mPinTyped.size()) {   //Only check for the pin validity if typed pin has the length of correct pin.
+
+            //Check if the pin is matched?
             if (Utils.isPINMatched(mCorrectPin, mPinTyped)) {
-                giveTactileFeedbackForAuthSuccess();
-                mAuthenticationListener.onAuthenticationSuccessful();
+                //Hurray!!! Authentication is successful.
+
+                giveTactileFeedbackForAuthSuccess();                    //Give tactile feedback.
+                mAuthenticationListener.onAuthenticationSuccessful();   //Notify the parent application
+
+                //Notify all the boxes for authentication success.
                 mBoxKeypad.onAuthenticationSuccess();
                 mBoxIndicator.onAuthenticationSuccess();
                 mBoxFingerprint.onAuthenticationSuccess();
             } else {
-                giveTactileFeedbackForAuthFail();
-                mAuthenticationListener.onAuthenticationFailed();
+                //:-( Authentication failed.
+
+                giveTactileFeedbackForAuthFail();                       //Give tactile feedback.
+                mAuthenticationListener.onAuthenticationFailed();       //Notify parent application
+
+                //Notify all the boxes for authentication success.
                 mBoxFingerprint.onAuthenticationFail();
                 mBoxKeypad.onAuthenticationFail();
                 mBoxIndicator.onAuthenticationFail();
@@ -312,6 +324,9 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
         }
     }
 
+    /**
+     * Run the vibrator to give tactile feedback for 50ms when any key is pressed.
+     */
     private void giveTactileFeedbackForKeyPress() {
         if (!mIsTactileFeedbackREnabled) return;
 
@@ -319,6 +334,14 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
         if (v.hasVibrator()) v.vibrate(50);
     }
 
+    /**
+     * Run the vibrator to give tactile feedback for 350ms when yser authentication is successful.
+     * <p>
+     * Note : When authentication is success, {@link #giveTactileFeedbackForKeyPress()} won't get call
+     * for the last key press.
+     *
+     * @see #onKeyPressed(String)
+     */
     private void giveTactileFeedbackForAuthFail() {
         if (!mIsTactileFeedbackREnabled) return;
 
@@ -326,6 +349,15 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
         if (v.hasVibrator()) v.vibrate(350);
     }
 
+    /**
+     * Run the vibrator to give tactile feedback for 100ms at difference of 50ms for two times when
+     * user authentication is failed.
+     * <p>
+     * Note : When authentication is success, {@link #giveTactileFeedbackForKeyPress()} won't get call
+     * for the last key press.
+     *
+     * @see #onKeyPressed(String)
+     */
     private void giveTactileFeedbackForAuthSuccess() {
         if (!mIsTactileFeedbackREnabled) return;
 
@@ -341,6 +373,12 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
         invalidate();
     }
 
+    /**
+     * This method will be called when there is any change in {@link #mPinTyped}.
+     *
+     * @param size this is the new size of {@link #mPinTyped}.
+     * @see InteractiveArrayList
+     */
     @Override
     public void onArrayValueChange(int size) {
         mBoxIndicator.onPinDigitEntered(size);
@@ -455,13 +493,13 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
         return mBoxFingerprint.getStatusTextSize();
     }
 
-    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
+    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(statusTextSize);
         invalidate();
     }
 
-    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(statusTextSize);
+    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
         invalidate();
     }
 

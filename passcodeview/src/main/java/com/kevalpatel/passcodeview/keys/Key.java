@@ -53,7 +53,14 @@ public abstract class Key {
 
     public abstract void onAuthSuccess();
 
-    public abstract boolean checkKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY);
+    /**
+     * Check if the key is pressed or not for given touch coordinates?
+     *
+     * @param touchX touch X coordinate
+     * @param touchY touch Y coordinate
+     * @return true if the key is pressed else false.
+     */
+    public abstract boolean isKeyPressed(float touchX, float touchY);
 
     public abstract void playClickAnimation();
 

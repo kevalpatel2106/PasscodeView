@@ -213,39 +213,24 @@ public final class RoundKey extends Key {
     }
 
     /**
-     * Check if the key is pressed or not? It will check if the touch x & y coordinates are inside
-     * thw key bound or not?
+     * Check if the key is pressed or not for given touch coordinates?
      *
-     * @param downEventX ACTION_DOWN event X coordinate
-     * @param downEventY ACTION_DOWN event Y coordinate
-     * @param upEventX   ACTION_UP event X coordinate
-     * @param upEventY   ACTION_UP event Y coordinate
+     * @param touchX touch X coordinate
+     * @param touchY touch Y coordinate
      * @return true if the key is pressed else false.
      */
     @Override
-    public boolean checkKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY) {
+    public boolean isKeyPressed(float touchX, float touchY) {
         if (getDigit().isEmpty()) return false;  //Empty key
 
         //Check if the click is between the width bounds
-        if (downEventX > mBounds.exactCenterX() - mKeyRadius
-                && downEventX < mBounds.exactCenterX() + mKeyRadius) {
+        if (touchX > mBounds.exactCenterX() - mKeyRadius
+                && touchX < mBounds.exactCenterX() + mKeyRadius) {
 
             //Check if the click is between the height bounds
-            if (downEventY > mBounds.exactCenterY() - mKeyRadius
-                    && downEventY < mBounds.exactCenterY() + mKeyRadius) {
-
-                //Check if the click is between the width bounds
-                if (upEventX > mBounds.exactCenterX() - mKeyRadius
-                        && upEventX < mBounds.exactCenterX() + mKeyRadius) {
-
-                    //Check if the click is between the height bounds
-                    if (upEventY > mBounds.exactCenterY() - mKeyRadius
-                            && upEventY < mBounds.exactCenterY() + mKeyRadius) {
-
-                        playClickAnimation();
-                        return true;
-                    }
-                }
+            if (touchY > mBounds.exactCenterY() - mKeyRadius
+                    && touchY < mBounds.exactCenterY() + mKeyRadius) {
+                return true;
             }
         }
         return false;
@@ -281,13 +266,13 @@ public final class RoundKey extends Key {
             return mKeyPadding;
         }
 
-        public RoundKey.Builder setKeyPadding(@DimenRes int keyPaddingRes) {
-            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
+        public RoundKey.Builder setKeyPadding(@Dimension float keyPadding) {
+            mKeyPadding = keyPadding;
             return this;
         }
 
-        public RoundKey.Builder setKeyPadding(@Dimension float keyPadding) {
-            mKeyPadding = keyPadding;
+        public RoundKey.Builder setKeyPadding(@DimenRes int keyPaddingRes) {
+            mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
             return this;
         }
 
@@ -295,13 +280,13 @@ public final class RoundKey extends Key {
             return mKeyTextSize;
         }
 
-        public RoundKey.Builder setKeyTextSize(@DimenRes int keyTextSize) {
-            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
+        public RoundKey.Builder setKeyTextSize(float keyTextSize) {
+            mKeyTextSize = keyTextSize;
             return this;
         }
 
-        public RoundKey.Builder setKeyTextSize(float keyTextSize) {
-            mKeyTextSize = keyTextSize;
+        public RoundKey.Builder setKeyTextSize(@DimenRes int keyTextSize) {
+            mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
             return this;
         }
 
@@ -310,14 +295,14 @@ public final class RoundKey extends Key {
         }
 
         @Dimension
-        public RoundKey.Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
-            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
+        public RoundKey.Builder setKeyStrokeWidth(float keyStrokeWidth) {
+            mKeyStrokeWidth = keyStrokeWidth;
             return this;
         }
 
         @Dimension
-        public RoundKey.Builder setKeyStrokeWidth(float keyStrokeWidth) {
-            mKeyStrokeWidth = keyStrokeWidth;
+        public RoundKey.Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
+            mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
             return this;
         }
 
