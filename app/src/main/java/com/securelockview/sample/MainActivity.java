@@ -24,7 +24,7 @@ import com.kevalpatel.passcodeview.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.indicators.CircleIndicator;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
-import com.kevalpatel.passcodeview.keys.SquareKey;
+import com.kevalpatel.passcodeview.keys.RoundKey;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Build the desired key shape and pass the theme parameters.
         //REQUIRED
-        mPinView.setKey(new SquareKey.Builder(mPinView)
+        mPinView.setKey(new RoundKey.Builder(mPinView)
                 .setKeyPadding(R.dimen.key_padding)
                 .setKeyStrokeColorResource(R.color.colorAccent)
                 .setKeyStrokeWidth(R.dimen.key_stroke_width)

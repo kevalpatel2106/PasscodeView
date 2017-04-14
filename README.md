@@ -65,9 +65,10 @@ This library provide easy and secure PIN authentication view, which
   ```
 
 - ### Set the shape of the key you want to use. 
-  - There are two built in key shapes. 
+  - There are three built in key shapes. You can also generate your own key by extending [`Key`](https://github.com/kevalpatel2106/PasscodeView/blob/master/passcodeview/src/main/java/com/kevalpatel/passcodeview/keys/Key.java) class.
     * Round key
     * Rectangle key
+    * Square key
   - Here is the example for the round keys.
   ```java
     @Override
