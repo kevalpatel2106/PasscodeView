@@ -126,7 +126,7 @@ final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPr
         if (isFingerPrintBoxVisible) {
             mBounds.left = rootViewBounds.left;
             mBounds.right = rootViewBounds.right;
-            mBounds.top = (int) (rootViewBounds.bottom - rootViewBounds.height() * (BoxKeypad.KEY_BOARD_BOTTOM_WEIGHT));
+            mBounds.top = (int) (rootViewBounds.bottom - rootViewBounds.height() * (Constants.KEY_BOARD_BOTTOM_WEIGHT));
             mBounds.bottom = rootViewBounds.bottom;
         }
     }

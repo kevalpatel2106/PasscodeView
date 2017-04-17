@@ -36,9 +36,6 @@ import java.util.ArrayList;
  */
 
 final class BoxKeypad extends Box {
-    static final float KEY_BOARD_BOTTOM_WEIGHT = 0.14F;
-    static final float KEY_BOARD_TOP_WEIGHT = 0.2F;
-
     @Size(Constants.NO_OF_ROWS * Constants.NO_OF_COLUMNS)
     private static String[][] sKeyNames;
     private static KeyNamesBuilder sKeyNamesBuilder;
@@ -81,7 +78,7 @@ final class BoxKeypad extends Box {
      * |                        | | => The title and the indicator. ({@link BoxTitleIndicator#measure(Rect)})
      * |                        | |
      * |                        | |
-     * |------------------------|=| => {@link #KEY_BOARD_TOP_WEIGHT} of the total height.
+     * |------------------------|=| => {@link Constants#KEY_BOARD_TOP_WEIGHT} of the total height.
      * |                        | |
      * |                        | |
      * |                        | |
@@ -93,7 +90,7 @@ final class BoxKeypad extends Box {
      * |                        | |
      * |                        | |
      * |                        | |
-     * |------------------------|=|=> {@link #KEY_BOARD_BOTTOM_WEIGHT} of the total weight if the fingerprint is available. Else it touches to the bottom of the main view.
+     * |------------------------|=|=> {@link Constants#KEY_BOARD_BOTTOM_WEIGHT} of the total weight if the fingerprint is available. Else it touches to the bottom of the main view.
      * |                        | |
      * |                        | |=> Section for fingerprint. If the fingerprint is enabled. Otherwise keyboard streaches to the bottom of the root view.
      * |------------------------|=|
@@ -108,9 +105,9 @@ final class BoxKeypad extends Box {
 
         mKeyBoxBound.left = mIsOneHandOperation ? (int) (rootViewBound.width() * 0.3) : 0;
         mKeyBoxBound.right = rootViewBound.width();
-        mKeyBoxBound.top = (int) (rootViewBound.top + (rootViewBound.height() * KEY_BOARD_TOP_WEIGHT));
+        mKeyBoxBound.top = (int) (rootViewBound.top + (rootViewBound.height() * Constants.KEY_BOARD_TOP_WEIGHT));
         mKeyBoxBound.bottom = (int) (rootViewBound.bottom -
-                rootViewBound.height() * (getRootView().isFingerPrintEnable() ? KEY_BOARD_BOTTOM_WEIGHT : 0));
+                rootViewBound.height() * (getRootView().isFingerPrintEnable() ? Constants.KEY_BOARD_BOTTOM_WEIGHT : 0));
 
         float singleKeyHeight = mKeyBoxBound.height() / Constants.NO_OF_ROWS;
         float singleKeyWidth = mKeyBoxBound.width() / Constants.NO_OF_COLUMNS;
