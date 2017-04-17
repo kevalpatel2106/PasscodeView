@@ -24,6 +24,27 @@ This library provide easy and secure PIN authentication view, which
   * color and shape of pin indicators.👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators)
   * Control over tactile feedback for key press and authentication success/failure events.
 
+## Demo: 
+**Authentication using PIN**
+
+|Success|Fail|
+|:---:|:---:|
+|![PIN Success](/resource/pin_success.gif)|![PIN Failed](/resource/pin_failed.gif)|
+
+**Authentication using fingerprint**
+
+|Success|Fail|
+|:---:|:---:|
+|![Fingerprint Success](/resource/fingerprint_success.gif)|![Fingerprint Failed](/resource/fingerprint_failed.gif)|
+
+**Localized Texts**
+
+|English|Hindi|
+|:---:|:---:|
+|![Locale English](/resource/locale_en.png)|![Locale Hindi](/resource/locale_hn.png)|
+
+*Here is the link of the demo application. 👉 [Demo](resource/sample.apk)*
+
  
 ## How to use this library?
 - ### Gradle Dependency:
@@ -187,29 +208,6 @@ This library provide easy and secure PIN authentication view, which
       //...
     }
   ```
-
-
-## Demo: 
-**Authentication using PIN**
-
-|Success|Fail|
-|:---:|:---:|
-|![PIN Success](/resource/pin_success.gif)|![PIN Failed](/resource/pin_failed.gif)|
-
-**Authentication using fingerprint**
-
-|Success|Fail|
-|:---:|:---:|
-|![Fingerprint Success](/resource/fingerprint_success.gif)|![Fingerprint Failed](/resource/fingerprint_failed.gif)|
-
-**Localized Texts**
-
-|English|Hindi|
-|:---:|:---:|
-|![Locale English](/resource/locale_en.png)|![Locale Hindi](/resource/locale_hn.png)|
-
-*Here is the link of the demo application. 👉 [Demo](resource/sample.apk)*
-
 
 ## How to contribute?
 * Check out contribution guidelines 👉[CONTRIBUTING.md](https://github.com/kevalpatel2106/PasscodeView/blob/master/CONTRIBUTING.md)
