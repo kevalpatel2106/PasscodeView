@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -79,11 +80,24 @@ public final class Utils {
         }
     }
 
+    /**
+     * Check if the given pin is valid or not?
+     *
+     * @param pinToCheck pin to validate
+     * @return true if the entered pin is valid.
+     */
     static boolean isValidPin(int[] pinToCheck) {
         for (int i : pinToCheck) if (i > 9 && i < 0) return false;
         return true;
     }
 
+    /**
+     * Compare two arrays of the PIN and check if both pin matches?
+     *
+     * @param correctPin correct pin.
+     * @param pinToCheck pin entered by the user.
+     * @return true if the both pin matches.
+     */
     static boolean isPINMatched(int[] correctPin, ArrayList<Integer> pinToCheck) {
         for (int i = 0; i < correctPin.length; i++)
             if (correctPin[i] != pinToCheck.get(i)) return false;
@@ -103,5 +117,30 @@ public final class Utils {
         Color.colorToHSV(color, hsv);
         hsv[2] = 1f - 0.8f * hsv[2]; // value component
         return Color.HSVToColor(hsv);
+    }
+
+    /**
+     * Run the vibrator to give tactile feedback for 50ms when any key is pressed.
+     */
+    static void giveTactileFeedbackForKeyPress(@NonNull Context context) {
+        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        if (v.hasVibrator()) v.vibrate(50);
+    }
+
+    /**
+     * Run the vibrator to give tactile feedback for 350ms when yser authentication is successful.
+     */
+    static void giveTactileFeedbackForAuthFail(@NonNull Context context) {
+        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        if (v.hasVibrator()) v.vibrate(350);
+    }
+
+    /**
+     * Run the vibrator to give tactile feedback for 100ms at difference of 50ms for two times when
+     * user authentication is failed.
+     */
+    static void giveTactileFeedbackForAuthSuccess(@NonNull Context context) {
+        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        if (v.hasVibrator()) v.vibrate(new long[]{50, 100, 50, 100}, -1);
     }
 }

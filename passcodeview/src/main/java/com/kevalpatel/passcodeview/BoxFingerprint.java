@@ -65,6 +65,15 @@ final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPr
 
     BoxFingerprint(@NonNull PinView view) {
         super(view);
+        init();
+    }
+
+    BoxFingerprint(@NonNull PatternView view) {
+        super(view);
+        init();
+    }
+
+    private void init() {
         isFingerPrintBoxVisible = Utils.isFingerPrintEnrolled(getContext());
 
         if (isFingerPrintBoxVisible) {

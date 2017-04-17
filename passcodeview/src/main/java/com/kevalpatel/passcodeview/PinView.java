@@ -21,7 +21,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.os.Vibrator;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
@@ -172,6 +171,11 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
     //                  VIEW DRAW
     ///////////////////////////////////////////////////////////////
 
+    /**
+     * Draw method of the view called every time frame refreshes.
+     *
+     * @param canvas view canvas
+     */
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -291,7 +295,8 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
             if (Utils.isPINMatched(mCorrectPin, mPinTyped)) {
                 //Hurray!!! Authentication is successful.
 
-                giveTactileFeedbackForAuthSuccess();                    //Give tactile feedback.
+                if (mIsTactileFeedbackREnabled)
+                    Utils.giveTactileFeedbackForAuthSuccess(mContext);  //Give tactile feedback.
                 mAuthenticationListener.onAuthenticationSuccessful();   //Notify the parent application
 
                 //Notify all the boxes for authentication success.
@@ -301,7 +306,8 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
             } else {
                 //:-( Authentication failed.
 
-                giveTactileFeedbackForAuthFail();                       //Give tactile feedback.
+                if (mIsTactileFeedbackREnabled)
+                    Utils.giveTactileFeedbackForAuthFail(mContext);     //Give tactile feedback.
                 mAuthenticationListener.onAuthenticationFailed();       //Notify parent application
 
                 //Notify all the boxes for authentication success.
@@ -317,50 +323,9 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
                     reset();
                 }
             }, 350);
-        } else {
-            giveTactileFeedbackForKeyPress();
+        } else if (mIsTactileFeedbackREnabled) {
+            Utils.giveTactileFeedbackForKeyPress(mContext);
         }
-    }
-
-    /**
-     * Run the vibrator to give tactile feedback for 50ms when any key is pressed.
-     */
-    private void giveTactileFeedbackForKeyPress() {
-        if (!mIsTactileFeedbackREnabled) return;
-
-        Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-        if (v.hasVibrator()) v.vibrate(50);
-    }
-
-    /**
-     * Run the vibrator to give tactile feedback for 350ms when yser authentication is successful.
-     * <p>
-     * Note : When authentication is success, {@link #giveTactileFeedbackForKeyPress()} won't get call
-     * for the last key press.
-     *
-     * @see #onKeyPressed(String)
-     */
-    private void giveTactileFeedbackForAuthFail() {
-        if (!mIsTactileFeedbackREnabled) return;
-
-        Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-        if (v.hasVibrator()) v.vibrate(350);
-    }
-
-    /**
-     * Run the vibrator to give tactile feedback for 100ms at difference of 50ms for two times when
-     * user authentication is failed.
-     * <p>
-     * Note : When authentication is success, {@link #giveTactileFeedbackForKeyPress()} won't get call
-     * for the last key press.
-     *
-     * @see #onKeyPressed(String)
-     */
-    private void giveTactileFeedbackForAuthSuccess() {
-        if (!mIsTactileFeedbackREnabled) return;
-
-        Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-        if (v.hasVibrator()) v.vibrate(new long[]{50, 100, 50, 100}, -1);
     }
 
     /**
@@ -491,13 +456,13 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
         return mBoxFingerprint.getStatusTextSize();
     }
 
-    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(statusTextSize);
+    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
         invalidate();
     }
 
-    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
+    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(statusTextSize);
         invalidate();
     }
 
