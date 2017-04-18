@@ -27,21 +27,21 @@ This library provide easy and secure PIN authentication view, which
 ## Demo: 
 **Authentication using PIN**
 
-|Success|Fail|
-|:---:|:---:|
-|![PIN Success](/resource/pin_success.gif)|![PIN Failed](/resource/pin_failed.gif)|
-
-**Authentication using fingerprint**
-
-|Success|Fail|
-|:---:|:---:|
-|![Fingerprint Success](/resource/fingerprint_success.gif)|![Fingerprint Failed](/resource/fingerprint_failed.gif)|
+|Success|Fail||Fingerprint Success|Fingerprint Fail|
+|:---:|:---:||:---:|:---:|
+|![PIN Success](/resource/pin_success.gif)|![PIN Failed](/resource/pin_failed.gif)||![Fingerprint Success](/resource/fingerprint_success.gif)|![Fingerprint Failed](/resource/fingerprint_failed.gif)|
 
 **Localized Texts**
 
 |English|Hindi|
 |:---:|:---:|
 |![Locale English](/resource/locale_en.png)|![Locale Hindi](/resource/locale_hn.png)|
+
+**Different Key Shape**
+
+|Rectangle|Circle|Square|
+|:---:|:---:|:---:|
+|![Rect](/resource/rect_key.png)|![Circle](/resource/circle_key.png)|![Square](/resource/square_key.png)|
 
 *Here is the link of the demo application. 👉 [Demo](resource/sample.apk)*
 
