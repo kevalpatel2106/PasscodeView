@@ -29,14 +29,14 @@ import android.support.annotation.NonNull;
 
 abstract class Box {
 
-    private final PinView mView;
+    private final PasscodeView mView;
 
-    public Box(@NonNull PinView rootView) {
+    public Box(@NonNull PasscodeView rootView) {
         mView = rootView;
     }
 
     @NonNull
-    public final PinView getRootView() {
+    public final PasscodeView getRootView() {
         return mView;
     }
 

@@ -57,15 +57,15 @@ public final class DotIndicator extends Indicator {
      * Draw the indicator.
      *
      * @param canvas   Canvas of {@link PinView}.
-     * @param isFilled True if to display filled indicator.
+     * @param isSelected True if to display selectedL indicator.
      */
     @Override
-    public void draw(@NonNull Canvas canvas, boolean isFilled) {
+    public void draw(@NonNull Canvas canvas, boolean isSelected) {
         canvas.drawCircle(mBounds.exactCenterX(),
                 mBounds.exactCenterY(),
                 mBuilder.getIndicatorRadius(),
                 isDisplayError ? mBuilder.getErrorIndicatorPaint() :
-                        isFilled ? mBuilder.getSolidIndicatorPaint() : mBuilder.getEmptyIndicatorPaint());
+                        isSelected ? mBuilder.getSelectedIndicatorPaint() : mBuilder.getNormalIndicatorPaint());
     }
 
     @Override
@@ -177,24 +177,24 @@ public final class DotIndicator extends Indicator {
         }
 
         @NonNull
-        public DotIndicator.Builder setIndicatorRadius(@Dimension float indicatorRadius) {
-            mIndicatorRadius = indicatorRadius;
-            return this;
-        }
-
-        @NonNull
         public DotIndicator.Builder setIndicatorRadius(@DimenRes int indicatorRadius) {
             mIndicatorRadius = getContext().getResources().getDimension(indicatorRadius);
             return this;
         }
 
         @NonNull
-        public Paint getEmptyIndicatorPaint() {
+        public DotIndicator.Builder setIndicatorRadius(@Dimension float indicatorRadius) {
+            mIndicatorRadius = indicatorRadius;
+            return this;
+        }
+
+        @NonNull
+        public Paint getNormalIndicatorPaint() {
             return mEmptyIndicatorPaint;
         }
 
         @NonNull
-        public Paint getSolidIndicatorPaint() {
+        public Paint getSelectedIndicatorPaint() {
             return mSolidIndicatorPaint;
         }
 

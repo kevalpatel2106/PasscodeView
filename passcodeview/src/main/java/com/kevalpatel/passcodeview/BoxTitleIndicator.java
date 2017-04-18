@@ -49,7 +49,7 @@ final class BoxTitleIndicator extends Box {
     private Rect mDotsIndicatorBound;
     private Indicator.Builder mIndicatorBuilder;
 
-    BoxTitleIndicator(@NonNull PinView view) {
+    BoxTitleIndicator(@NonNull PasscodeView view) {
         super(view);
     }
 
@@ -106,13 +106,13 @@ final class BoxTitleIndicator extends Box {
      * |   |===============|    | |
      * |   |   INDICATORS  |    | |
      * |   |===============|    | | => 2 * {@link com.kevalpatel.passcodeview.R.dimen#lib_divider_vertical_margin} px up from the bottom key board
-     * |------------------------|=| => {@link BoxKeypad#KEY_BOARD_TOP_WEIGHT} of the total height.
+     * |------------------------|=| => {@link Constants#KEY_BOARD_TOP_WEIGHT} of the total height.
      * |                        | |
      * |                        | |
      * |                        | | => Keypad height. ({@link BoxKeypad#measure(Rect)})
      * |                        | |
      * |                        | |
-     * |------------------------|=| => {@link BoxKeypad#KEY_BOARD_BOTTOM_WEIGHT} of the total weight if the fingerprint is available. Else it touches to the bottom of the main view.
+     * |------------------------|=| => {@link Constants#KEY_BOARD_BOTTOM_WEIGHT} of the total weight if the fingerprint is available. Else it touches to the bottom of the main view.
      * |                        | | => Section for fingerprint. If the fingerprint is enabled. Otherwise keyboard streaches to the bottom of the root view.
      * |------------------------|=|
      * Don't change until you know what you are doing. :-)
@@ -130,7 +130,7 @@ final class BoxTitleIndicator extends Box {
         mDotsIndicatorBound.left = (rootViewBounds.width() - totalSpace) / 2;
         mDotsIndicatorBound.right = mDotsIndicatorBound.left + totalSpace;
         mDotsIndicatorBound.bottom = rootViewBounds.top
-                + (int) (rootViewBounds.height() * BoxKeypad.KEY_BOARD_TOP_WEIGHT
+                + (int) (rootViewBounds.height() * Constants.KEY_BOARD_TOP_WEIGHT
                 - 2 * getContext().getResources().getDimension(R.dimen.lib_divider_vertical_margin));
         mDotsIndicatorBound.top = mDotsIndicatorBound.bottom - indicatorWidth;
 

@@ -48,10 +48,10 @@ final class BoxKeypad extends Box {
     /**
      * Public constructor
      *
-     * @param pinView {@link PinView} in which box will be displayed.
+     * @param passcodeView {@link PinView} in which box will be displayed.
      */
-    BoxKeypad(@NonNull PinView pinView) {
-        super(pinView);
+    BoxKeypad(@NonNull PasscodeView passcodeView) {
+        super(passcodeView);
         sKeyNamesBuilder = new KeyNamesBuilder();
         sKeyNames = sKeyNamesBuilder.build();
     }

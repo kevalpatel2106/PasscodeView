@@ -63,8 +63,8 @@ final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPr
     @Nullable
     private FingerPrintAuthHelper mFingerPrintAuthHelper;
 
-    BoxFingerprint(@NonNull PinView view) {
-        super(view);
+    BoxFingerprint(@NonNull PasscodeView passcodeView) {
+        super(passcodeView);
         init();
     }
 

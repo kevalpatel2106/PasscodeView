@@ -17,15 +17,11 @@
 package com.kevalpatel.passcodeview;
 
 import android.graphics.Canvas;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.Size;
 
-import com.kevalpatel.passcodeview.keys.Key;
+import com.kevalpatel.passcodeview.indicators.Indicator;
 
 import java.util.ArrayList;
 
@@ -36,39 +32,18 @@ import java.util.ArrayList;
  */
 
 final class BoxPattern extends Box {
-    @Size(Constants.NO_OF_ROWS * Constants.NO_OF_COLUMNS)
-    private static String[][] sKeyNames;
-    private static KeyNamesBuilder sKeyNamesBuilder;
-
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
-    private ArrayList<Key> mKeys;
-    private Rect mKeyBoxBound = new Rect();
-    private Key.Builder mKeyBuilder;
+    private ArrayList<Indicator> mIndicators;
+    private Rect mPatternBoxBound = new Rect();
+    private Indicator.Builder mIndicatorBuilder;
 
     /**
      * Public constructor
      *
-     * @param pinView {@link PinView} in which box will be displayed.
+     * @param passcodeView {@link PasscodeView} in which box will be displayed.
      */
-    BoxPattern(@NonNull PinView pinView) {
-        super(pinView);
-        sKeyNamesBuilder = new KeyNamesBuilder();
-        sKeyNames = sKeyNamesBuilder.build();
-    }
-
-    /**
-     * Set the name of the different keys based on the locale.
-     * This method and {@link #sKeyNames} are static to avoid duplicate object creation.
-     *
-     * @param keyNames String with the names of the key.
-     */
-    static void setKeyNames(@NonNull KeyNamesBuilder keyNames) {
-        sKeyNamesBuilder = keyNames;
-        sKeyNames = keyNames.build();
-    }
-
-    KeyNamesBuilder getKeyNameBuilder() {
-        return sKeyNamesBuilder;
+    BoxPattern(@NonNull PasscodeView passcodeView) {
+        super(passcodeView);
     }
 
     /**
@@ -100,28 +75,25 @@ final class BoxPattern extends Box {
      */
     @Override
     void measure(@NonNull Rect rootViewBound) {
-        if (mKeyBuilder == null)
-            throw new NullPointerException("Set key using KeyBuilder first.");
-
-        mKeyBoxBound.left = mIsOneHandOperation ? (int) (rootViewBound.width() * 0.3) : 0;
-        mKeyBoxBound.right = rootViewBound.width();
-        mKeyBoxBound.top = (int) (rootViewBound.top + (rootViewBound.height() * Constants.KEY_BOARD_TOP_WEIGHT));
-        mKeyBoxBound.bottom = (int) (rootViewBound.bottom -
+        mPatternBoxBound.left = mIsOneHandOperation ? (int) (rootViewBound.width() * 0.3) : 0;
+        mPatternBoxBound.right = rootViewBound.width();
+        mPatternBoxBound.top = (int) (rootViewBound.top + (rootViewBound.height() * Constants.KEY_BOARD_TOP_WEIGHT));
+        mPatternBoxBound.bottom = (int) (rootViewBound.bottom -
                 rootViewBound.height() * (getRootView().isFingerPrintEnable() ? Constants.KEY_BOARD_BOTTOM_WEIGHT : 0));
 
-        float singleKeyHeight = mKeyBoxBound.height() / Constants.NO_OF_ROWS;
-        float singleKeyWidth = mKeyBoxBound.width() / Constants.NO_OF_COLUMNS;
+        float singleIndicatorHeight = mPatternBoxBound.height() / Constants.NO_OF_ROWS;
+        float singleIndicatorWidth = mPatternBoxBound.width() / Constants.NO_OF_COLUMNS;
 
-        mKeys = new ArrayList<>();
+        mIndicators = new ArrayList<>();
         for (int colNo = 0; colNo < Constants.NO_OF_COLUMNS; colNo++) {
 
             for (int rowNo = 0; rowNo < Constants.NO_OF_ROWS; rowNo++) {
-                Rect keyBound = new Rect();
-                keyBound.left = (int) ((colNo * singleKeyWidth) + mKeyBoxBound.left);
-                keyBound.right = (int) (keyBound.left + singleKeyWidth);
-                keyBound.top = (int) ((rowNo * singleKeyHeight) + mKeyBoxBound.top);
-                keyBound.bottom = (int) (keyBound.top + singleKeyHeight);
-                mKeys.add(mKeyBuilder.getKey(sKeyNames[colNo][rowNo], keyBound));
+                Rect indicatorBound = new Rect();
+                indicatorBound.left = (int) ((colNo * singleIndicatorWidth) + mPatternBoxBound.left);
+                indicatorBound.right = (int) (indicatorBound.left + singleIndicatorWidth);
+                indicatorBound.top = (int) ((rowNo * singleIndicatorHeight) + mPatternBoxBound.top);
+                indicatorBound.bottom = (int) (indicatorBound.top + singleIndicatorHeight);
+                mIndicators.add(mIndicatorBuilder.getIndicator(indicatorBound));
             }
         }
     }
@@ -143,37 +115,25 @@ final class BoxPattern extends Box {
     @Override
     void onAuthenticationFail() {
         //Play failed animation for all keys
-        for (Key key : mKeys) key.onAuthFail();
+        for (Indicator indicator : mIndicators) indicator.onAuthFailed();
         getRootView().invalidate();
     }
 
     @Override
     void onAuthenticationSuccess() {
         //Play success animation for all keys
-        for (Key key : mKeys) key.onAuthSuccess();
+        for (Indicator indicator : mIndicators) indicator.onAuthSuccess();
         getRootView().invalidate();
     }
 
     /**
-     * Draw keyboard on the canvas. This will drawText all the {@link #sKeyNames} on the canvas.
+     * Draw pattern box on the canvas.
      *
      * @param canvas canvas on which the keyboard will be drawn.
      */
     @Override
     void draw(@NonNull Canvas canvas) {
-        Drawable d = getContext().getResources().getDrawable(R.drawable.ic_back_space);
-        d.setColorFilter(new PorterDuffColorFilter(mKeyBuilder.getKeyTextPaint().getColor(), PorterDuff.Mode.SRC_ATOP));
-
-        for (Key key : mKeys) {
-            if (key.getDigit().isEmpty()) continue; //Don't drawText the empty button
-
-            key.drawShape(canvas);
-            if (key.getDigit().equals(KeyNamesBuilder.BACKSPACE_TITLE)) {
-                key.drawBackSpace(canvas, d);
-            } else {
-                key.drawText(canvas);
-            }
-        }
+        for (Indicator indicator : mIndicators) indicator.draw(canvas, false);
     }
 
     ///////////////// SETTERS/GETTERS //////////////
@@ -188,26 +148,26 @@ final class BoxPattern extends Box {
      */
     @Nullable
     String findKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY) {
-        //figure out down key.
-        for (Key key : mKeys) {
-            if (key.getDigit().isEmpty()) continue;  //Empty key
-
-            //Update the typed passcode if the ACTION_DOWN and ACTION_UP keys are same.
-            //Prevent swipe gestures to trigger false key press event.
-            if (key.isKeyPressed(downEventX, downEventY) && key.isKeyPressed(upEventX, upEventY)) {
-                key.playClickAnimation();
-                return key.getDigit();
-            }
-        }
+//        //figure out down key.
+//        for (Key key : mIndicators) {
+//            if (key.getDigit().isEmpty()) continue;  //Empty key
+//
+//            //Update the typed passcode if the ACTION_DOWN and ACTION_UP keys are same.
+//            //Prevent swipe gestures to trigger false key press event.
+//            if (key.isKeyPressed(downEventX, downEventY) && key.isKeyPressed(upEventX, upEventY)) {
+//                key.playClickAnimation();
+//                return key.getDigit();
+//            }
+//        }
         return null;
     }
 
-    ArrayList<Key> getKeys() {
-        return mKeys;
+    ArrayList<Indicator> getIndicators() {
+        return mIndicators;
     }
 
     Rect getBounds() {
-        return mKeyBoxBound;
+        return mPatternBoxBound;
     }
 
     boolean isOneHandOperation() {
@@ -218,12 +178,11 @@ final class BoxPattern extends Box {
         mIsOneHandOperation = oneHandOperation;
     }
 
-
-    Key.Builder getKeyBuilder() {
-        return mKeyBuilder;
+    Indicator.Builder getIndicatorBuilder() {
+        return mIndicatorBuilder;
     }
 
-    void setKeyBuilder(Key.Builder keyBuilder) {
-        mKeyBuilder = keyBuilder;
+    void setIndicatorBuilder(@NonNull Indicator.Builder mIndicatorBuilder) {
+        this.mIndicatorBuilder = mIndicatorBuilder;
     }
 }

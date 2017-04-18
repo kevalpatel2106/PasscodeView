@@ -19,21 +19,13 @@ package com.kevalpatel.passcodeview;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DimenRes;
-import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.MotionEvent;
-import android.view.View;
 
 import com.kevalpatel.passcodeview.indicators.Indicator;
-import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 import com.kevalpatel.passcodeview.keys.Key;
 
 /**
@@ -42,29 +34,14 @@ import com.kevalpatel.passcodeview.keys.Key;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class PinView extends View implements InteractiveArrayList.ChangeListener {
-    private Context mContext;
+public class PinView extends PasscodeView implements InteractiveArrayList.ChangeListener {
     private float mDownKeyX;                                        //X coordinate of the ACTION_DOWN point
     private float mDownKeyY;                                        //Y coordinate of the ACTION_DOWN point
 
-    private AuthenticationListener mAuthenticationListener;         //Callback listener for application to get notify when authentication successful.
     private int[] mCorrectPin;                                      //Current PIN with witch entered PIN will check.
-    private InteractiveArrayList<Integer> mPinTyped = new InteractiveArrayList<>();       //PIN typed.
-
-    //Rectangle bounds
-    private Rect mRootViewBound = new Rect();       //Root bound
-    private Rect mDividerBound = new Rect();        //Divider bound
-
-    //Theme attributes
-    @ColorInt
-    private int mDividerColor;                              //Horizontal divider color
-    private boolean mIsTactileFeedbackREnabled = true;      //Bool to indicate weather to enable tactile feedback
-
-    //Paints
-    private Paint mDividerPaint;                    //Horizontal divider paint color
+    private InteractiveArrayList<Integer> mPinTyped;                //PIN typed.
 
     private BoxKeypad mBoxKeypad;
-    private BoxFingerprint mBoxFingerprint;
     private BoxTitleIndicator mBoxIndicator;
 
     ///////////////////////////////////////////////////////////////
@@ -73,97 +50,57 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
 
     public PinView(Context context) {
         super(context);
-        init(context, null);
     }
 
     public PinView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init(context, attrs);
     }
 
     public PinView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context, attrs);
     }
 
     ///////////////////////////////////////////////////////////////
-    //                  SET THEME PARAMS
+    //                  SET THEME PARAMS INITIALIZE
     ///////////////////////////////////////////////////////////////
 
     /**
      * Initialize view.
-     *
-     * @param context instance of the caller.
-     * @param attrs   Typed attributes or null.
      */
     @SuppressWarnings("deprecation")
-    private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
-        mContext = context;
+    @Override
+    protected void init() {
+        mPinTyped = new InteractiveArrayList<>();
         mPinTyped.setChangeListener(this);
 
-        //Initialize UI boxes.
         mBoxKeypad = new BoxKeypad(this);
-        mBoxFingerprint = new BoxFingerprint(this);
         mBoxIndicator = new BoxTitleIndicator(this);
+    }
 
-        if (attrs != null) {    //Parse all the params from the arguments.
-            parseTypeArr(attrs);
-        } else {        //Nothing's provided in XML. Set default for now.
-            mDividerColor = getResources().getColor(R.color.lib_divider_color);
+    @Override
+    protected void setDefaultParams() {
+        mBoxIndicator.setDefaults();
+        mBoxKeypad.setDefaults();
+    }
 
-            mBoxIndicator.setDefaults();
-            mBoxKeypad.setDefaults();
-            mBoxFingerprint.setDefaults();
-        }
-
+    @Override
+    protected void preparePaint() {
         //Prepare paints.
-        prepareDividerPaint();
         mBoxKeypad.preparePaint();
-        mBoxFingerprint.preparePaint();
         mBoxIndicator.preparePaint();
     }
 
     /**
      * Parse the theme attribute using the parse array.
-     *
-     * @param attrs theme AttributeSet.
      */
     @SuppressWarnings("deprecation")
-    private void parseTypeArr(@Nullable AttributeSet attrs) {
-        TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.PinView, 0, 0);
-        try {
-            mIsTactileFeedbackREnabled = a.getBoolean(R.styleable.PinView_giveTactileFeedback, true);
-
-            //Parse title params
-            mBoxIndicator.setTitle(a.hasValue(R.styleable.PinView_titleText) ?
-                    a.getString(R.styleable.PinView_titleText) : BoxTitleIndicator.DEF_TITLE_TEXT);
-            mBoxIndicator.setTitleColor(a.getColor(R.styleable.PinView_titleTextColor,
-                    mContext.getResources().getColor(R.color.lib_key_default_color)));
-
-            //Parse divider params
-            mDividerColor = a.getColor(R.styleable.PinView_dividerColor,
-                    mContext.getResources().getColor(R.color.lib_divider_color));
-
-            //Fet fingerprint params
-            //noinspection ConstantConditions
-            mBoxFingerprint.setStatusText(a.hasValue(R.styleable.PinView_titleText) ?
-                    a.getString(R.styleable.PinView_fingerprintDefaultText) : BoxFingerprint.DEF_FINGERPRINT_STATUS);
-            mBoxFingerprint.setStatusTextColor(a.getColor(R.styleable.PinView_fingerprintTextColor,
-                    mContext.getResources().getColor(R.color.lib_key_default_color)));
-            mBoxFingerprint.setStatusTextSize(a.getDimension(R.styleable.PinView_fingerprintTextSize,
-                    (int) mContext.getResources().getDimension(R.dimen.lib_fingerprint_status_text_size)));
-            mBoxFingerprint.setFingerPrintEnable(a.getBoolean(R.styleable.PinView_fingerprintEnable, true));
-        } finally {
-            a.recycle();
-        }
-    }
-
-    /**
-     * Create the paint to drawText divider.
-     */
-    private void prepareDividerPaint() {
-        mDividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mDividerPaint.setColor(mDividerColor);
+    @Override
+    protected void parseTypeArr(@Nullable TypedArray typedArray) {
+        //Parse title params
+        mBoxIndicator.setTitle(typedArray.hasValue(R.styleable.PinView_titleText) ?
+                typedArray.getString(R.styleable.PinView_titleText) : BoxTitleIndicator.DEF_TITLE_TEXT);
+        mBoxIndicator.setTitleColor(typedArray.getColor(R.styleable.PinView_titleTextColor,
+                mContext.getResources().getColor(R.color.lib_key_default_color)));
     }
 
 
@@ -180,17 +117,8 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         mBoxKeypad.draw(canvas);
-        drawDivider(canvas);
         mBoxIndicator.draw(canvas);
         mBoxFingerprint.draw(canvas);
-    }
-
-    private void drawDivider(Canvas canvas) {
-        canvas.drawLine(mDividerBound.left,
-                mDividerBound.top,
-                mDividerBound.right,
-                mDividerBound.bottom,
-                mDividerPaint);
     }
 
     ///////////////////////////////////////////////////////////////
@@ -199,42 +127,10 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
-        measureMainView();
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         mBoxKeypad.measure(mRootViewBound);
-        measureDivider();
         mBoxIndicator.measure(mRootViewBound);
         mBoxFingerprint.measure(mRootViewBound);
-
-        setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    }
-
-    /**
-     * Measure the root view and get bounds.
-     */
-    private Rect measureMainView() {
-        getLocalVisibleRect(mRootViewBound);
-
-        //Get the height of the actionbar if we have any actionbar and add it to the top
-        TypedValue tv = new TypedValue();
-        if (mContext.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-            mRootViewBound.top = mRootViewBound.top
-                    + TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-        }
-
-        return mRootViewBound;
-    }
-
-    /**
-     * Measure horizontal divider bounds.
-     * Don't change untill you know what you are doing. :-)
-     */
-    private void measureDivider() {
-        mDividerBound.left = (int) (mRootViewBound.left + mContext.getResources().getDimension(R.dimen.lib_divider_horizontal_margin));
-        mDividerBound.right = (int) (mRootViewBound.right - mContext.getResources().getDimension(R.dimen.lib_divider_horizontal_margin));
-        mDividerBound.top = (int) (mBoxKeypad.getBounds().top - mContext.getResources().getDimension(R.dimen.lib_divider_vertical_margin));
-        mDividerBound.bottom = (int) (mBoxKeypad.getBounds().top - mContext.getResources().getDimension(R.dimen.lib_divider_vertical_margin));
     }
 
     ///////////////////////////////////////////////////////////////
@@ -295,7 +191,7 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
             if (Utils.isPINMatched(mCorrectPin, mPinTyped)) {
                 //Hurray!!! Authentication is successful.
 
-                if (mIsTactileFeedbackREnabled)
+                if (isTactileFeedbackEnable())
                     Utils.giveTactileFeedbackForAuthSuccess(mContext);  //Give tactile feedback.
                 mAuthenticationListener.onAuthenticationSuccessful();   //Notify the parent application
 
@@ -306,7 +202,7 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
             } else {
                 //:-( Authentication failed.
 
-                if (mIsTactileFeedbackREnabled)
+                if (isTactileFeedbackEnable())
                     Utils.giveTactileFeedbackForAuthFail(mContext);     //Give tactile feedback.
                 mAuthenticationListener.onAuthenticationFailed();       //Notify parent application
 
@@ -323,7 +219,7 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
                     reset();
                 }
             }, 350);
-        } else if (mIsTactileFeedbackREnabled) {
+        } else if (isTactileFeedbackEnable()) {
             Utils.giveTactileFeedbackForKeyPress(mContext);
         }
     }
@@ -331,6 +227,7 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
     /**
      * Reset the pin code and view state.
      */
+    @Override
     public void reset() {
         mPinTyped.clear();
         invalidate();
@@ -345,14 +242,6 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
     @Override
     public void onArrayValueChange(int size) {
         mBoxIndicator.onPinDigitEntered(size);
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-
-        //Stop scanning fingerprint
-        mBoxFingerprint.stopFingerprintScanner();
     }
 
     ///////////////////////////////////////////////////////////////
@@ -382,26 +271,6 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
         invalidate();
     }
 
-    @Nullable
-    public AuthenticationListener getAuthenticationListener() {
-        return mAuthenticationListener;
-    }
-
-    public void setAuthenticationListener(@NonNull AuthenticationListener authenticationListener) {
-        mAuthenticationListener = authenticationListener;
-        mBoxFingerprint.setAuthListener(authenticationListener);
-    }
-
-    public int getDividerColor() {
-        return mDividerColor;
-    }
-
-    public void setDividerColor(@ColorInt int dividerColor) {
-        mDividerColor = dividerColor;
-        prepareDividerPaint();
-        invalidate();
-    }
-
     public int getTitleColor() {
         return mBoxIndicator.getTitleColor();
     }
@@ -425,53 +294,6 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
      */
     public void setTitle(@NonNull String title) {
         mBoxIndicator.setTitle(title);
-        invalidate();
-    }
-
-    @NonNull
-    public String getFingerPrintStatusText() {
-        return mBoxFingerprint.getStatusText();
-    }
-
-    public void setFingerPrintStatusText(@NonNull String statusText) {
-        mBoxFingerprint.setStatusText(statusText);
-        invalidate();
-    }
-
-    public int getFingerPrintStatusTextColor() {
-        return mBoxFingerprint.getStatusTextColor();
-    }
-
-    public void setFingerPrintStatusTextColor(@ColorInt int statusTextColor) {
-        mBoxFingerprint.setStatusTextColor(statusTextColor);
-        invalidate();
-    }
-
-    public void setFingerPrintStatusTextColorRes(@ColorRes int statusTextColor) {
-        mBoxFingerprint.setStatusTextColor(mContext.getResources().getColor(statusTextColor));
-        invalidate();
-    }
-
-    public float getFingerPrintStatusTextSize() {
-        return mBoxFingerprint.getStatusTextSize();
-    }
-
-    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
-        invalidate();
-    }
-
-    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(statusTextSize);
-        invalidate();
-    }
-
-    public Boolean isFingerPrintEnable() {
-        return mBoxFingerprint.isFingerPrintEnable();
-    }
-
-    public void setIsFingerPrintEnable(boolean isEnable) {
-        mBoxFingerprint.setFingerPrintEnable(isEnable);
         invalidate();
     }
 
@@ -525,13 +347,5 @@ public class PinView extends View implements InteractiveArrayList.ChangeListener
 
         requestLayout();
         invalidate();
-    }
-
-    public boolean isTactileFeedbackEnable() {
-        return mIsTactileFeedbackREnabled;
-    }
-
-    public void setTactileFeedback(boolean enable) {
-        mIsTactileFeedbackREnabled = enable;
     }
 }
