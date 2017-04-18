@@ -336,7 +336,7 @@ public class PinView extends PasscodeView implements InteractiveArrayList.Change
 
     public void setCurrentTypedPin(int[] currentTypedPin) {
         if (mCorrectPin.length == 0) {
-            throw new IllegalStateException("You must call setCorrectPin() before calling this method.");
+            throw new IllegalStateException("You must call setCorrectPattern() before calling this method.");
         } else if (currentTypedPin.length > mCorrectPin.length) {
             throw new IllegalArgumentException("Invalid pin length.");
         }

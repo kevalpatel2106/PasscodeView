@@ -33,6 +33,7 @@ import java.util.ArrayList;
 
 final class BoxPattern extends Box {
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
+
     private ArrayList<Indicator> mIndicators;
     private Rect mPatternBoxBound = new Rect();
     private Indicator.Builder mIndicatorBuilder;

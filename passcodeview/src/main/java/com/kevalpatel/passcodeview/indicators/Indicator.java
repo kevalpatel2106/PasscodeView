@@ -22,6 +22,8 @@ import android.graphics.Rect;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 
+import com.kevalpatel.passcodeview.PasscodeView;
+import com.kevalpatel.passcodeview.PatternView;
 import com.kevalpatel.passcodeview.PinView;
 
 /**
@@ -31,23 +33,23 @@ import com.kevalpatel.passcodeview.PinView;
  */
 public abstract class Indicator {
 
-    private PinView mPinView;
+    private PasscodeView mPasscodeView;
 
     private Indicator() {
     }
 
-    protected Indicator(@NonNull PinView mPinView,
+    protected Indicator(@NonNull PasscodeView pinView,
                         @NonNull Rect bound,
                         @NonNull Indicator.Builder builder) {
-        this.mPinView = mPinView;
+        this.mPasscodeView = pinView;
     }
 
-    protected final PinView getRootView() {
-        return mPinView;
+    protected final PasscodeView getRootView() {
+        return mPasscodeView;
     }
 
     protected final Context getContext() {
-        return mPinView.getContext();
+        return mPasscodeView.getContext();
     }
 
     public abstract void draw(@NonNull Canvas canvas, boolean isFilled);
@@ -59,24 +61,29 @@ public abstract class Indicator {
 
     public static abstract class Builder {
 
-        private PinView mPinView;
+        private PasscodeView mPasscodeView;
 
         private Builder() {
         }
 
-        public Builder(PinView pinView) {
-            mPinView = pinView;
+        public Builder(@NonNull PinView pinView) {
+            mPasscodeView = pinView;
+            setDefaults(pinView.getContext());
+        }
+
+        public Builder(@NonNull PatternView pinView) {
+            mPasscodeView = pinView;
             setDefaults(pinView.getContext());
         }
 
         @NonNull
-        protected final PinView getRootView() {
-            return mPinView;
+        protected final PasscodeView getRootView() {
+            return mPasscodeView;
         }
 
         @NonNull
         protected final Context getContext() {
-            return mPinView.getContext();
+            return mPasscodeView.getContext();
         }
 
         @Dimension

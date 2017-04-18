@@ -27,6 +27,7 @@ import android.support.annotation.DimenRes;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 
+import com.kevalpatel.passcodeview.PasscodeView;
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.R;
 
@@ -44,7 +45,7 @@ public final class DotIndicator extends Indicator {
     private final Builder mBuilder;
     private boolean isDisplayError;
 
-    DotIndicator(@NonNull PinView pinView,
+    DotIndicator(@NonNull PasscodeView pinView,
                  @NonNull Rect bound,
                  @NonNull DotIndicator.Builder builder) {
         super(pinView, bound, builder);
@@ -56,7 +57,7 @@ public final class DotIndicator extends Indicator {
     /**
      * Draw the indicator.
      *
-     * @param canvas   Canvas of {@link PinView}.
+     * @param canvas     Canvas of {@link PinView}.
      * @param isSelected True if to display selectedL indicator.
      */
     @Override
@@ -177,14 +178,14 @@ public final class DotIndicator extends Indicator {
         }
 
         @NonNull
-        public DotIndicator.Builder setIndicatorRadius(@DimenRes int indicatorRadius) {
-            mIndicatorRadius = getContext().getResources().getDimension(indicatorRadius);
+        public DotIndicator.Builder setIndicatorRadius(@Dimension float indicatorRadius) {
+            mIndicatorRadius = indicatorRadius;
             return this;
         }
 
         @NonNull
-        public DotIndicator.Builder setIndicatorRadius(@Dimension float indicatorRadius) {
-            mIndicatorRadius = indicatorRadius;
+        public DotIndicator.Builder setIndicatorRadius(@DimenRes int indicatorRadius) {
+            mIndicatorRadius = getContext().getResources().getDimension(indicatorRadius);
             return this;
         }
 

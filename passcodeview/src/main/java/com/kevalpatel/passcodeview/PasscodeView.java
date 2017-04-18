@@ -41,16 +41,25 @@ import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-abstract class PasscodeView extends View {
+public abstract class PasscodeView extends View {
     protected final Context mContext;
-    protected Rect mRootViewBound = new Rect();
-    protected BoxFingerprint mBoxFingerprint;
+
+    protected Rect mRootViewBound = new Rect();             //Bounds for the root view
     protected AuthenticationListener mAuthenticationListener;
+
+    //Boxes
+    protected BoxFingerprint mBoxFingerprint;               //Fingerprint box
+
+    //Title divider
     @ColorInt
     private int mDividerColor;                              //Horizontal divider color
     private Paint mDividerPaint;                            //Horizontal divider paint color
     private Rect mDividerBound = new Rect();                //Divider bound
     private boolean mIsTactileFeedbackEnabled = true;       //Bool to indicate weather to enable tactile feedback
+
+    ///////////////////////////////////////////////////////////////
+    //                  CONSTRUCTORS
+    ///////////////////////////////////////////////////////////////
 
     public PasscodeView(Context context) {
         super(context);
@@ -81,9 +90,25 @@ abstract class PasscodeView extends View {
     //                  SET THEME PARAMS INITIALIZE
     ///////////////////////////////////////////////////////////////
 
+    /**
+     * Initialize the view. This will set {@link BoxFingerprint} and parse {@link TypedArray} to
+     * read all the parameters added in xml file.
+     * <p>
+     * If you wan to enable customized parameters, override {@link #init()}  method and initialize the
+     * parameters. This method will call before parsing the {@link TypedArray}.
+     * <p>
+     * If you want to parse view specific XML parameters, override {@link #parseTypeArr(TypedArray)}
+     * and parse the {@link TypedArray}. This method will only call if there is any custom parameters
+     * defined in XML.
+     * <p>
+     * You can set default theme parameters by overriding {@link #setDefaultParams()} if there are no
+     * parameters defined in XML layout.
+     *
+     * @param attrs {@link AttributeSet}
+     */
     private void init(@Nullable AttributeSet attrs) {
-        init();
         mBoxFingerprint = new BoxFingerprint(this);
+        init();
 
         if (attrs != null) {    //Parse all the params from the arguments.
             TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.PinView, 0, 0);
@@ -125,7 +150,7 @@ abstract class PasscodeView extends View {
 
     protected abstract void preparePaint();
 
-    protected abstract void parseTypeArr(@Nullable TypedArray typedArray);
+    protected abstract void parseTypeArr(@NonNull TypedArray typedArray);
 
     /**
      * Create the paint to drawText divider.
@@ -266,13 +291,13 @@ abstract class PasscodeView extends View {
         return mBoxFingerprint.getStatusTextSize();
     }
 
-    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(statusTextSize);
+    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
         invalidate();
     }
 
-    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
+    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(statusTextSize);
         invalidate();
     }
 
