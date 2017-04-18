@@ -22,24 +22,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    android:padding="@dimen/lib_divider_horizontal_margin"
-    tools:context="com.securelockview.sample.MainActivity">
+    android:paddingBottom="10dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="10dp"
+    tools:context="com.securelockview.sample.PinViewActivity">
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="@dimen/profile_image_dimen"
         android:layout_height="@dimen/profile_image_dimen"
-        android:layout_centerVertical="true"
-        android:layout_margin="20dp"
+        android:layout_centerHorizontal="true"
         android:elevation="4dp"
         android:src="@drawable/user_face"
         tools:ignore="ContentDescription"/>
 
     <com.kevalpatel.passcodeview.PinView
-        android:id="@+id/pin_view"
+        android:id="@+id/pattern_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toRightOf="@id/imageView"
+        android:layout_below="@id/imageView"
         app:dividerColor="@color/colorPrimaryDark"
         app:fingerprintDefaultText="Scan your finger to unlock application"
         app:fingerprintEnable="true"

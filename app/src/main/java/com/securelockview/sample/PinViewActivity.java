@@ -31,7 +31,7 @@ import com.kevalpatel.passcodeview.keys.RoundKey;
  *
  * @author 'https://github.com/kevalpatel2106'
  */
-public class MainActivity extends AppCompatActivity {
+public class PinViewActivity extends AppCompatActivity {
     private static final String ARG_CURRENT_PIN = "current_pin";
 
     private PinView mPinView;
@@ -39,9 +39,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_pinview);
 
-        mPinView = (PinView) findViewById(R.id.pin_view);
+        mPinView = (PinView) findViewById(R.id.pattern_view);
 
         //Set the correct pin code.
         //REQUIRED
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
             public void onAuthenticationSuccessful() {
                 //User authenticated successfully.
                 //Navigate to secure screens.
-                startActivity(new Intent(MainActivity.this, AuthenticatedActivity.class));
+                startActivity(new Intent(PinViewActivity.this, AuthenticatedActivity.class));
                 finish();
             }
 

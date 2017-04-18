@@ -15,32 +15,39 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    android:gravity="center"
-    android:orientation="vertical"
     android:paddingBottom="10dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="10dp"
     tools:context="com.securelockview.sample.PinViewActivity">
 
-    <android.support.v7.widget.AppCompatImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:src="@drawable/locked"/>
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="@dimen/profile_image_dimen"
+        android:layout_height="@dimen/profile_image_dimen"
+        android:layout_centerHorizontal="true"
+        android:elevation="4dp"
+        android:src="@drawable/user_face"
+        tools:ignore="ContentDescription"/>
 
-    <TextView
+    <com.kevalpatel.passcodeview.PatternView
+        android:id="@+id/pattern_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="20dp"
-        android:text="Authentication Successful"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textSize="20sp"/>
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_below="@id/imageView"
+        app:dividerColor="@color/colorPrimaryDark"
+        app:fingerprintDefaultText="Scan your finger to unlock application"
+        app:fingerprintEnable="true"
+        app:fingerprintTextColor="@color/colorAccent"
+        app:fingerprintTextSize="@dimen/finger_print_text_size"
+        app:giveTactileFeedback="true"
+        app:titleTextColor="@android:color/white"/>
+
+</RelativeLayout>
