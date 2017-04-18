@@ -200,8 +200,10 @@ public final class PatternView extends PasscodeView {
                 reset();
             case MotionEvent.ACTION_MOVE:
                 PatternCell cellNumber = mBoxPattern.findCell(touchX, touchY);
-                if (cellNumber != null && !mPatternTyped.contains(cellNumber))
+                if (cellNumber != null && !mPatternTyped.contains(cellNumber)) {
                     mPatternTyped.add(cellNumber);
+                    if (isTactileFeedbackEnable()) Utils.giveTactileFeedbackForKeyPress(mContext);
+                }
 
                 mPathEndX = touchX;
                 mPathEndY = touchY;
@@ -230,10 +232,14 @@ public final class PatternView extends PasscodeView {
             mBoxPattern.onAuthenticationSuccess();
             mBoxTitle.onAuthenticationSuccess();
             isErrorShowing = false;
+
+            if (isTactileFeedbackEnable()) Utils.giveTactileFeedbackForAuthSuccess(mContext);
         } else {
             mBoxPattern.onAuthenticationFail();
             mBoxTitle.onAuthenticationFail();
             isErrorShowing = true;
+
+            if (isTactileFeedbackEnable()) Utils.giveTactileFeedbackForAuthFail(mContext);
         }
         invalidate();
     }

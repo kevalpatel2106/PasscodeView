@@ -44,9 +44,8 @@ public class PatternViewActivity extends AppCompatActivity {
 
         //Build the desired indicator shape and pass the theme attributes.
         //REQUIRED
-        patternView.setIndicator(new DotPatternCell.Builder(patternView)
+        patternView.setPatternCell(new DotPatternCell.Builder(patternView)
                 .setRadius(R.dimen.pattern_cell_radius)
-                .setSelectedCellColorResource(R.color.colorAccent)
                 .setCellColorResource(R.color.colorAccent)
                 .build());
 
