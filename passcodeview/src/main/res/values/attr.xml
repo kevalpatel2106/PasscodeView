@@ -40,6 +40,9 @@
         <attr name="titleText" format="string"/>
         <attr name="titleTextColor" format="color"/>
 
+        <attr name="noOfColumns" format="integer"/>
+        <attr name="noOfRows" format="integer"/>
+
         <attr name="patternLineColor" format="color"/>
     </declare-styleable>
 </resources>

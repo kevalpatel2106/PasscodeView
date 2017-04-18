@@ -20,6 +20,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.kevalpatel.passcodeview.patternCells.PatternCell;
 
@@ -34,8 +35,10 @@ import java.util.ArrayList;
 final class BoxPattern extends Box {
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
 
+    private int mNoOfColumn;
+    private int mNoOfRows;
+
     private ArrayList<PatternCell> mPatternCells;
-    private ArrayList<Integer> mSelectedIndicator;
     private Rect mPatternBoxBound = new Rect();
 
     private PatternCell.Builder mCellBuilder;    //Pattern indicator builder
@@ -84,18 +87,21 @@ final class BoxPattern extends Box {
         mPatternBoxBound.bottom = (int) (rootViewBound.bottom -
                 rootViewBound.height() * (getRootView().isFingerPrintEnable() ? Constants.KEY_BOARD_BOTTOM_WEIGHT : 0));
 
-        float singleIndicatorHeight = mPatternBoxBound.height() / Constants.NO_OF_ROWS;
-        float singleIndicatorWidth = mPatternBoxBound.width() / Constants.NO_OF_COLUMNS;
+        float singleIndicatorHeight = mPatternBoxBound.height() / mNoOfRows;
+        float singleIndicatorWidth = mPatternBoxBound.width() / mNoOfColumn;
 
         mPatternCells = new ArrayList<>();
         int i = 0;
-        for (int colNo = 0; colNo < Constants.NO_OF_COLUMNS; colNo++) {
-            for (int rowNo = 0; rowNo < Constants.NO_OF_ROWS; rowNo++) {
+        Log.d("def", mNoOfColumn + " : " + mNoOfRows);
+        for (int colNo = 0; colNo < mNoOfColumn; colNo++) {
+            for (int rowNo = 0; rowNo < mNoOfRows; rowNo++) {
+                Log.d("loc", colNo + " : " + rowNo);
                 Rect indicatorBound = new Rect();
                 indicatorBound.left = (int) ((colNo * singleIndicatorWidth) + mPatternBoxBound.left);
                 indicatorBound.right = (int) (indicatorBound.left + singleIndicatorWidth);
                 indicatorBound.top = (int) ((rowNo * singleIndicatorHeight) + mPatternBoxBound.top);
                 indicatorBound.bottom = (int) (indicatorBound.top + singleIndicatorHeight);
+
                 mPatternCells.add(mCellBuilder.getCell(indicatorBound, i));
                 i++;
             }
@@ -113,7 +119,8 @@ final class BoxPattern extends Box {
     @SuppressWarnings("deprecation")
     @Override
     void setDefaults() {
-        //Do nothing
+        mNoOfRows = Constants.DEF_PATTERN_LENGTH;
+        mNoOfColumn = Constants.DEF_PATTERN_LENGTH;
     }
 
     @Override
@@ -175,7 +182,19 @@ final class BoxPattern extends Box {
         this.mCellBuilder = mIndicatorBuilder;
     }
 
-    public void setSelectedIndicator(ArrayList<Integer> selectedIndicator) {
-        mSelectedIndicator = selectedIndicator;
+    public int getNoOfColumn() {
+        return mNoOfColumn;
+    }
+
+    public void setNoOfColumn(int noOfColumn) {
+        mNoOfColumn = noOfColumn;
+    }
+
+    public int getNoOfRows() {
+        return mNoOfRows;
+    }
+
+    public void setNoOfRows(int noOfRows) {
+        mNoOfRows = noOfRows;
     }
 }

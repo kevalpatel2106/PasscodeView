@@ -128,6 +128,9 @@ public final class PatternView extends PasscodeView {
             mBoxTitle.setTitleColor(a.getColor(R.styleable.PatternView_titleTextColor,
                     mContext.getResources().getColor(R.color.lib_key_default_color)));
 
+            mBoxPattern.setNoOfRows(a.getInt(R.styleable.PatternView_noOfRows, Constants.DEF_PATTERN_LENGTH));
+            mBoxPattern.setNoOfColumn(a.getInt(R.styleable.PatternView_noOfColumns, Constants.DEF_PATTERN_LENGTH));
+
             mPathColor = a.getColor(R.styleable.PatternView_patternLineColor,
                     mContext.getResources().getColor(android.R.color.holo_green_dark));
         } finally {
@@ -211,6 +214,8 @@ public final class PatternView extends PasscodeView {
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
+                if (mPatternTyped.size() == 0) return true;
+
                 validatePattern();
 
                 //Reset the view.
@@ -335,5 +340,25 @@ public final class PatternView extends PasscodeView {
     @Nullable
     public PatternCell.Builder getPatternCellBuilder() {
         return mBoxPattern.getCellBuilder();
+    }
+
+    public int getNoOfColumn() {
+        return mBoxPattern.getNoOfColumn();
+    }
+
+    public void setNoOfColumn(int noOfColumn) {
+        mBoxPattern.setNoOfColumn(noOfColumn);
+        requestLayout();
+        invalidate();
+    }
+
+    public int getNoOfRows() {
+        return mBoxPattern.getNoOfRows();
+    }
+
+    public void setNoOfRows(int noOfRows) {
+        mBoxPattern.setNoOfRows(noOfRows);
+        requestLayout();
+        invalidate();
     }
 }

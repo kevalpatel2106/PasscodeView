@@ -23,11 +23,13 @@ package com.kevalpatel.passcodeview;
  */
 
 public final class Constants {
-    public static final int NO_OF_COLUMNS = 3;
-    public static final int NO_OF_ROWS = 4;
+    static final int NO_OF_KEY_BOARD_COLUMNS = 3;
+    static final int NO_OF_KEY_BOARD_ROWS = 4;
+
+    static final int DEF_PATTERN_LENGTH = 3;
+
     static final float KEY_BOARD_BOTTOM_WEIGHT = 0.14F;
     static final float KEY_BOARD_TOP_WEIGHT = 0.2F;
-    static final int DEF_PIN_LENGTH = 4;
 
     private Constants() {
     }

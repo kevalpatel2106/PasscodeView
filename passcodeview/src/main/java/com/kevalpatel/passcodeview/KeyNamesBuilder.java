@@ -190,7 +190,7 @@ public final class KeyNamesBuilder {
     }
 
     @SuppressWarnings("Range")
-    @Size(Constants.NO_OF_ROWS * Constants.NO_OF_COLUMNS)
+    @Size(Constants.NO_OF_KEY_BOARD_ROWS * Constants.NO_OF_KEY_BOARD_COLUMNS)
     String[][] build() {
         return new String[][]{{mKeyOne, mKeyFour, mKeySeven, ""},
                 {mKeyTwo, mKeyFive, mKeyEight, mKeyZero},

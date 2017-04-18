@@ -36,7 +36,7 @@ import java.util.ArrayList;
  */
 
 final class BoxKeypad extends Box {
-    @Size(Constants.NO_OF_ROWS * Constants.NO_OF_COLUMNS)
+    @Size(Constants.NO_OF_KEY_BOARD_ROWS * Constants.NO_OF_KEY_BOARD_COLUMNS)
     private static String[][] sKeyNames;
     private static KeyNamesBuilder sKeyNamesBuilder;
 
@@ -109,13 +109,13 @@ final class BoxKeypad extends Box {
         mKeyBoxBound.bottom = (int) (rootViewBound.bottom -
                 rootViewBound.height() * (getRootView().isFingerPrintEnable() ? Constants.KEY_BOARD_BOTTOM_WEIGHT : 0));
 
-        float singleKeyHeight = mKeyBoxBound.height() / Constants.NO_OF_ROWS;
-        float singleKeyWidth = mKeyBoxBound.width() / Constants.NO_OF_COLUMNS;
+        float singleKeyHeight = mKeyBoxBound.height() / Constants.NO_OF_KEY_BOARD_ROWS;
+        float singleKeyWidth = mKeyBoxBound.width() / Constants.NO_OF_KEY_BOARD_COLUMNS;
 
         mKeys = new ArrayList<>();
-        for (int colNo = 0; colNo < Constants.NO_OF_COLUMNS; colNo++) {
+        for (int colNo = 0; colNo < Constants.NO_OF_KEY_BOARD_COLUMNS; colNo++) {
 
-            for (int rowNo = 0; rowNo < Constants.NO_OF_ROWS; rowNo++) {
+            for (int rowNo = 0; rowNo < Constants.NO_OF_KEY_BOARD_ROWS; rowNo++) {
                 Rect keyBound = new Rect();
                 keyBound.left = (int) ((colNo * singleKeyWidth) + mKeyBoxBound.left);
                 keyBound.right = (int) (keyBound.left + singleKeyWidth);

@@ -37,6 +37,8 @@ public class PatternViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pattern_view);
 
         PatternView patternView = (PatternView) findViewById(R.id.pattern_view);
+        patternView.setNoOfColumn(3);
+        patternView.setNoOfRows(3);
 
         //Set the correct pin code.
         //REQUIRED
