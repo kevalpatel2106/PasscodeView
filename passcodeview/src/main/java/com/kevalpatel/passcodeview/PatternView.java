@@ -238,12 +238,14 @@ public final class PatternView extends PasscodeView {
             mBoxTitle.onAuthenticationSuccess();
             isErrorShowing = false;
 
+            mAuthenticationListener.onAuthenticationSuccessful();
             if (isTactileFeedbackEnable()) Utils.giveTactileFeedbackForAuthSuccess(mContext);
         } else {
             mBoxPattern.onAuthenticationFail();
             mBoxTitle.onAuthenticationFail();
             isErrorShowing = true;
 
+            mAuthenticationListener.onAuthenticationFailed();
             if (isTactileFeedbackEnable()) Utils.giveTactileFeedbackForAuthFail(mContext);
         }
         invalidate();

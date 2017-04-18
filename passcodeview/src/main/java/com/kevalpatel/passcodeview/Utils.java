@@ -109,6 +109,7 @@ public final class Utils {
     static boolean isPatternMatched(int[] correctPin, ArrayList<PatternCell> pinToCheck) {
         for (int i = 0; i < correctPin.length; i++)
             if (correctPin[i] != pinToCheck.get(i).getIndex()) return false;
+
         return correctPin.length == pinToCheck.size();
     }
 

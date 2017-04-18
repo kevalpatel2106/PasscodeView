@@ -20,7 +20,6 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.kevalpatel.passcodeview.patternCells.PatternCell;
 
@@ -92,10 +91,8 @@ final class BoxPattern extends Box {
 
         mPatternCells = new ArrayList<>();
         int i = 0;
-        Log.d("def", mNoOfColumn + " : " + mNoOfRows);
         for (int colNo = 0; colNo < mNoOfColumn; colNo++) {
             for (int rowNo = 0; rowNo < mNoOfRows; rowNo++) {
-                Log.d("loc", colNo + " : " + rowNo);
                 Rect indicatorBound = new Rect();
                 indicatorBound.left = (int) ((colNo * singleIndicatorWidth) + mPatternBoxBound.left);
                 indicatorBound.right = (int) (indicatorBound.left + singleIndicatorWidth);
