@@ -27,8 +27,6 @@ import android.support.annotation.DimenRes;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 
-import com.kevalpatel.passcodeview.PasscodeView;
-import com.kevalpatel.passcodeview.PatternView;
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.R;
 
@@ -46,9 +44,9 @@ public final class CircleIndicator extends Indicator {
     private final Builder mBuilder;
     private boolean isDisplayError;
 
-    CircleIndicator(@NonNull PasscodeView pinView,
-                    @NonNull Rect bound,
-                    @NonNull CircleIndicator.Builder builder) {
+    private CircleIndicator(@NonNull PinView pinView,
+                            @NonNull Rect bound,
+                            @NonNull CircleIndicator.Builder builder) {
         super(pinView, bound, builder);
 
         mBounds = bound;
@@ -103,10 +101,6 @@ public final class CircleIndicator extends Indicator {
 
 
         public Builder(@NonNull PinView pinView) {
-            super(pinView);
-        }
-
-        public Builder(@NonNull PatternView pinView) {
             super(pinView);
         }
 
@@ -188,14 +182,14 @@ public final class CircleIndicator extends Indicator {
         }
 
         @NonNull
-        public CircleIndicator.Builder setIndicatorRadius(@Dimension float indicatorRadius) {
-            mIndicatorRadius = indicatorRadius;
+        public CircleIndicator.Builder setIndicatorRadius(@DimenRes int indicatorRadius) {
+            mIndicatorRadius = getContext().getResources().getDimension(indicatorRadius);
             return this;
         }
 
         @NonNull
-        public CircleIndicator.Builder setIndicatorRadius(@DimenRes int indicatorRadius) {
-            mIndicatorRadius = getContext().getResources().getDimension(indicatorRadius);
+        public CircleIndicator.Builder setIndicatorRadius(@Dimension float indicatorRadius) {
+            mIndicatorRadius = indicatorRadius;
             return this;
         }
 
@@ -205,14 +199,14 @@ public final class CircleIndicator extends Indicator {
         }
 
         @NonNull
-        public CircleIndicator.Builder setIndicatorStrokeWidth(@Dimension float indicatorStrokeWidth) {
-            mIndicatorStrokeWidth = indicatorStrokeWidth;
+        public CircleIndicator.Builder setIndicatorStrokeWidth(@DimenRes int indicatorStrokeWidth) {
+            mIndicatorStrokeWidth = getContext().getResources().getDimension(indicatorStrokeWidth);
             return this;
         }
 
         @NonNull
-        public CircleIndicator.Builder setIndicatorStrokeWidth(@DimenRes int indicatorStrokeWidth) {
-            mIndicatorStrokeWidth = getContext().getResources().getDimension(indicatorStrokeWidth);
+        public CircleIndicator.Builder setIndicatorStrokeWidth(@Dimension float indicatorStrokeWidth) {
+            mIndicatorStrokeWidth = indicatorStrokeWidth;
             return this;
         }
 

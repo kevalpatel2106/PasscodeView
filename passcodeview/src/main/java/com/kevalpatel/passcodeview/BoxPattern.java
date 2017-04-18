@@ -17,11 +17,14 @@
 package com.kevalpatel.passcodeview;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.kevalpatel.passcodeview.indicators.Indicator;
+import com.kevalpatel.passcodeview.patternCells.PatternCell;
 
 import java.util.ArrayList;
 
@@ -34,9 +37,15 @@ import java.util.ArrayList;
 final class BoxPattern extends Box {
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
 
-    private ArrayList<Indicator> mIndicators;
+    private ArrayList<PatternCell> mPatternCells;
+    private ArrayList<Integer> mSelectedIndicator;
+    private ArrayList<Path> mPaths = new ArrayList<>();
     private Rect mPatternBoxBound = new Rect();
-    private Indicator.Builder mIndicatorBuilder;
+
+    private PatternCell.Builder mCellBuilder;    //Pattern indicator builder
+
+    private Paint mPathPaint;
+    private Paint mPathErrorPaint;
 
     /**
      * Public constructor
@@ -85,23 +94,28 @@ final class BoxPattern extends Box {
         float singleIndicatorHeight = mPatternBoxBound.height() / Constants.NO_OF_ROWS;
         float singleIndicatorWidth = mPatternBoxBound.width() / Constants.NO_OF_COLUMNS;
 
-        mIndicators = new ArrayList<>();
+        mPatternCells = new ArrayList<>();
+        int i = 0;
         for (int colNo = 0; colNo < Constants.NO_OF_COLUMNS; colNo++) {
-
             for (int rowNo = 0; rowNo < Constants.NO_OF_ROWS; rowNo++) {
                 Rect indicatorBound = new Rect();
                 indicatorBound.left = (int) ((colNo * singleIndicatorWidth) + mPatternBoxBound.left);
                 indicatorBound.right = (int) (indicatorBound.left + singleIndicatorWidth);
                 indicatorBound.top = (int) ((rowNo * singleIndicatorHeight) + mPatternBoxBound.top);
                 indicatorBound.bottom = (int) (indicatorBound.top + singleIndicatorHeight);
-                mIndicators.add(mIndicatorBuilder.getIndicator(indicatorBound));
+                mPatternCells.add(mCellBuilder.getCell(indicatorBound, i));
+                i++;
             }
         }
     }
 
     @Override
     void preparePaint() {
+        mPathErrorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPathErrorPaint.setColor(Color.RED);
 
+        mPathPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPathPaint.setColor(Color.GREEN);
     }
 
     /**
@@ -116,14 +130,14 @@ final class BoxPattern extends Box {
     @Override
     void onAuthenticationFail() {
         //Play failed animation for all keys
-        for (Indicator indicator : mIndicators) indicator.onAuthFailed();
+        for (PatternCell patternCell : mPatternCells) patternCell.onAuthFailed();
         getRootView().invalidate();
     }
 
     @Override
     void onAuthenticationSuccess() {
         //Play success animation for all keys
-        for (Indicator indicator : mIndicators) indicator.onAuthSuccess();
+        for (PatternCell patternCell : mPatternCells) patternCell.onAuthSuccess();
         getRootView().invalidate();
     }
 
@@ -134,37 +148,25 @@ final class BoxPattern extends Box {
      */
     @Override
     void draw(@NonNull Canvas canvas) {
-        for (Indicator indicator : mIndicators) indicator.draw(canvas, false);
+        for (PatternCell patternCell : mPatternCells) {
+            patternCell.draw(canvas, false); //TODO
+        }
     }
 
     ///////////////// SETTERS/GETTERS //////////////
 
     /**
      * Find which key is pressed based on the ACTION_DOWN and ACTION_UP coordinates.
-     *
-     * @param downEventX ACTION_DOWN event X coordinate
-     * @param downEventY ACTION_DOWN event Y coordinate
-     * @param upEventX   ACTION_UP event X coordinate
-     * @param upEventY   ACTION_UP event Y coordinate
      */
     @Nullable
-    String findKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY) {
-//        //figure out down key.
-//        for (Key key : mIndicators) {
-//            if (key.getDigit().isEmpty()) continue;  //Empty key
-//
-//            //Update the typed passcode if the ACTION_DOWN and ACTION_UP keys are same.
-//            //Prevent swipe gestures to trigger false key press event.
-//            if (key.isKeyPressed(downEventX, downEventY) && key.isKeyPressed(upEventX, upEventY)) {
-//                key.playClickAnimation();
-//                return key.getDigit();
-//            }
-//        }
-        return null;
+    Integer findKeyPressed(float touchX, float touchY) {
+        for (PatternCell patternCell : mPatternCells)
+            if (patternCell.isIndicatorTouched(touchX, touchY)) return patternCell.getIndex();
+        return -1;
     }
 
-    ArrayList<Indicator> getIndicators() {
-        return mIndicators;
+    ArrayList<PatternCell> getPatternCells() {
+        return mPatternCells;
     }
 
     Rect getBounds() {
@@ -179,11 +181,15 @@ final class BoxPattern extends Box {
         mIsOneHandOperation = oneHandOperation;
     }
 
-    Indicator.Builder getIndicatorBuilder() {
-        return mIndicatorBuilder;
+    PatternCell.Builder getCellBuilder() {
+        return mCellBuilder;
     }
 
-    void setIndicatorBuilder(@NonNull Indicator.Builder mIndicatorBuilder) {
-        this.mIndicatorBuilder = mIndicatorBuilder;
+    void setCellBuilder(@NonNull PatternCell.Builder mIndicatorBuilder) {
+        this.mCellBuilder = mIndicatorBuilder;
+    }
+
+    public void setSelectedIndicator(ArrayList<Integer> selectedIndicator) {
+        mSelectedIndicator = selectedIndicator;
     }
 }

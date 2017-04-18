@@ -21,8 +21,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.kevalpatel.passcodeview.PatternView;
-import com.kevalpatel.passcodeview.indicators.CircleIndicator;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
+import com.kevalpatel.passcodeview.patternCells.DotPatternCell;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -44,11 +44,10 @@ public class PatternViewActivity extends AppCompatActivity {
 
         //Build the desired indicator shape and pass the theme attributes.
         //REQUIRED
-        patternView.setIndicator(new CircleIndicator.Builder(patternView)
-                .setIndicatorRadius(R.dimen.indicator_radius)
-                .setIndicatorFilledColorResource(R.color.colorAccent)
-                .setIndicatorStrokeColorResource(R.color.colorAccent)
-                .setIndicatorStrokeWidth(R.dimen.indicator_stroke_width)
+        patternView.setIndicator(new DotPatternCell.Builder(patternView)
+                .setRadius(R.dimen.pattern_cell_radius)
+                .setSelectedCellColorResource(R.color.colorAccent)
+                .setCellColorResource(R.color.colorAccent)
                 .build());
 
         patternView.setAuthenticationListener(new AuthenticationListener() {

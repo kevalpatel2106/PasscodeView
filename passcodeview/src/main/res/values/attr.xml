@@ -27,11 +27,11 @@
         <!--<enum name="square" value="1"/>-->
         <!--</attr>-->
 
-        <!--&lt;!&ndash;Indicator.&ndash;&gt;-->
-        <!--<attr name="indicatorStrokeColor" format="color" />-->
+        <!--&lt;!&ndash;PatternCell.&ndash;&gt;-->
+        <!--<attr name="normalColor" format="color" />-->
         <!--<attr name="indicatorSolidColor" format="color" />-->
-        <!--<attr name="indicatorStrokeWidth" format="dimension"/>-->
-        <!--<attr name="indicatorRadius" format="dimension"/>-->
+        <!--<attr name="strokeWidth" format="dimension"/>-->
+        <!--<attr name="radius" format="dimension"/>-->
 
         <!--Horizontal divider-->
         <attr name="dividerColor" format="color" />

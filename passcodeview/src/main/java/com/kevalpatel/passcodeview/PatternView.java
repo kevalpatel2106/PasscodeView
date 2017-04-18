@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.kevalpatel.passcodeview.indicators.Indicator;
+import com.kevalpatel.passcodeview.patternCells.PatternCell;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -145,6 +145,9 @@ public class PatternView extends PasscodeView implements InteractiveArrayList.Ch
             case MotionEvent.ACTION_UP:
 
                 break;
+            case MotionEvent.ACTION_HOVER_ENTER:
+
+                break;
             default:
                 return false;
         }
@@ -221,14 +224,14 @@ public class PatternView extends PasscodeView implements InteractiveArrayList.Ch
         invalidate();
     }
 
-    public void setIndicator(@NonNull Indicator.Builder indicatorBuilder) {
-        mBoxPattern.setIndicatorBuilder(indicatorBuilder);
+    public void setIndicator(@NonNull PatternCell.Builder indicatorBuilder) {
+        mBoxPattern.setCellBuilder(indicatorBuilder);
         requestLayout();
         invalidate();
     }
 
     @Nullable
-    public Indicator.Builder getIndicatorBuilder() {
-        return mBoxPattern.getIndicatorBuilder();
+    public PatternCell.Builder getIndicatorBuilder() {
+        return mBoxPattern.getCellBuilder();
     }
 }
