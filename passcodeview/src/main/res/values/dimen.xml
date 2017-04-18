@@ -30,4 +30,8 @@
     <dimen name="lib_fingerprint_status_text_size">16sp</dimen>
     <dimen name="lib_title_vertical_margin">16dp</dimen>
     <dimen name="lib_title_text_size">16sp</dimen>
+
+    <dimen name="lib_min_touch_radius">10dp</dimen>
+
+    <dimen name="lib_dot_cell_radius_radius">5dp</dimen>
 </resources>

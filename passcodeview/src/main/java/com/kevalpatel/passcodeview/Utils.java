@@ -29,6 +29,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.RequiresPermission;
 
+import com.kevalpatel.passcodeview.patternCells.PatternCell;
+
 import java.util.ArrayList;
 
 /**
@@ -101,6 +103,12 @@ public final class Utils {
     static boolean isPINMatched(int[] correctPin, ArrayList<Integer> pinToCheck) {
         for (int i = 0; i < correctPin.length; i++)
             if (correctPin[i] != pinToCheck.get(i)) return false;
+        return correctPin.length == pinToCheck.size();
+    }
+
+    static boolean isPatternMatched(int[] correctPin, ArrayList<PatternCell> pinToCheck) {
+        for (int i = 0; i < correctPin.length; i++)
+            if (correctPin[i] != pinToCheck.get(i).getIndex()) return false;
         return correctPin.length == pinToCheck.size();
     }
 

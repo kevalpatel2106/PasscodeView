@@ -17,9 +17,6 @@
 package com.kevalpatel.passcodeview;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -39,13 +36,9 @@ final class BoxPattern extends Box {
 
     private ArrayList<PatternCell> mPatternCells;
     private ArrayList<Integer> mSelectedIndicator;
-    private ArrayList<Path> mPaths = new ArrayList<>();
     private Rect mPatternBoxBound = new Rect();
 
     private PatternCell.Builder mCellBuilder;    //Pattern indicator builder
-
-    private Paint mPathPaint;
-    private Paint mPathErrorPaint;
 
     /**
      * Public constructor
@@ -111,11 +104,7 @@ final class BoxPattern extends Box {
 
     @Override
     void preparePaint() {
-        mPathErrorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPathErrorPaint.setColor(Color.RED);
-
-        mPathPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPathPaint.setColor(Color.GREEN);
+        //Do nothing
     }
 
     /**
@@ -146,11 +135,8 @@ final class BoxPattern extends Box {
      *
      * @param canvas canvas on which the keyboard will be drawn.
      */
-    @Override
     void draw(@NonNull Canvas canvas) {
-        for (PatternCell patternCell : mPatternCells) {
-            patternCell.draw(canvas, false); //TODO
-        }
+        for (PatternCell patternCell : mPatternCells) patternCell.draw(canvas);
     }
 
     ///////////////// SETTERS/GETTERS //////////////
@@ -159,10 +145,10 @@ final class BoxPattern extends Box {
      * Find which key is pressed based on the ACTION_DOWN and ACTION_UP coordinates.
      */
     @Nullable
-    Integer findKeyPressed(float touchX, float touchY) {
+    PatternCell findCell(float touchX, float touchY) {
         for (PatternCell patternCell : mPatternCells)
-            if (patternCell.isIndicatorTouched(touchX, touchY)) return patternCell.getIndex();
-        return -1;
+            if (patternCell.isIndicatorTouched(touchX, touchY)) return patternCell;
+        return null;
     }
 
     ArrayList<PatternCell> getPatternCells() {

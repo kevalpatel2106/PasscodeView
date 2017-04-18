@@ -55,15 +55,13 @@ public final class CirclePatternCell extends PatternCell {
      * Draw the indicator.
      *
      * @param canvas     Canvas of {@link PinView}.
-     * @param isSelected True if to display filled indicator.
      */
     @Override
-    public void draw(@NonNull Canvas canvas, boolean isSelected) {
+    public void draw(@NonNull Canvas canvas) {
         canvas.drawCircle(getBound().exactCenterX(),
                 getBound().exactCenterY(),
                 mBuilder.getRadius(),
-                isDisplayError ? mBuilder.getErrorPaint() :
-                        isSelected ? mBuilder.getSelectedCellPaint() : mBuilder.getCellPaint());
+                isDisplayError ? mBuilder.getErrorPaint() : mBuilder.getCellPaint());
     }
 
     @Override
@@ -101,15 +99,12 @@ public final class CirclePatternCell extends PatternCell {
     public static class Builder extends PatternCell.Builder {
         @ColorInt
         private int mNormalColor;              //Empty indicator stroke color
-        @ColorInt
-        private int mSelectedColor;              //Filled indicator stroke color
         @Dimension
         private float mRadius;
         @Dimension
         private float mStrokeWidth;
 
         private Paint mCellPaint;             //Empty indicator color
-        private Paint mSelectedCellPaint;             //Solid indicator color
         private Paint mErrorPaint;             //Error indicator color
 
         public Builder(@NonNull PatternView patternView) {
@@ -132,10 +127,6 @@ public final class CirclePatternCell extends PatternCell {
             mCellPaint.setStrokeWidth(mStrokeWidth);
 
             //Set filled dot paint
-            mSelectedCellPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mSelectedCellPaint.setColor(mSelectedColor);
-
-            //Set filled dot paint
             mErrorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mErrorPaint.setColor(Color.RED);
             return this;
@@ -145,7 +136,6 @@ public final class CirclePatternCell extends PatternCell {
         protected void setDefaults(@NonNull Context context) {
             mRadius = getContext().getResources().getDimension(R.dimen.lib_indicator_radius);
             mStrokeWidth = getContext().getResources().getDimension(R.dimen.lib_indicator_stroke_width);
-            mSelectedColor = getContext().getResources().getColor(R.color.lib_indicator_filled_color);
             mNormalColor = getContext().getResources().getColor(R.color.lib_indicator_stroke_color);
         }
 
@@ -171,37 +161,20 @@ public final class CirclePatternCell extends PatternCell {
             return this;
         }
 
-        @ColorInt
-        public int getSelectedColor() {
-            return mSelectedColor;
-        }
-
-        @NonNull
-        public CirclePatternCell.Builder setSelectedColor(@ColorInt int selectedColor) {
-            mSelectedColor = selectedColor;
-            return this;
-        }
-
-        @NonNull
-        public CirclePatternCell.Builder setSelectedCellColorResource(@ColorRes int indicatorFilledColor) {
-            mSelectedColor = getContext().getResources().getColor(indicatorFilledColor);
-            return this;
-        }
-
         @Dimension
         public float getRadius() {
             return mRadius;
         }
 
         @NonNull
-        public CirclePatternCell.Builder setRadius(@DimenRes int indicatorRadius) {
-            mRadius = getContext().getResources().getDimension(indicatorRadius);
+        public CirclePatternCell.Builder setRadius(@Dimension float radius) {
+            mRadius = radius;
             return this;
         }
 
         @NonNull
-        public CirclePatternCell.Builder setRadius(@Dimension float radius) {
-            mRadius = radius;
+        public CirclePatternCell.Builder setRadius(@DimenRes int indicatorRadius) {
+            mRadius = getContext().getResources().getDimension(indicatorRadius);
             return this;
         }
 
@@ -211,25 +184,20 @@ public final class CirclePatternCell extends PatternCell {
         }
 
         @NonNull
-        public CirclePatternCell.Builder setStrokeWidth(@DimenRes int indicatorStrokeWidth) {
-            mStrokeWidth = getContext().getResources().getDimension(indicatorStrokeWidth);
-            return this;
-        }
-
-        @NonNull
         public CirclePatternCell.Builder setStrokeWidth(@Dimension float strokeWidth) {
             mStrokeWidth = strokeWidth;
             return this;
         }
 
         @NonNull
-        public Paint getCellPaint() {
-            return mCellPaint;
+        public CirclePatternCell.Builder setStrokeWidth(@DimenRes int indicatorStrokeWidth) {
+            mStrokeWidth = getContext().getResources().getDimension(indicatorStrokeWidth);
+            return this;
         }
 
         @NonNull
-        public Paint getSelectedCellPaint() {
-            return mSelectedCellPaint;
+        public Paint getCellPaint() {
+            return mCellPaint;
         }
 
         @NonNull

@@ -34,7 +34,7 @@ import com.kevalpatel.passcodeview.keys.Key;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class PinView extends PasscodeView implements InteractiveArrayList.ChangeListener {
+public final class PinView extends PasscodeView implements InteractiveArrayList.ChangeListener {
     private float mDownKeyX;                                        //X coordinate of the ACTION_DOWN point
     private float mDownKeyY;                                        //Y coordinate of the ACTION_DOWN point
 
@@ -92,15 +92,21 @@ public class PinView extends PasscodeView implements InteractiveArrayList.Change
 
     /**
      * Parse the theme attribute using the parse array.
+     * @param typedArray
      */
     @SuppressWarnings("deprecation")
     @Override
-    protected void parseTypeArr(@Nullable TypedArray typedArray) {
-        //Parse title params
-        mBoxIndicator.setTitle(typedArray.hasValue(R.styleable.PinView_titleText) ?
-                typedArray.getString(R.styleable.PinView_titleText) : BoxTitleIndicator.DEF_TITLE_TEXT);
-        mBoxIndicator.setTitleColor(typedArray.getColor(R.styleable.PinView_titleTextColor,
-                mContext.getResources().getColor(R.color.lib_key_default_color)));
+    protected void parseTypeArr(@NonNull AttributeSet typedArray) {
+        TypedArray a = mContext.getTheme().obtainStyledAttributes(typedArray, R.styleable.PinView, 0, 0);
+        try {
+            //Parse title params
+            mBoxIndicator.setTitle(a.hasValue(R.styleable.PinView_pin_titleText) ?
+                    a.getString(R.styleable.PinView_pin_titleText) : BoxTitleIndicator.DEF_TITLE_TEXT);
+            mBoxIndicator.setTitleColor(a.getColor(R.styleable.PinView_pin_titleTextColor,
+                    mContext.getResources().getColor(R.color.lib_key_default_color)));
+        } finally {
+            a.recycle();
+        }
     }
 
 

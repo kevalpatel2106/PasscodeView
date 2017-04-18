@@ -57,11 +57,19 @@ public abstract class PatternCell {
         return mPatternView.getContext();
     }
 
-    public abstract void draw(@NonNull Canvas canvas, boolean isFilled);
+    public abstract void draw(@NonNull Canvas canvas);
 
     public abstract void onAuthFailed();
 
     public abstract void onAuthSuccess();
+
+    public float getCenterX() {
+        return getBound().exactCenterX();
+    }
+
+    public float getCenterY() {
+        return getBound().exactCenterY();
+    }
 
     @NonNull
     public Rect getBound() {

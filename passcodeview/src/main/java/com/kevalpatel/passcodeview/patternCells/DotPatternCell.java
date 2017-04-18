@@ -38,9 +38,8 @@ import com.kevalpatel.passcodeview.R;
  */
 
 public final class DotPatternCell extends PatternCell {
-
-    @NonNull
-    private final Builder mBuilder;
+    private Builder mBuilder;
+    private float mTouchRadius;
     private boolean isDisplayError;
 
     DotPatternCell(@NonNull PatternView patternView,
@@ -49,21 +48,21 @@ public final class DotPatternCell extends PatternCell {
                    int index) {
         super(patternView, bound, builder, index);
         mBuilder = builder;
+        mTouchRadius = mBuilder.getRadius() < getContext().getResources().getDimension(R.dimen.lib_min_touch_radius) ?
+                mBuilder.getRadius() + 20 : mBuilder.getRadius();
     }
 
     /**
      * Draw the indicator.
      *
      * @param canvas     Canvas of {@link PinView}.
-     * @param isSelected True if to display selectedL indicator.
      */
     @Override
-    public void draw(@NonNull Canvas canvas, boolean isSelected) {
+    public void draw(@NonNull Canvas canvas) {
         canvas.drawCircle(getBound().exactCenterX(),
                 getBound().exactCenterY(),
                 mBuilder.getRadius(),
-                isDisplayError ? mBuilder.getErrorCellPaint() :
-                        isSelected ? mBuilder.getSelectedCellPaint() : mBuilder.getNormalCellPaint());
+                isDisplayError ? mBuilder.getErrorCellPaint() : mBuilder.getNormalCellPaint());
     }
 
     @Override
@@ -86,12 +85,12 @@ public final class DotPatternCell extends PatternCell {
     @Override
     public boolean isIndicatorTouched(float touchX, float touchY) {
         //Check if the click is between the width bounds
-        if (touchX > getBound().exactCenterX() - mBuilder.getRadius()
-                && touchX < getBound().exactCenterX() + mBuilder.getRadius()) {
+        if (touchX > getBound().exactCenterX() - mTouchRadius
+                && touchX < getBound().exactCenterX() + mTouchRadius) {
 
             //Check if the click is between the height bounds
-            if (touchY > getBound().exactCenterY() - mBuilder.getRadius()
-                    && touchY < getBound().exactCenterY() + mBuilder.getRadius()) {
+            if (touchY > getBound().exactCenterY() - mTouchRadius
+                    && touchY < getBound().exactCenterY() + mTouchRadius) {
                 return true;
             }
         }
@@ -101,13 +100,10 @@ public final class DotPatternCell extends PatternCell {
     public static class Builder extends PatternCell.Builder {
         @ColorInt
         private int mCellColor;              //Empty indicator stroke color
-        @ColorInt
-        private int mSelectedColor;              //Filled indicator stroke color
         @Dimension
         private float mRadius;
 
         private Paint mCellPaint;             //Empty indicator color
-        private Paint mSelectedCellPaint;             //Solid indicator color
         private Paint mErrorCellPaint;             //Error indicator color
 
 
@@ -129,10 +125,6 @@ public final class DotPatternCell extends PatternCell {
             mCellPaint.setColor(mCellColor);
 
             //Set filled dot paint
-            mSelectedCellPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mSelectedCellPaint.setColor(mSelectedColor);
-
-            //Set filled dot paint
             mErrorCellPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mErrorCellPaint.setColor(Color.RED);
             return this;
@@ -140,8 +132,7 @@ public final class DotPatternCell extends PatternCell {
 
         @Override
         protected void setDefaults(@NonNull Context context) {
-            mRadius = getContext().getResources().getDimension(R.dimen.lib_indicator_radius);
-            mSelectedColor = getContext().getResources().getColor(R.color.lib_indicator_filled_color);
+            mRadius = getContext().getResources().getDimension(R.dimen.lib_dot_cell_radius_radius);
             mCellColor = getContext().getResources().getColor(R.color.lib_indicator_stroke_color);
         }
 
@@ -167,32 +158,9 @@ public final class DotPatternCell extends PatternCell {
             return this;
         }
 
-        @ColorInt
-        public int getSelectedColor() {
-            return mSelectedColor;
-        }
-
-        @NonNull
-        public DotPatternCell.Builder setSelectedColor(@ColorInt int selectedColor) {
-            mSelectedColor = selectedColor;
-            return this;
-        }
-
-        @NonNull
-        public DotPatternCell.Builder setSelectedCellColorResource(@ColorRes int indicatorFilledColor) {
-            mSelectedColor = getContext().getResources().getColor(indicatorFilledColor);
-            return this;
-        }
-
         @Dimension
         public float getRadius() {
             return mRadius;
-        }
-
-        @NonNull
-        public DotPatternCell.Builder setRadius(@DimenRes int indicatorRadius) {
-            mRadius = getContext().getResources().getDimension(indicatorRadius);
-            return this;
         }
 
         @NonNull
@@ -202,13 +170,14 @@ public final class DotPatternCell extends PatternCell {
         }
 
         @NonNull
-        public Paint getNormalCellPaint() {
-            return mCellPaint;
+        public DotPatternCell.Builder setRadius(@DimenRes int indicatorRadius) {
+            mRadius = getContext().getResources().getDimension(indicatorRadius);
+            return this;
         }
 
         @NonNull
-        public Paint getSelectedCellPaint() {
-            return mSelectedCellPaint;
+        public Paint getNormalCellPaint() {
+            return mCellPaint;
         }
 
         @NonNull

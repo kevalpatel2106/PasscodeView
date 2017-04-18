@@ -19,7 +19,10 @@ package com.kevalpatel.passcodeview;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -27,19 +30,31 @@ import android.view.MotionEvent;
 
 import com.kevalpatel.passcodeview.patternCells.PatternCell;
 
+import java.util.ArrayList;
+
 /**
  * Created by Keval on 06-Apr-17.
  *
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public class PatternView extends PasscodeView implements InteractiveArrayList.ChangeListener {
+public final class PatternView extends PasscodeView {
     private int[] mCorrectPattern;                                      //Current PIN with witch entered PIN will check.
-    private InteractiveArrayList<Integer> mPatternTyped;                //PIN typed.
+    private ArrayList<PatternCell> mPatternTyped;            //PIN typed.
+
+    private float mPathEndX;
+    private float mPathEndY;
+
+    @ColorInt
+    private int mPathColor;
 
     private BoxPattern mBoxPattern;
     private BoxTitle mBoxTitle;
 
+    private Paint mNormalPaint;
+    private Paint mErrorPaint;
+
+    private boolean isErrorShowing = false;
     ///////////////////////////////////////////////////////////////
     //                  CONSTRUCTORS
     ///////////////////////////////////////////////////////////////
@@ -67,8 +82,7 @@ public class PatternView extends PasscodeView implements InteractiveArrayList.Ch
     @Override
     protected void init() {
         //Initialized the typed pattern array
-        mPatternTyped = new InteractiveArrayList<>();
-        mPatternTyped.setChangeListener(this);
+        mPatternTyped = new ArrayList<>();
 
         //initialize boxes
         mBoxPattern = new BoxPattern(this);
@@ -79,10 +93,20 @@ public class PatternView extends PasscodeView implements InteractiveArrayList.Ch
     protected void setDefaultParams() {
         mBoxTitle.setDefaults();
         mBoxPattern.setDefaults();
+
+        mPathColor = mContext.getResources().getColor(android.R.color.holo_green_dark);
     }
 
     @Override
     protected void preparePaint() {
+        mNormalPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mNormalPaint.setStrokeWidth(10);
+        mNormalPaint.setColor(mPathColor);
+
+        mErrorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mErrorPaint.setStrokeWidth(10);
+        mErrorPaint.setColor(Color.RED);
+
         //Prepare paints.
         mBoxPattern.preparePaint();
         mBoxTitle.preparePaint();
@@ -90,15 +114,25 @@ public class PatternView extends PasscodeView implements InteractiveArrayList.Ch
 
     /**
      * Parse the theme attribute using the parse array.
+     *
+     * @param typedArray
      */
     @SuppressWarnings("deprecation")
     @Override
-    protected void parseTypeArr(@NonNull TypedArray typedArray) {
-        //Parse title params
-        mBoxTitle.setTitle(typedArray.hasValue(R.styleable.PinView_titleText) ?
-                typedArray.getString(R.styleable.PinView_titleText) : BoxTitleIndicator.DEF_TITLE_TEXT);
-        mBoxTitle.setTitleColor(typedArray.getColor(R.styleable.PinView_titleTextColor,
-                mContext.getResources().getColor(R.color.lib_key_default_color)));
+    protected void parseTypeArr(@NonNull AttributeSet typedArray) {
+        TypedArray a = mContext.getTheme().obtainStyledAttributes(typedArray, R.styleable.PatternView, 0, 0);
+
+        try { //Parse title params
+            mBoxTitle.setTitle(a.hasValue(R.styleable.PatternView_titleText) ?
+                    a.getString(R.styleable.PatternView_titleText) : BoxTitleIndicator.DEF_TITLE_TEXT);
+            mBoxTitle.setTitleColor(a.getColor(R.styleable.PatternView_titleTextColor,
+                    mContext.getResources().getColor(R.color.lib_key_default_color)));
+
+            mPathColor = a.getColor(R.styleable.PatternView_patternLineColor,
+                    mContext.getResources().getColor(android.R.color.holo_green_dark));
+        } finally {
+            a.recycle();
+        }
     }
 
 
@@ -117,6 +151,26 @@ public class PatternView extends PasscodeView implements InteractiveArrayList.Ch
         mBoxPattern.draw(canvas);
         mBoxTitle.draw(canvas);
         mBoxFingerprint.draw(canvas);
+
+        drawPaths(canvas);
+    }
+
+    private void drawPaths(Canvas canvas) {
+        if (mPatternTyped.size() == 0) return;
+
+        int lastElementPos = mPatternTyped.size() - 1;
+        for (int i = 0; i < lastElementPos; i++) {
+            PatternCell startCell = mPatternTyped.get(i);
+            PatternCell endCell = mPatternTyped.get(i + 1);
+            canvas.drawLine(startCell.getCenterX(), startCell.getCenterY(),
+                    endCell.getCenterX(), endCell.getCenterY(),
+                    isErrorShowing ? mErrorPaint : mNormalPaint);
+        }
+
+        canvas.drawLine(mPatternTyped.get(lastElementPos).getCenterX(),
+                mPatternTyped.get(lastElementPos).getCenterY(),
+                mPathEndX, mPathEndY,
+                isErrorShowing ? mErrorPaint : mNormalPaint);
     }
 
     ///////////////////////////////////////////////////////////////
@@ -138,15 +192,32 @@ public class PatternView extends PasscodeView implements InteractiveArrayList.Ch
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        float touchX = event.getX();
+        float touchY = event.getY();
+
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
+                reset();
+            case MotionEvent.ACTION_MOVE:
+                PatternCell cellNumber = mBoxPattern.findCell(touchX, touchY);
+                if (cellNumber != null && !mPatternTyped.contains(cellNumber))
+                    mPatternTyped.add(cellNumber);
 
+                mPathEndX = touchX;
+                mPathEndY = touchY;
+
+                invalidate();
                 break;
             case MotionEvent.ACTION_UP:
+                validatePattern();
 
-                break;
-            case MotionEvent.ACTION_HOVER_ENTER:
-
+                //Reset the view.
+                new android.os.Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        reset();
+                    }
+                }, 350);
                 break;
             default:
                 return false;
@@ -154,24 +225,27 @@ public class PatternView extends PasscodeView implements InteractiveArrayList.Ch
         return true;
     }
 
+    private void validatePattern() {
+        if (mCorrectPattern.length == mPatternTyped.size() && Utils.isPatternMatched(mCorrectPattern, mPatternTyped)) {
+            mBoxPattern.onAuthenticationSuccess();
+            mBoxTitle.onAuthenticationSuccess();
+            isErrorShowing = false;
+        } else {
+            mBoxPattern.onAuthenticationFail();
+            mBoxTitle.onAuthenticationFail();
+            isErrorShowing = true;
+        }
+        invalidate();
+    }
+
     /**
      * Reset the pin code and view state.
      */
     @Override
     public void reset() {
+        isErrorShowing = false;
         mPatternTyped.clear();
         invalidate();
-    }
-
-    /**
-     * This method will be called when there is any change in {@link #mPatternTyped}.
-     *
-     * @param size this is the new size of {@link #mPatternTyped}.
-     * @see InteractiveArrayList
-     */
-    @Override
-    public void onArrayValueChange(int size) {
-        //Do nothing
     }
 
     ///////////////////////////////////////////////////////////////
@@ -207,6 +281,28 @@ public class PatternView extends PasscodeView implements InteractiveArrayList.Ch
         invalidate();
     }
 
+    @SuppressWarnings("deprecation")
+    public void setTitleColorResource(@ColorRes int titleColor) {
+        mBoxTitle.setTitleColor(mContext.getResources().getColor(titleColor));
+        invalidate();
+    }
+
+
+    public int getPatternPathColor() {
+        return mPathColor;
+    }
+
+    public void setPatternPathColor(@ColorInt int pathColor) {
+        mPathColor = pathColor;
+        invalidate();
+    }
+
+    @SuppressWarnings("deprecation")
+    public void setPatternPathColorResource(@ColorRes int pathColor) {
+        mPathColor = mContext.getResources().getColor(pathColor);
+        invalidate();
+    }
+
     /**
      * @return Current title of the view.
      */
@@ -224,14 +320,14 @@ public class PatternView extends PasscodeView implements InteractiveArrayList.Ch
         invalidate();
     }
 
-    public void setIndicator(@NonNull PatternCell.Builder indicatorBuilder) {
+    public void setPatternCell(@NonNull PatternCell.Builder indicatorBuilder) {
         mBoxPattern.setCellBuilder(indicatorBuilder);
         requestLayout();
         invalidate();
     }
 
     @Nullable
-    public PatternCell.Builder getIndicatorBuilder() {
+    public PatternCell.Builder getPatternCellBuilder() {
         return mBoxPattern.getCellBuilder();
     }
 }

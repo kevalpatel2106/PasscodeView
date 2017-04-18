@@ -97,7 +97,7 @@ public abstract class PasscodeView extends View {
      * If you wan to enable customized parameters, override {@link #init()}  method and initialize the
      * parameters. This method will call before parsing the {@link TypedArray}.
      * <p>
-     * If you want to parse view specific XML parameters, override {@link #parseTypeArr(TypedArray)}
+     * If you want to parse view specific XML parameters, override {@link #parseTypeArr(AttributeSet)}
      * and parse the {@link TypedArray}. This method will only call if there is any custom parameters
      * defined in XML.
      * <p>
@@ -111,25 +111,25 @@ public abstract class PasscodeView extends View {
         init();
 
         if (attrs != null) {    //Parse all the params from the arguments.
-            TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.PinView, 0, 0);
+            TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.PasscodeView, 0, 0);
             try {
-                mIsTactileFeedbackEnabled = a.getBoolean(R.styleable.PinView_giveTactileFeedback, true);
+                mIsTactileFeedbackEnabled = a.getBoolean(R.styleable.PasscodeView_giveTactileFeedback, true);
 
                 //Parse divider params
-                mDividerColor = a.getColor(R.styleable.PinView_dividerColor,
+                mDividerColor = a.getColor(R.styleable.PasscodeView_dividerColor,
                         mContext.getResources().getColor(R.color.lib_divider_color));
 
                 //Fet fingerprint params
                 //noinspection ConstantConditions
-                mBoxFingerprint.setStatusText(a.hasValue(R.styleable.PinView_titleText) ?
-                        a.getString(R.styleable.PinView_fingerprintDefaultText) : BoxFingerprint.DEF_FINGERPRINT_STATUS);
-                mBoxFingerprint.setStatusTextColor(a.getColor(R.styleable.PinView_fingerprintTextColor,
+                mBoxFingerprint.setStatusText(a.hasValue(R.styleable.PasscodeView_fingerprintDefaultText) ?
+                        a.getString(R.styleable.PasscodeView_fingerprintDefaultText) : BoxFingerprint.DEF_FINGERPRINT_STATUS);
+                mBoxFingerprint.setStatusTextColor(a.getColor(R.styleable.PasscodeView_fingerprintTextColor,
                         mContext.getResources().getColor(R.color.lib_key_default_color)));
-                mBoxFingerprint.setStatusTextSize(a.getDimension(R.styleable.PinView_fingerprintTextSize,
+                mBoxFingerprint.setStatusTextSize(a.getDimension(R.styleable.PasscodeView_fingerprintTextSize,
                         (int) mContext.getResources().getDimension(R.dimen.lib_fingerprint_status_text_size)));
-                mBoxFingerprint.setFingerPrintEnable(a.getBoolean(R.styleable.PinView_fingerprintEnable, true));
+                mBoxFingerprint.setFingerPrintEnable(a.getBoolean(R.styleable.PasscodeView_fingerprintEnable, true));
 
-                parseTypeArr(a);
+                parseTypeArr(attrs);
             } finally {
                 a.recycle();
             }
@@ -150,7 +150,7 @@ public abstract class PasscodeView extends View {
 
     protected abstract void preparePaint();
 
-    protected abstract void parseTypeArr(@NonNull TypedArray typedArray);
+    protected abstract void parseTypeArr(@NonNull AttributeSet typedArray);
 
     /**
      * Create the paint to drawText divider.
@@ -291,13 +291,13 @@ public abstract class PasscodeView extends View {
         return mBoxFingerprint.getStatusTextSize();
     }
 
-    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
+    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(statusTextSize);
         invalidate();
     }
 
-    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(statusTextSize);
+    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
         invalidate();
     }
 

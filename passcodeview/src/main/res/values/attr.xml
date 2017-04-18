@@ -17,30 +17,12 @@
 
 <resources>
     <declare-styleable name="PinView">
-        <!--&lt;!&ndash;KEY&ndash;&gt;-->
-        <!--<attr name="keyTextSize" format="dimension" />-->
-        <!--<attr name="keyTextColor" format="color" />-->
-        <!--<attr name="keyStrokeColor" format="color" />-->
-        <!--<attr name="keyStrokeWidth" format="dimension" />-->
-        <!--<attr name="keyShape" format="integer">-->
-        <!--<enum name="circle" value="0"/>-->
-        <!--<enum name="square" value="1"/>-->
-        <!--</attr>-->
-
-        <!--&lt;!&ndash;PatternCell.&ndash;&gt;-->
-        <!--<attr name="normalColor" format="color" />-->
-        <!--<attr name="indicatorSolidColor" format="color" />-->
-        <!--<attr name="strokeWidth" format="dimension"/>-->
-        <!--<attr name="radius" format="dimension"/>-->
-
-        <!--Horizontal divider-->
-        <attr name="dividerColor" format="color" />
-
         <!--Title text-->
-        <attr name="titleText" format="string" />
-        <attr name="titleTextColor" format="color" />
-        <attr name="titleTextSize" format="color" />
+        <attr name="pin_titleText" format="string"/>
+        <attr name="pin_titleTextColor" format="color"/>
+    </declare-styleable>
 
+    <declare-styleable name="PasscodeView">
         <attr name="giveTactileFeedback" format="boolean"/>
 
         <!--Fingerprint-->
@@ -48,5 +30,16 @@
         <attr name="fingerprintDefaultText" format="string" />
         <attr name="fingerprintTextColor" format="color" />
         <attr name="fingerprintTextSize" format="dimension" />
+
+        <!--Horizontal divider-->
+        <attr name="dividerColor" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="PatternView">
+        <!--Title text-->
+        <attr name="titleText" format="string"/>
+        <attr name="titleTextColor" format="color"/>
+
+        <attr name="patternLineColor" format="color"/>
     </declare-styleable>
 </resources>
