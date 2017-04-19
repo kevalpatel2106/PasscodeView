@@ -18,6 +18,7 @@ package com.kevalpatel.passcodeview.patternCells;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
@@ -35,7 +36,7 @@ public abstract class PatternCell {
     private PatternView mPatternView;
 
     private Rect mBound;
-    private Integer mIndex;
+    private Point mPoint;
 
     private PatternCell() {
     }
@@ -43,10 +44,10 @@ public abstract class PatternCell {
     protected PatternCell(@NonNull PatternView pinView,
                           @NonNull Rect bound,
                           @NonNull PatternCell.Builder builder,
-                          int index) {
+                          Point location) {
         this.mPatternView = pinView;
         mBound = bound;
-        mIndex = index;
+        mPoint = location;
     }
 
     protected final PasscodeView getRootView() {
@@ -78,8 +79,8 @@ public abstract class PatternCell {
 
     public abstract boolean isIndicatorTouched(float touchX, float touchY);
 
-    public Integer getIndex() {
-        return mIndex;
+    public Point getPoint() {
+        return mPoint;
     }
 
     public static abstract class Builder {
@@ -111,6 +112,6 @@ public abstract class PatternCell {
 
         protected abstract void setDefaults(@NonNull Context context);
 
-        public abstract PatternCell getCell(@NonNull Rect bound, int index);
+        public abstract PatternCell getCell(@NonNull Rect bound, Point point);
     }
 }

@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
@@ -45,8 +46,8 @@ public final class DotPatternCell extends PatternCell {
     DotPatternCell(@NonNull PatternView patternView,
                    @NonNull Rect bound,
                    @NonNull DotPatternCell.Builder builder,
-                   int index) {
-        super(patternView, bound, builder, index);
+                   Point point) {
+        super(patternView, bound, builder, point);
         mBuilder = builder;
         mTouchRadius = mBuilder.getRadius() < getContext().getResources().getDimension(R.dimen.lib_min_touch_radius) ?
                 mBuilder.getRadius() + 20 : mBuilder.getRadius();
@@ -137,8 +138,8 @@ public final class DotPatternCell extends PatternCell {
         }
 
         @Override
-        public PatternCell getCell(@NonNull Rect bound, int index) {
-            return new DotPatternCell(getRootView(), bound, this, index);
+        public PatternCell getCell(@NonNull Rect bound, Point point) {
+            return new DotPatternCell(getRootView(), bound, this, point);
         }
 
         @ColorInt
@@ -164,14 +165,14 @@ public final class DotPatternCell extends PatternCell {
         }
 
         @NonNull
-        public DotPatternCell.Builder setRadius(@Dimension float radius) {
-            mRadius = radius;
+        public DotPatternCell.Builder setRadius(@DimenRes int indicatorRadius) {
+            mRadius = getContext().getResources().getDimension(indicatorRadius);
             return this;
         }
 
         @NonNull
-        public DotPatternCell.Builder setRadius(@DimenRes int indicatorRadius) {
-            mRadius = getContext().getResources().getDimension(indicatorRadius);
+        public DotPatternCell.Builder setRadius(@Dimension float radius) {
+            mRadius = radius;
             return this;
         }
 

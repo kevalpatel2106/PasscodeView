@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
@@ -46,8 +47,8 @@ public final class CirclePatternCell extends PatternCell {
     private CirclePatternCell(@NonNull PatternView patternView,
                               @NonNull Rect bound,
                               @NonNull CirclePatternCell.Builder builder,
-                              int index) {
-        super(patternView, bound, builder, index);
+                              Point point) {
+        super(patternView, bound, builder, point);
         mBuilder = builder;
     }
 
@@ -140,8 +141,8 @@ public final class CirclePatternCell extends PatternCell {
         }
 
         @Override
-        public PatternCell getCell(@NonNull Rect bound, int index) {
-            return new CirclePatternCell(getRootView(), bound, this, index);
+        public PatternCell getCell(@NonNull Rect bound, Point point) {
+            return new CirclePatternCell(getRootView(), bound, this, point);
         }
 
         @ColorInt
@@ -167,14 +168,14 @@ public final class CirclePatternCell extends PatternCell {
         }
 
         @NonNull
-        public CirclePatternCell.Builder setRadius(@Dimension float radius) {
-            mRadius = radius;
+        public CirclePatternCell.Builder setRadius(@DimenRes int indicatorRadius) {
+            mRadius = getContext().getResources().getDimension(indicatorRadius);
             return this;
         }
 
         @NonNull
-        public CirclePatternCell.Builder setRadius(@DimenRes int indicatorRadius) {
-            mRadius = getContext().getResources().getDimension(indicatorRadius);
+        public CirclePatternCell.Builder setRadius(@Dimension float radius) {
+            mRadius = radius;
             return this;
         }
 
@@ -184,14 +185,14 @@ public final class CirclePatternCell extends PatternCell {
         }
 
         @NonNull
-        public CirclePatternCell.Builder setStrokeWidth(@Dimension float strokeWidth) {
-            mStrokeWidth = strokeWidth;
+        public CirclePatternCell.Builder setStrokeWidth(@DimenRes int indicatorStrokeWidth) {
+            mStrokeWidth = getContext().getResources().getDimension(indicatorStrokeWidth);
             return this;
         }
 
         @NonNull
-        public CirclePatternCell.Builder setStrokeWidth(@DimenRes int indicatorStrokeWidth) {
-            mStrokeWidth = getContext().getResources().getDimension(indicatorStrokeWidth);
+        public CirclePatternCell.Builder setStrokeWidth(@Dimension float strokeWidth) {
+            mStrokeWidth = strokeWidth;
             return this;
         }
 

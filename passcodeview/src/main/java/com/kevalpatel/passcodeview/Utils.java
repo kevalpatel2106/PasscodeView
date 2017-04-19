@@ -30,6 +30,7 @@ import android.support.annotation.RequiresApi;
 import android.support.annotation.RequiresPermission;
 
 import com.kevalpatel.passcodeview.patternCells.PatternCell;
+import com.kevalpatel.passcodeview.patternCells.PatternPoint;
 
 import java.util.ArrayList;
 
@@ -49,6 +50,7 @@ public final class Utils {
      *
      * @param context instance of the caller.
      */
+    @SuppressWarnings("WeakerAccess")
     public static void openSecuritySettings(@NonNull Context context) {
         Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
         context.startActivity(intent);
@@ -69,7 +71,15 @@ public final class Utils {
         return fingerprintManager.isHardwareDetected();
     }
 
-    @SuppressWarnings("MissingPermission")
+    /**
+     * Check if the device has any fingerprint registered?
+     * <p>
+     * If no fingerprint registered, use {@link #openSecuritySettings(Context)} to open security settings.
+     *
+     * @param context instance
+     * @return true if any fingerprint is register.
+     */
+    @SuppressWarnings({"MissingPermission", "WeakerAccess"})
     public static boolean isFingerPrintEnrolled(Context context) {
         // Check if we're running on Android 6.0 (M) or higher
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -106,11 +116,22 @@ public final class Utils {
         return correctPin.length == pinToCheck.size();
     }
 
-    static boolean isPatternMatched(int[] correctPin, ArrayList<PatternCell> pinToCheck) {
-        for (int i = 0; i < correctPin.length; i++)
-            if (correctPin[i] != pinToCheck.get(i).getIndex()) return false;
+    /**
+     * Check if the both pattern matches? It uses {@link PatternPoint#equals(Object)} to match row and
+     * column number of both pattern poins.
+     *
+     * @param correctPattern correct list of {@link PatternPoint}.
+     * @param patternToCheck list of {@link PatternPoint} to check.
+     * @return true if both pattern matches.
+     * @see PatternPoint#equals(Object)
+     */
+    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+    static boolean isPatternMatched(@NonNull PatternPoint[] correctPattern,
+                                    @NonNull ArrayList<PatternCell> patternToCheck) {
+        for (int i = 0; i < correctPattern.length; i++)
+            if (!correctPattern[i].equals(patternToCheck.get(i).getPoint())) return false;
 
-        return correctPin.length == pinToCheck.size();
+        return correctPattern.length == patternToCheck.size();
     }
 
     /**

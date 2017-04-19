@@ -29,6 +29,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.kevalpatel.passcodeview.patternCells.PatternCell;
+import com.kevalpatel.passcodeview.patternCells.PatternPoint;
 
 import java.util.ArrayList;
 
@@ -39,7 +40,7 @@ import java.util.ArrayList;
  */
 
 public final class PatternView extends PasscodeView {
-    private int[] mCorrectPattern;                                      //Current PIN with witch entered PIN will check.
+    private PatternPoint[] mCorrectPattern;                                      //Current PIN with witch entered PIN will check.
     private ArrayList<PatternCell> mPatternTyped;            //PIN typed.
 
     private float mPathEndX;
@@ -275,10 +276,7 @@ public final class PatternView extends PasscodeView {
         invalidate();
     }
 
-    public void setCorrectPattern(@NonNull int[] correctPattern) {
-        //Validate the pin
-        if (!Utils.isValidPin(correctPattern)) throw new IllegalArgumentException("Invalid PIN.");
-
+    public void setCorrectPattern(@NonNull PatternPoint[] correctPattern) {
         mCorrectPattern = correctPattern;
 
         mPatternTyped.clear();

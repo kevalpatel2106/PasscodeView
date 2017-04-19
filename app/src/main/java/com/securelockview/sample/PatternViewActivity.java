@@ -23,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.kevalpatel.passcodeview.PatternView;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 import com.kevalpatel.passcodeview.patternCells.DotPatternCell;
+import com.kevalpatel.passcodeview.patternCells.PatternPoint;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -42,7 +43,12 @@ public class PatternViewActivity extends AppCompatActivity {
 
         //Set the correct pin code.
         //REQUIRED
-        patternView.setCorrectPattern(new int[]{1, 2, 3, 4});
+        patternView.setCorrectPattern(new PatternPoint[]{
+                new PatternPoint(0, 0),
+                new PatternPoint(1, 0),
+                new PatternPoint(2, 0),
+                new PatternPoint(2, 1)
+        });
 
         //Build the desired indicator shape and pass the theme attributes.
         //REQUIRED

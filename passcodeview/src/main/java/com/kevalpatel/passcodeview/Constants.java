@@ -22,7 +22,7 @@ package com.kevalpatel.passcodeview;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public final class Constants {
+final class Constants {
     static final int NO_OF_KEY_BOARD_COLUMNS = 3;
     static final int NO_OF_KEY_BOARD_ROWS = 4;
 

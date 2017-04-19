@@ -17,6 +17,7 @@
 package com.kevalpatel.passcodeview;
 
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -99,7 +100,7 @@ final class BoxPattern extends Box {
                 indicatorBound.top = (int) ((rowNo * singleIndicatorHeight) + mPatternBoxBound.top);
                 indicatorBound.bottom = (int) (indicatorBound.top + singleIndicatorHeight);
 
-                mPatternCells.add(mCellBuilder.getCell(indicatorBound, i));
+                mPatternCells.add(mCellBuilder.getCell(indicatorBound, new Point(rowNo, colNo)));
                 i++;
             }
         }
