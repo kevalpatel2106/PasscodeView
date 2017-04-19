@@ -215,6 +215,7 @@ This library provide easy and secure PIN authentication view, which
 
 ## What's next?
 - Create view for pattern based authentication. (**Upcoming Release** preview)
+
 ![Pattern Unlock](/resource/pattern_unlock.gif)
 
 - Build more customisation parameters to provide granular control over the theme of the view. 
