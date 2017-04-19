@@ -208,7 +208,7 @@ This library provide easy and secure PIN authentication view, which
     }
   ```
   
-## [Visit our wiki page for more information.](https://github.com/kevalpatel2106/PasscodeView/wiki)
+*[**Visit our wiki page for more information.**](https://github.com/kevalpatel2106/PasscodeView/wiki)*
 
 ## How to contribute?
 * Check out contribution guidelines 👉[CONTRIBUTING.md](https://github.com/kevalpatel2106/PasscodeView/blob/master/CONTRIBUTING.md)
