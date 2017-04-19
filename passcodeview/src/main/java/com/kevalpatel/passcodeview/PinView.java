@@ -20,18 +20,32 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.kevalpatel.passcodeview.indicators.Indicator;
+import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 import com.kevalpatel.passcodeview.keys.Key;
 
 /**
  * Created by Keval on 06-Apr-17.
+ * <p>
+ * This view will perform the PIN based authentication. This view also support fingerprint authentication.
+ * To set this view application has to
+ * <li>1. Set the correct PIN using {@link #setCorrectPin(int[])}.</li>
+ * <li>2. Set key shape using {@link #setKey(Key.Builder)}.</li>
+ * <li>3. Set the callback listener. {@link #setAuthenticationListener(AuthenticationListener)}</li>
+ * <br/>
+ * This view is made up of three different views.
+ * <li>Title with the PIN indicators. {@link BoxTitleIndicator}</li>
+ * <li>Keyboard. {@link BoxKeypad}</li>
+ * <li>Fingerprint authentication view. {@link BoxFingerprint}</li>
  *
  * @author 'https://github.com/kevalpatel2106'
+ * @see AuthenticationListener
  */
 
 public final class PinView extends PasscodeView implements InteractiveArrayList.ChangeListener {
@@ -41,8 +55,8 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
     private int[] mCorrectPin;                                      //Current PIN with witch entered PIN will check.
     private InteractiveArrayList<Integer> mPinTyped;                //PIN typed.
 
-    private BoxKeypad mBoxKeypad;
-    private BoxTitleIndicator mBoxIndicator;
+    private BoxKeypad mBoxKeypad;                                   //Box that will display the keyboard.
+    private BoxTitleIndicator mBoxIndicator;                        //Box that will contain title and pin indicators.
 
     ///////////////////////////////////////////////////////////////
     //                  CONSTRUCTORS
@@ -65,7 +79,7 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
     ///////////////////////////////////////////////////////////////
 
     /**
-     * Initialize view.
+     * Initialize view. This will initialize the view boxes.
      */
     @SuppressWarnings("deprecation")
     @Override
@@ -77,12 +91,18 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
         mBoxIndicator = new BoxTitleIndicator(this);
     }
 
+    /**
+     * Set default parameters if the theme is not set.
+     */
     @Override
     protected void setDefaultParams() {
         mBoxIndicator.setDefaults();
         mBoxKeypad.setDefaults();
     }
 
+    /**
+     * Prepare all the required pain objects.
+     */
     @Override
     protected void preparePaint() {
         //Prepare paints.
@@ -92,7 +112,8 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
 
     /**
      * Parse the theme attribute using the parse array.
-     * @param typedArray
+     *
+     * @param typedArray {@link AttributeSet} received from the XML.
      */
     @SuppressWarnings("deprecation")
     @Override
@@ -131,6 +152,9 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
     //                  VIEW MEASUREMENT
     ///////////////////////////////////////////////////////////////
 
+    /***
+     * Measure the height/width of different component in view..
+     */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -143,7 +167,9 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
     //                  TOUCH HANDLER
     ///////////////////////////////////////////////////////////////
 
-
+    /**
+     * Handle touch event.
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getActionMasked()) {
@@ -254,21 +280,37 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
     //                  GETTERS/SETTERS
     ///////////////////////////////////////////////////////////////
 
+    /**
+     * @return true if the one hand operation is enabled.
+     */
     public boolean isOneHandOperationEnabled() {
         return mBoxKeypad.isOneHandOperation();
     }
 
+    /**
+     * Enable/Disable the one hand operation. One hand operation  will shrink the keypad to 70% of the
+     * original width and stick it to the right edge of the screen. This will allow user to press the
+     * key without using both hands on large screen devices.(e.g. Phablets)
+     *
+     * @param isEnable true to enable one hand mode.
+     */
     public void enableOneHandOperation(boolean isEnable) {
         mBoxKeypad.setOneHandOperation(isEnable);
         requestLayout();
         invalidate();
     }
 
+    /**
+     * Set the correct PIN. If the PIN entered by the user matches this correct PIN, authentication will
+     * successful. The length of the PIN and hence the number of the indicators in title will update
+     * based on this PIN length automatically.
+     *
+     * @param correctPin Array if single digits of the PIN. The single digit should not be less than 0 or grater
+     *                   than 9.
+     */
     public void setCorrectPin(@NonNull int[] correctPin) {
         //Validate the pin
-        if (!Utils.isValidPin(correctPin)) {
-            throw new IllegalArgumentException("Invalid PIN.");
-        }
+        if (!Utils.isValidPin(correctPin)) throw new IllegalArgumentException("Invalid PIN.");
 
         mCorrectPin = correctPin;
         mBoxIndicator.setPinLength(mCorrectPin.length);
@@ -277,12 +319,31 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
         invalidate();
     }
 
+    /**
+     * @return Title color of the view.
+     */
+    @ColorInt
     public int getTitleColor() {
         return mBoxIndicator.getTitleColor();
     }
 
+    /**
+     * Set the color of the view title.
+     *
+     * @param titleColor Color of the title.
+     */
     public void setTitleColor(@ColorInt int titleColor) {
         mBoxIndicator.setTitleColor(titleColor);
+        invalidate();
+    }
+
+    /**
+     * Set the color of the view title.
+     *
+     * @param titleColor Color of the title.
+     */
+    public void setTitleColorResource(@ColorRes int titleColor) {
+        mBoxIndicator.setTitleColor(mContext.getResources().getColor(titleColor));
         invalidate();
     }
 
@@ -303,28 +364,52 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
         invalidate();
     }
 
+    /**
+     * @return {@link com.kevalpatel.passcodeview.keys.Key.Builder}
+     */
     @Nullable
     public Key.Builder getKeyBuilder() {
         return mBoxKeypad.getKeyBuilder();
     }
 
+    /**
+     * Set the PIN change indicator. Use {@link com.kevalpatel.passcodeview.indicators.Indicator.Builder}
+     * to use different indicators.
+     *
+     * @param indicatorBuilder {@link com.kevalpatel.passcodeview.indicators.Indicator.Builder}
+     */
     public void setIndicator(@NonNull Indicator.Builder indicatorBuilder) {
         mBoxIndicator.setIndicatorBuilder(indicatorBuilder);
         requestLayout();
         invalidate();
     }
 
+    /**
+     * @return {@link com.kevalpatel.passcodeview.indicators.Indicator.Builder}
+     */
     @Nullable
     public Indicator.Builder getIndicatorBuilder() {
         return mBoxIndicator.getIndicatorBuilder();
     }
 
+    /**
+     * Set the key shape and theme properties by using {@link com.kevalpatel.passcodeview.keys.Key.Builder}.
+     *
+     * @param keyBuilder {@link com.kevalpatel.passcodeview.keys.Key.Builder}
+     * @see 'https://github.com/kevalpatel2106/PasscodeView/wiki/Diffrent-Key-Shapes'
+     */
     public void setKey(@NonNull Key.Builder keyBuilder) {
         mBoxKeypad.setKeyBuilder(keyBuilder);
         requestLayout();
         invalidate();
     }
 
+    /**
+     * Set the name of the keys. So that you can support different locale.
+     *
+     * @param keyNames {@link KeyNamesBuilder}
+     * @see 'https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names'
+     */
     public void setKeyNames(@NonNull KeyNamesBuilder keyNames) {
         BoxKeypad.setKeyNames(keyNames);
 
@@ -334,12 +419,22 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
         invalidate();
     }
 
+    /**
+     * Get the currently typed PIN numbers.
+     *
+     * @return Array of PIN digits.
+     */
     public int[] getCurrentTypedPin() {
         int[] arr = new int[mPinTyped.size()];
         for (int i = 0; i < mPinTyped.size(); i++) arr[i] = mPinTyped.get(i);
         return arr;
     }
 
+    /**
+     * Set the currently typed PIN numbers.
+     *
+     * @param currentTypedPin Array of PIN digits.
+     */
     public void setCurrentTypedPin(int[] currentTypedPin) {
         if (mCorrectPin.length == 0) {
             throw new IllegalStateException("You must call setCorrectPattern() before calling this method.");

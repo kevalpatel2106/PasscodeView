@@ -174,7 +174,7 @@ final class BoxTitleIndicator extends Box {
         return mTitleColor;
     }
 
-    void setTitleColor(int titleColor) {
+    void setTitleColor(@ColorInt int titleColor) {
         this.mTitleColor = titleColor;
         preparePaint();
     }
