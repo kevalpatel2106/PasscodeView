@@ -394,9 +394,9 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
 
     /**
      * Set the key shape and theme properties by using {@link com.kevalpatel.passcodeview.keys.Key.Builder}.
+     * https://github.com/kevalpatel2106/PasscodeView/wiki/Diffrent-Key-Shapes
      *
      * @param keyBuilder {@link com.kevalpatel.passcodeview.keys.Key.Builder}
-     * @see 'https://github.com/kevalpatel2106/PasscodeView/wiki/Diffrent-Key-Shapes'
      */
     public void setKey(@NonNull Key.Builder keyBuilder) {
         mBoxKeypad.setKeyBuilder(keyBuilder);
@@ -406,9 +406,9 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
 
     /**
      * Set the name of the keys. So that you can support different locale.
+     * https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names
      *
      * @param keyNames {@link KeyNamesBuilder}
-     * @see 'https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names'
      */
     public void setKeyNames(@NonNull KeyNamesBuilder keyNames) {
         BoxKeypad.setKeyNames(keyNames);
