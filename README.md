@@ -17,8 +17,7 @@ This library provide easy and secure PIN authentication view, which
 - provides access to built-in fingerprint-based authentication. This handles all the complexities of integrating the fingerprint API with your application.
 - provide error feedback when PIN entered is wrong.
 - is highly customizable. So that you can match it with your application them. It provides you control over,
-  * shape of the each key.
-  * color and shape of each key.
+  * color and shape of each key. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Diffrent-Key-Shapes)
   * localized name of each key in pin keyboard. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names)
   * size of the each single key.
   * color and shape of pin indicators.👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators)
@@ -208,13 +207,18 @@ This library provide easy and secure PIN authentication view, which
       //...
     }
   ```
+  
+*[**Visit our wiki page for more information.**](https://github.com/kevalpatel2106/PasscodeView/wiki)*
 
 ## How to contribute?
 * Check out contribution guidelines 👉[CONTRIBUTING.md](https://github.com/kevalpatel2106/PasscodeView/blob/master/CONTRIBUTING.md)
 
 
 ## What's next?
-- Create view for pattern based authentication.
+- Create view for pattern based authentication. (**Upcoming Release** preview)
+
+![Pattern Unlock](/resource/pattern_unlock.gif)
+
 - Build more customisation parameters to provide granular control over the theme of the view. 
 
 
