@@ -44,12 +44,16 @@ public final class CirclePatternCell extends PatternCell {
     private final Builder mBuilder;
     private boolean isDisplayError;
 
+    private float mTouchRadius;
+
     private CirclePatternCell(@NonNull PatternView patternView,
                               @NonNull Rect bound,
                               @NonNull CirclePatternCell.Builder builder,
                               Point point) {
         super(patternView, bound, builder, point);
         mBuilder = builder;
+        mTouchRadius = mBuilder.getRadius() < getContext().getResources().getDimension(R.dimen.lib_min_touch_radius) ?
+                mBuilder.getRadius() + 20 : mBuilder.getRadius();
     }
 
     /**
@@ -85,12 +89,12 @@ public final class CirclePatternCell extends PatternCell {
     @Override
     public boolean isIndicatorTouched(float touchX, float touchY) {
         //Check if the click is between the width bounds
-        if (touchX > getBound().exactCenterX() - mBuilder.getRadius()
-                && touchX < getBound().exactCenterX() + mBuilder.getRadius()) {
+        if (touchX > getBound().exactCenterX() - mTouchRadius
+                && touchX < getBound().exactCenterX() + mTouchRadius) {
 
             //Check if the click is between the height bounds
-            if (touchY > getBound().exactCenterY() - mBuilder.getRadius()
-                    && touchY < getBound().exactCenterY() + mBuilder.getRadius()) {
+            if (touchY > getBound().exactCenterY() - mTouchRadius
+                    && touchY < getBound().exactCenterY() + mTouchRadius) {
                 return true;
             }
         }
@@ -168,14 +172,14 @@ public final class CirclePatternCell extends PatternCell {
         }
 
         @NonNull
-        public CirclePatternCell.Builder setRadius(@DimenRes int indicatorRadius) {
-            mRadius = getContext().getResources().getDimension(indicatorRadius);
+        public CirclePatternCell.Builder setRadius(@Dimension float radius) {
+            mRadius = radius;
             return this;
         }
 
         @NonNull
-        public CirclePatternCell.Builder setRadius(@Dimension float radius) {
-            mRadius = radius;
+        public CirclePatternCell.Builder setRadius(@DimenRes int indicatorRadius) {
+            mRadius = getContext().getResources().getDimension(indicatorRadius);
             return this;
         }
 
@@ -185,14 +189,14 @@ public final class CirclePatternCell extends PatternCell {
         }
 
         @NonNull
-        public CirclePatternCell.Builder setStrokeWidth(@DimenRes int indicatorStrokeWidth) {
-            mStrokeWidth = getContext().getResources().getDimension(indicatorStrokeWidth);
+        public CirclePatternCell.Builder setStrokeWidth(@Dimension float strokeWidth) {
+            mStrokeWidth = strokeWidth;
             return this;
         }
 
         @NonNull
-        public CirclePatternCell.Builder setStrokeWidth(@Dimension float strokeWidth) {
-            mStrokeWidth = strokeWidth;
+        public CirclePatternCell.Builder setStrokeWidth(@DimenRes int indicatorStrokeWidth) {
+            mStrokeWidth = getContext().getResources().getDimension(indicatorStrokeWidth);
             return this;
         }
 

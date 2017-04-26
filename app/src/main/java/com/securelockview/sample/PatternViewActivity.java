@@ -22,7 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.kevalpatel.passcodeview.PatternView;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
-import com.kevalpatel.passcodeview.patternCells.DotPatternCell;
+import com.kevalpatel.passcodeview.patternCells.CirclePatternCell;
 import com.kevalpatel.passcodeview.patternCells.PatternPoint;
 
 /**
@@ -52,7 +52,7 @@ public class PatternViewActivity extends AppCompatActivity {
 
         //Build the desired indicator shape and pass the theme attributes.
         //REQUIRED
-        patternView.setPatternCell(new DotPatternCell.Builder(patternView)
+        patternView.setPatternCell(new CirclePatternCell.Builder(patternView)
                 .setRadius(R.dimen.pattern_cell_radius)
                 .setCellColorResource(R.color.colorAccent)
                 .build());
