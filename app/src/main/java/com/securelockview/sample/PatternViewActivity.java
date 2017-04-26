@@ -38,10 +38,14 @@ public class PatternViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pattern_view);
 
         PatternView patternView = (PatternView) findViewById(R.id.pattern_view);
-        patternView.setNoOfColumn(3);
-        patternView.setNoOfRows(3);
+
+        //Set number of pattern counts.
+        //REQUIRED
+        patternView.setNoOfColumn(3);   //Number of columns
+        patternView.setNoOfRows(3);     //Number of rows
 
         //Set the correct pin code.
+        //Display row and column number of the pattern point sequence.
         //REQUIRED
         patternView.setCorrectPattern(new PatternPoint[]{
                 new PatternPoint(0, 0),

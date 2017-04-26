@@ -22,6 +22,7 @@ This library provide easy and secure PIN authentication view, which
   * size of the each single key.
   * color and shape of pin indicators.👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators)
   * Control over tactile feedback for key press and authentication success/failure events.
+  * Authenticate using using the pattern.
 
 ## Demo: 
 **Authentication using PIN/Fingerprint**
@@ -42,6 +43,10 @@ This library provide easy and secure PIN authentication view, which
 |:---:|:---:|:---:|
 |![Rect](/resource/rect_key.png)|![Circle](/resource/circle_key.png)|![Square](/resource/square_key.png)|
 
+**Pattern based authentication**
+
+![Pattern Unlock](/resource/pattern_unlock.gif)
+
 *Here is the link of the demo application. 👉 [Demo](resource/sample.apk)*
 
  
@@ -50,11 +55,13 @@ This library provide easy and secure PIN authentication view, which
   * Add below lines to `app/build.gradle` file of your project.
   ```
   dependencies {
-      compile 'com.kevalpatel2106:passcodeview:1.1'
+      compile 'com.kevalpatel2106:passcodeview:1.2'
   }
   ```
   * To integrate using maven visit this [page](https://github.com/kevalpatel2106/PasscodeView/wiki/Dependencies).
-  
+
+## PIN based authentication:
+
 - ### Add `PinView` in your layout file.
   ```java
   <com.kevalpatel.passcodeview.PinView
@@ -115,9 +122,10 @@ This library provide easy and secure PIN authentication view, which
     ```
 
 - ### Set the shape of the pin indicators you want to use. 
-  - There are two built in key shapes. 
+  - There are three built in key shapes.
     * Round indicator
     * Dot indicator
+    * Circle indicator
   - Here is the example for the round indicator. You can learn more about other indicators from [here](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators).
   ```java
     @Override
@@ -207,7 +215,116 @@ This library provide easy and secure PIN authentication view, which
       //...
     }
   ```
-  
+
+
+## Pattern based authentication:
+
+- ### Set the number of rows and columns of the pattern in your activity/fragment.
+  ```java
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    //....
+    //...
+
+    PatternView patternView = (PatternView) findViewById(R.id.pattern_view);
+
+    //Set number of pattern counts.
+    //REQUIRED
+    patternView.setNoOfColumn(3);   //Number of columns
+    patternView.setNoOfRows(3);     //Number of rows
+
+    //...
+  }
+  ```
+
+- ### Set the correct pattern to authenticate the user in your activity/fragment.
+  ```java
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    //....
+    //...
+
+    PatternView patternView = (PatternView) findViewById(R.id.pattern_view);
+
+    //Set number of pattern counts.
+    //REQUIRED
+    patternView.setNoOfColumn(3);   //Number of columns
+    patternView.setNoOfRows(3);     //Number of rows
+
+    //Set the correct pin code.
+    //Display row and column number of the pattern point sequence.
+    //REQUIRED
+    patternView.setCorrectPattern(new PatternPoint[]{
+            new PatternPoint(0, 0),
+            new PatternPoint(1, 0),
+            new PatternPoint(2, 0),
+            new PatternPoint(2, 1)
+    });
+    //...
+  }
+  ```
+
+- ### Set the pattern cell shape.
+  - There are two built in pattern cells available.
+    * Circle indicator
+    * Dot indicator
+
+  ```java
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    //....
+    //...
+
+    PatternView patternView = (PatternView) findViewById(R.id.pattern_view);
+    patternView.setNoOfColumn(3);   //Number of columns
+    patternView.setNoOfRows(3);     //Number of rows
+    patternView.setCorrectPattern(new PatternPoint[]{...});
+
+
+    //Build the desired indicator shape and pass the theme attributes.
+    //REQUIRED
+    patternView.setPatternCell(new CirclePatternCell.Builder(patternView)
+            .setRadius(R.dimen.pattern_cell_radius)
+            .setCellColorResource(R.color.colorAccent)
+            .build());
+
+    //...
+  }
+  ```
+
+- ### Set callback listener to get callbacks when user is authenticated or authentication fails.
+```java
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    //....
+    //...
+
+    PatternView patternView = (PatternView) findViewById(R.id.pattern_view);
+    patternView.setNoOfColumn(3);   //Number of columns
+    patternView.setNoOfRows(3);     //Number of rows
+    patternView.setCorrectPattern(new PatternPoint[]{...});
+    patternView.setPatternCell(...);
+
+    patternView.setAuthenticationListener(new AuthenticationListener() {
+        @Override
+        public void onAuthenticationSuccessful() {
+            //User authenticated successfully.
+        }
+
+        @Override
+        public void onAuthenticationFailed() {
+            //Calls whenever authentication is failed or user is unauthorized.
+            //Do something
+        }
+    });
+    //...
+  }
+  ```
+
 *[**Visit our wiki page for more information.**](https://github.com/kevalpatel2106/PasscodeView/wiki)*
 
 ## How to contribute?
@@ -215,10 +332,6 @@ This library provide easy and secure PIN authentication view, which
 
 
 ## What's next?
-- Create view for pattern based authentication. (**Upcoming Release** preview)
-
-![Pattern Unlock](/resource/pattern_unlock.gif)
-
 - Build more customisation parameters to provide granular control over the theme of the view. 
 
 
