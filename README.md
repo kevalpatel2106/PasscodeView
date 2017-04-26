@@ -219,6 +219,23 @@ This library provide easy and secure PIN authentication view, which
 
 ## Pattern based authentication:
 
+- ### Add `PatternView` in your layout file.
+  ```xml
+  <com.kevalpatel.passcodeview.PatternView
+          android:id="@+id/pattern_view"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_below="@id/imageView"
+          app:dividerColor="@color/colorPrimaryDark"
+          app:fingerprintDefaultText="Scan your finger to unlock application"
+          app:fingerprintEnable="true"
+          app:fingerprintTextColor="@color/colorAccent"
+          app:fingerprintTextSize="@dimen/finger_print_text_size"
+          app:giveTactileFeedback="true"
+          app:patternLineColor="@color/colorAccent"
+          app:titleTextColor="@android:color/white"/>
+  ```
+
 - ### Set the number of rows and columns of the pattern in your activity/fragment.
   ```java
   @Override
