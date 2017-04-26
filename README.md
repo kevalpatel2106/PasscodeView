@@ -9,11 +9,11 @@
 - Secure authentication is the key factor in many application (e.g. financial applications). Many application uses PIN-based authentication. 
 - But Android System doesn't provide any easy to set the view for PIN-based authentication which can tightly integrate and take advantage of fingerprint API introduced in newer versions of android. This limitation led me to work on this project.
 
-- With the use of *PasscodeView* you can easily integrate PIN & Fingerprint based authentication in your application. 
+- With the use of *PasscodeView*, you can easily integrate PIN & Fingerprint based authentication in your application. 
 
 
 ## Features:
-This library provide easy and secure PIN authentication view, which
+This library provides easy and secure PIN authentication view, which
 - provides access to built-in fingerprint-based authentication. This handles all the complexities of integrating the fingerprint API with your application.
 - provide error feedback when PIN entered is wrong.
 - is highly customizable. So that you can match it with your application them. It provides you control over,
@@ -22,7 +22,7 @@ This library provide easy and secure PIN authentication view, which
   * size of the each single key.
   * color and shape of pin indicators.👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators)
   * Control over tactile feedback for key press and authentication success/failure events.
-  * Authenticate using using the pattern.
+  * Authenticate using the pattern.
 
 ## Demo: 
 **Authentication using PIN/Fingerprint**
@@ -92,7 +92,7 @@ This library provide easy and secure PIN authentication view, which
   ```
 
 - ### Set the shape of the key you want to use. 
-  - There are three built in key shapes. You can also generate your own key by extending [`Key`](https://github.com/kevalpatel2106/PasscodeView/blob/master/passcodeview/src/main/java/com/kevalpatel/passcodeview/keys/Key.java) class.
+  - There are three built-in key shapes. You can also generate your own key by extending [`Key`](https://github.com/kevalpatel2106/PasscodeView/blob/master/passcodeview/src/main/java/com/kevalpatel/passcodeview/keys/Key.java) class.
     * Round key
     * Rectangle key
     * Square key
@@ -152,7 +152,7 @@ This library provide easy and secure PIN authentication view, which
     ```
 
 - ### Set key names.
-  - Set the texts to display on different keys. This is optional step. If you don't set the key names, by default `PINView` will display English locale digits.
+  - Set the texts to display on different keys. This is an optional step. If you don't set the key names, by default `PINView` will display English locale digits.
   - If you want to learn more about key name localization visit [here](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names).
   ```java
     @Override
@@ -184,7 +184,7 @@ This library provide easy and secure PIN authentication view, which
     }
     ```
   
-- ### Set callback listener to get callbacks when user is authenticated or authentication fails.
+- ### Set callback listener to get callbacks when the user is authenticated or authentication fails.
   ```java
     @Override
     protected void onCreate(Bundle savedInstanceState) {
