@@ -22,6 +22,8 @@ import android.support.v7.app.AppCompatActivity;
 
 /**
  * Created by Keval on 12-Apr-17.
+ *
+ * @author 'https://github.com/kevalpatel2106'
  */
 
 public class AuthenticatedActivity extends AppCompatActivity {

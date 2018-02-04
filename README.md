@@ -27,21 +27,13 @@ This library provides easy and secure PIN authentication view, which
 ## Demo: 
 **Authentication using PIN/Fingerprint**
 
-|Success|Fail|Fingerprint Success|Fingerprint Fail|
-|:---:|:---:|:---:|:---:|
-|![PIN Success](/resource/pin_success.gif)|![PIN Failed](/resource/pin_failed.gif)|![Fingerprint Success](/resource/fingerprint_success.gif)|![Fingerprint Failed](/resource/fingerprint_failed.gif)|
-
-**Localized Texts**
-
-|English|Hindi|
+|Success|Fail|
 |:---:|:---:|
-|![Locale English](/resource/locale_en.png)|![Locale Hindi](/resource/locale_hn.png)|
+|![PIN Success](/resource/pin_success.gif)|![PIN Failed](/resource/pin_failed.gif)|
 
-**Different Key Shape**
-
-|Rectangle|Circle|Square|
-|:---:|:---:|:---:|
-|![Rect](/resource/rect_key.png)|![Circle](/resource/circle_key.png)|![Square](/resource/square_key.png)|
+|Fingerprint Success|Fingerprint Fail|
+|:---:|:---:|
+|![Fingerprint Success](/resource/fingerprint_success.gif)|![Fingerprint Failed](/resource/fingerprint_failed.gif)|
 
 **Pattern based authentication**
 
@@ -49,7 +41,7 @@ This library provides easy and secure PIN authentication view, which
 
 *Here is the link of the demo application. 👉 [Demo](resource/sample.apk)*
 
- 
+
 ## How to use this library?
 - ### Gradle Dependency:
   * Add below lines to `app/build.gradle` file of your project.
@@ -120,6 +112,11 @@ This library provides easy and secure PIN authentication view, which
       //...
     }
     ```
+  **Different Key Shape**
+    
+  |Rectangle|Circle|Square|
+  |:---:|:---:|:---:|
+  |![Rect](/resource/rect_key.png)|![Circle](/resource/circle_key.png)|![Square](/resource/square_key.png)|
 
 - ### Set the shape of the pin indicators you want to use. 
   - There are three built in key shapes.
@@ -184,6 +181,13 @@ This library provides easy and secure PIN authentication view, which
     }
     ```
   
+  **Localized Texts**
+
+  |English|Hindi|
+  |:---:|:---:|
+  |![Locale English](/resource/locale_en.png)|![Locale Hindi](/resource/locale_hn.png)|
+
+
 - ### Set callback listener to get callbacks when the user is authenticated or authentication fails.
   ```java
     @Override

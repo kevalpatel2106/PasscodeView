@@ -37,17 +37,36 @@ import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 
 /**
  * Created by Keval Patel on 18/04/17.
+ * A base class to implement the view for authentication like {@link PinView} and {@link PatternView}.
+ * This class will set up finger print reader and
  *
  * @author 'https://github.com/kevalpatel2106'
+ * @see PatternView
+ * @see PinView
  */
 
-public abstract class PasscodeView extends View {
+abstract class PasscodeView extends View {
+
+    /**
+     * Context of the view.
+     */
     protected final Context mContext;
 
+    /**
+     * Bounds of the whole {@link PasscodeView}.
+     */
     protected Rect mRootViewBound = new Rect();             //Bounds for the root view
+
+    /**
+     * A listener to notify the user when the authentication successful or ffailed.
+     *
+     * @see AuthenticationListener
+     */
     protected AuthenticationListener mAuthenticationListener;
 
-    //Boxes
+    /**
+     * Finger print box.
+     */
     protected BoxFingerprint mBoxFingerprint;               //Fingerprint box
 
     //Title divider
@@ -120,6 +139,7 @@ public abstract class PasscodeView extends View {
                         mContext.getResources().getColor(R.color.lib_divider_color));
 
                 //Fet fingerprint params
+                mBoxFingerprint.setFingerPrintEnable(a.getBoolean(R.styleable.PasscodeView_fingerprintEnable, true));
                 //noinspection ConstantConditions
                 mBoxFingerprint.setStatusText(a.hasValue(R.styleable.PasscodeView_fingerprintDefaultText) ?
                         a.getString(R.styleable.PasscodeView_fingerprintDefaultText) : BoxFingerprint.DEF_FINGERPRINT_STATUS);
@@ -127,7 +147,6 @@ public abstract class PasscodeView extends View {
                         mContext.getResources().getColor(R.color.lib_key_default_color)));
                 mBoxFingerprint.setStatusTextSize(a.getDimension(R.styleable.PasscodeView_fingerprintTextSize,
                         (int) mContext.getResources().getDimension(R.dimen.lib_fingerprint_status_text_size)));
-                mBoxFingerprint.setFingerPrintEnable(a.getBoolean(R.styleable.PasscodeView_fingerprintEnable, true));
 
                 parseTypeArr(attrs);
             } finally {
@@ -149,6 +168,8 @@ public abstract class PasscodeView extends View {
     protected abstract void setDefaultParams();
 
     protected abstract void preparePaint();
+
+    public abstract void reset();
 
     protected abstract void parseTypeArr(@NonNull AttributeSet typedArray);
 
@@ -221,10 +242,6 @@ public abstract class PasscodeView extends View {
                 mDividerPaint);
     }
 
-    ///////////////////////////////////////////////////////////////
-    //                  GETTERS/SETTERS
-    ///////////////////////////////////////////////////////////////
-
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -233,18 +250,20 @@ public abstract class PasscodeView extends View {
         mBoxFingerprint.stopFingerprintScanner();
     }
 
-    public abstract void reset();
+    ///////////////////////////////////////////////////////////////
+    //                  GETTERS/SETTERS
+    ///////////////////////////////////////////////////////////////
 
-    @Nullable
-    public AuthenticationListener getAuthenticationListener() {
-        return mAuthenticationListener;
-    }
 
     public void setAuthenticationListener(@NonNull AuthenticationListener authenticationListener) {
         mAuthenticationListener = authenticationListener;
         mBoxFingerprint.setAuthListener(authenticationListener);
     }
 
+    /**
+     * Get the colors of the dividers.
+     */
+    @ColorInt
     public int getDividerColor() {
         return mDividerColor;
     }
@@ -255,12 +274,31 @@ public abstract class PasscodeView extends View {
         invalidate();
     }
 
+    public void setDividerColorRes(@ColorRes int dividerColor) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            setDividerColor(mContext.getColor(dividerColor));
+        } else {
+            setDividerColor(mContext.getResources().getColor(dividerColor));
+        }
+    }
+
     public boolean isTactileFeedbackEnable() {
         return mIsTactileFeedbackEnabled;
     }
 
     public void setTactileFeedback(boolean enable) {
         mIsTactileFeedbackEnabled = enable;
+    }
+
+
+    public Boolean isFingerPrintEnable() {
+        return mBoxFingerprint.isFingerPrintEnable();
+    }
+
+    public void setIsFingerPrintEnable(boolean isEnable) {
+        mBoxFingerprint.setFingerPrintEnable(isEnable);
+        requestLayout();
+        invalidate();
     }
 
     @NonNull
@@ -301,13 +339,4 @@ public abstract class PasscodeView extends View {
         invalidate();
     }
 
-    public Boolean isFingerPrintEnable() {
-        return mBoxFingerprint.isFingerPrintEnable();
-    }
-
-    public void setIsFingerPrintEnable(boolean isEnable) {
-        mBoxFingerprint.setFingerPrintEnable(isEnable);
-        requestLayout();
-        invalidate();
-    }
 }

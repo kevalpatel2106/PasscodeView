@@ -37,7 +37,7 @@ public class PatternViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pattern_view);
 
-        PatternView patternView = (PatternView) findViewById(R.id.pattern_view);
+        PatternView patternView = findViewById(R.id.pattern_view);
 
         //Set number of pattern counts.
         //REQUIRED
