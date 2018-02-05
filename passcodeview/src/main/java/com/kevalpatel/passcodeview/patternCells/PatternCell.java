@@ -23,8 +23,8 @@ import android.graphics.Rect;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 
-import com.kevalpatel.passcodeview.PasscodeView;
 import com.kevalpatel.passcodeview.PatternView;
+import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 
 /**
  * Created by Keval Patel on 07/04/17.
@@ -50,7 +50,7 @@ public abstract class PatternCell {
         mPoint = location;
     }
 
-    protected final PasscodeView getRootView() {
+    protected final BasePasscodeView getRootView() {
         return mPatternView;
     }
 

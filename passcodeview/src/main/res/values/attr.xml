@@ -22,7 +22,7 @@
         <attr name="pin_titleTextColor" format="color"/>
     </declare-styleable>
 
-    <declare-styleable name="PasscodeView">
+    <declare-styleable name="BasePasscodeView">
         <attr name="giveTactileFeedback" format="boolean"/>
 
         <!--Fingerprint-->

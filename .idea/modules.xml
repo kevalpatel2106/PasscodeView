@@ -3,11 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PasscodeView.iml" filepath="$PROJECT_DIR$/PasscodeView.iml" />
-      <module fileurl="file://F:\git-clone\PasscodeView\PasscodeView.iml" filepath="F:\git-clone\PasscodeView\PasscodeView.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://F:\git-clone\PasscodeView\app\app.iml" filepath="F:\git-clone\PasscodeView\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/passcodeview/passcodeview.iml" filepath="$PROJECT_DIR$/passcodeview/passcodeview.iml" />
-      <module fileurl="file://F:\git-clone\PasscodeView\passcodeview\passcodeview.iml" filepath="F:\git-clone\PasscodeView\passcodeview\passcodeview.iml" />
     </modules>
   </component>
 </project>

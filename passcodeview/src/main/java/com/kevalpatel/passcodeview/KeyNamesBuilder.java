@@ -21,6 +21,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 import android.support.annotation.StringRes;
 
+import com.kevalpatel.passcodeview.internal.Constants;
+
 /**
  * Created by Keval Patel on 13/04/17.
  * This is the builder class to set the names to display on each key. The keys name should be appropriate
@@ -191,7 +193,7 @@ public final class KeyNamesBuilder {
 
     @SuppressWarnings("Range")
     @Size(Constants.NO_OF_KEY_BOARD_ROWS * Constants.NO_OF_KEY_BOARD_COLUMNS)
-    String[][] build() {
+    public String[][] build() {
         return new String[][]{{mKeyOne, mKeyFour, mKeySeven, ""},
                 {mKeyTwo, mKeyFive, mKeyEight, mKeyZero},
                 {mKeyThree, mKeySix, mKeyNine, BACKSPACE_TITLE}};

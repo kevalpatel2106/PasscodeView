@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package com.kevalpatel.passcodeview;
+package com.kevalpatel.passcodeview.internal.box;
 
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.util.AttributeSet;
+
+import com.kevalpatel.passcodeview.R;
+import com.kevalpatel.passcodeview.Utils;
+import com.kevalpatel.passcodeview.internal.BasePasscodeView;
+import com.kevalpatel.passcodeview.internal.Constants;
 
 /**
  * Created by Keval Patel on 09/04/17.
@@ -30,39 +37,53 @@ import android.support.annotation.NonNull;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-final class BoxTitle extends Box {
+public final class BoxTitle extends Box {
     private static final String DEF_TITLE_TEXT = "Enter pattern";
 
     @ColorInt
     private int mTitleColor;                        //Title text color
     private String mTitle;                          //Title color
+
     private Paint mTitlePaint;                      //Solid indicator color
 
     private Rect mBounds;
 
-    BoxTitle(@NonNull PasscodeView view) {
+    public BoxTitle(@NonNull BasePasscodeView view) {
         super(view);
+    }
+
+    @Override
+    public void init() {
+        //NO OP
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    void setDefaults() {
+    public void setDefaults() {
         mTitle = DEF_TITLE_TEXT;
-        mTitleColor = getContext().getResources().getColor(R.color.lib_key_default_color);
+        mTitleColor = Utils.getColorCompat(getContext(), R.color.lib_key_default_color);
     }
 
     @Override
-    void onAuthenticationFail() {
-        //TODO handle failur
+    public void onAuthenticationFail() {
+        //TODO handle failure
     }
 
     @Override
-    void onAuthenticationSuccess() {
+    public void onAuthenticationSuccess() {
         //TODO handle success
     }
 
     @Override
-    void draw(@NonNull Canvas canvas) {
+    public void reset() {
+        //TODO Reset the view.
+    }
+
+    @Override
+    public void drawView(@NonNull Canvas canvas) {
+        if (mTitle == null) return;
+
+        //Write title text
         canvas.drawText(mTitle,
                 mBounds.exactCenterX(),
                 mBounds.top - (int) getContext().getResources().getDimension(R.dimen.lib_divider_vertical_margin),
@@ -77,7 +98,7 @@ final class BoxTitle extends Box {
      * |------------------------|=| => {@link Constants#KEY_BOARD_TOP_WEIGHT} of the total height.
      * |                        | |
      * |                        | |
-     * |                        | | => Keypad height. ({@link BoxKeypad#measure(Rect)})
+     * |                        | | => Keypad height. ({@link BoxKeypad#measureView(Rect)})
      * |                        | |
      * |                        | |
      * |------------------------|=| => {@link Constants#KEY_BOARD_BOTTOM_WEIGHT} of the total weight if the fingerprint is available. Else it touches to the bottom of the main view.
@@ -88,8 +109,8 @@ final class BoxTitle extends Box {
      * @param rootViewBounds {@link Rect} bounds of the main view.
      */
     @Override
-    void measure(@NonNull Rect rootViewBounds) {
-        //Dots indicator
+    public void measureView(@NonNull Rect rootViewBounds) {
+        //Title box bounds
         mBounds = new Rect();
         mBounds.left = rootViewBounds.left;
         mBounds.right = rootViewBounds.right;
@@ -100,7 +121,7 @@ final class BoxTitle extends Box {
     }
 
     @Override
-    void preparePaint() {
+    public void preparePaint() {
         //Set title paint
         mTitlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTitlePaint.setColor(mTitleColor);
@@ -108,19 +129,35 @@ final class BoxTitle extends Box {
         mTitlePaint.setTextSize(getContext().getResources().getDimension(R.dimen.lib_title_text_size));
     }
 
-    String getTitle() {
+    @Override
+    public void parseTypeArr(@NonNull AttributeSet typedArray) {
+        TypedArray a = getContext().getTheme().obtainStyledAttributes(typedArray,
+                R.styleable.PatternView, 0, 0);
+
+        try { //Parse title params
+            mTitle = a.hasValue(R.styleable.PatternView_titleText) ?
+                    a.getString(R.styleable.PatternView_titleText) : DEF_TITLE_TEXT;
+            mTitleColor = a.getColor(R.styleable.PatternView_titleTextColor,
+                    getContext().getResources().getColor(R.color.lib_key_default_color));
+        } finally {
+            a.recycle();
+        }
+    }
+
+    public String getTitle() {
         return mTitle;
     }
 
-    void setTitle(String title) {
+    public void setTitle(String title) {
         this.mTitle = title;
     }
 
-    int getTitleColor() {
+    @ColorInt
+    public int getTitleColor() {
         return mTitleColor;
     }
 
-    void setTitleColor(int titleColor) {
+    public void setTitleColor(@ColorInt int titleColor) {
         this.mTitleColor = titleColor;
         preparePaint();
     }

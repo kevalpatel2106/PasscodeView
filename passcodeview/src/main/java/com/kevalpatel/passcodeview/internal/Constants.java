@@ -14,24 +14,42 @@
  * limitations under the License.
  */
 
-package com.kevalpatel.passcodeview.interfaces;
+package com.kevalpatel.passcodeview.internal;
 
 /**
  * Created by Keval on 06-Apr-17.
- * Interface to notify you authentication result whenever the authentication process completes.
+ * Constants for the library.
  *
  * @author 'https://github.com/kevalpatel2106'
  */
-public interface AuthenticationListener {
+
+public final class Constants {
 
     /**
-     * This method indicates that authentication is successful (either by matching pin ,matching
-     * password or correct fingerprint).
+     * Number of columns in the PIN keyboard.
      */
-    void onAuthenticationSuccessful();
+    public static final int NO_OF_KEY_BOARD_COLUMNS = 3;
 
     /**
-     * Authentication failed.
+     * Number of rows in the PIN keyboard.
      */
-    void onAuthenticationFailed();
+    public static final int NO_OF_KEY_BOARD_ROWS = 4;
+
+    /**
+     * Default number of rows and columns for the the pattern box.
+     */
+    public static final int DEF_PATTERN_LENGTH = 3;
+
+    /**
+     * Weight for the keyboard bottom line.
+     */
+    public static final float KEY_BOARD_BOTTOM_WEIGHT = 0.14F;
+
+    /**
+     * Weight for the keyboard top line.
+     */
+    public static final float KEY_BOARD_TOP_WEIGHT = 0.2F;
+
+    private Constants() {
+    }
 }

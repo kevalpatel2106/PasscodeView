@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevalpatel.passcodeview;
+package com.kevalpatel.passcodeview.internal;
 
 import android.support.annotation.NonNull;
 
@@ -26,10 +26,10 @@ import java.util.ArrayList;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-final class InteractiveArrayList<E> extends ArrayList<E> {
+public final class InteractiveArrayList<E> extends ArrayList<E> {
     private ChangeListener mChangeListener;
 
-    void setChangeListener(@NonNull ChangeListener listener) {
+    public void setChangeListener(@NonNull ChangeListener listener) {
         mChangeListener = listener;
     }
 

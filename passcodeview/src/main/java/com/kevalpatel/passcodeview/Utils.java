@@ -25,9 +25,11 @@ import android.os.Build;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.RequiresPermission;
+import android.util.Log;
 
 import com.kevalpatel.passcodeview.patternCells.PatternCell;
 import com.kevalpatel.passcodeview.patternCells.PatternPoint;
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Keval on 07-Oct-16.
+ * This class contains utility methods for the library.
  *
  * @author 'https://github.com/kevalpatel2106'
  */
@@ -46,7 +49,8 @@ public final class Utils {
     }
 
     /**
-     * Open the Security settings screen.
+     * Open the Security settings screen. This settings screen will allow user to register finger
+     * prints.
      *
      * @param context instance of the caller.
      */
@@ -65,10 +69,10 @@ public final class Utils {
     @SuppressWarnings("MissingPermission")
     @RequiresApi(api = Build.VERSION_CODES.M)
     @RequiresPermission(allOf = {Manifest.permission.USE_FINGERPRINT})
-    public static boolean isSupportedHardware(Context context) {
+    public static boolean hasSupportedFingerprintHardware(Context context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false;
         FingerprintManager fingerprintManager = (FingerprintManager) context.getSystemService(Context.FINGERPRINT_SERVICE);
-        return fingerprintManager.isHardwareDetected();
+        return fingerprintManager != null && fingerprintManager.isHardwareDetected();
     }
 
     /**
@@ -86,7 +90,9 @@ public final class Utils {
 
             //Fingerprint API only available on from Android 6.0 (M)
             FingerprintManager fingerprintManager = (FingerprintManager) context.getSystemService(Context.FINGERPRINT_SERVICE);
-            return !(!fingerprintManager.isHardwareDetected() || !fingerprintManager.hasEnrolledFingerprints());
+            return fingerprintManager != null
+                    && fingerprintManager.isHardwareDetected()
+                    && fingerprintManager.hasEnrolledFingerprints();
         } else {
             return false;
         }
@@ -154,14 +160,25 @@ public final class Utils {
      */
     static void giveTactileFeedbackForKeyPress(@NonNull Context context) {
         Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+
+        if (v == null) {
+            Log.w("PasscodeView", "Vibrator service not found.");
+            return;
+        }
+
         if (v.hasVibrator()) v.vibrate(50);
     }
 
     /**
-     * Run the vibrator to give tactile feedback for 350ms when yser authentication is successful.
+     * Run the vibrator to give tactile feedback for 350ms when user authentication is successful.
      */
     static void giveTactileFeedbackForAuthFail(@NonNull Context context) {
         Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        if (v == null) {
+            Log.w("PasscodeView", "Vibrator service not found.");
+            return;
+        }
+
         if (v.hasVibrator()) v.vibrate(350);
     }
 
@@ -171,6 +188,17 @@ public final class Utils {
      */
     static void giveTactileFeedbackForAuthSuccess(@NonNull Context context) {
         Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        if (v == null) {
+            Log.w("PasscodeView", "Vibrator service not found.");
+            return;
+        }
+
         if (v.hasVibrator()) v.vibrate(new long[]{50, 100, 50, 100}, -1);
+    }
+
+    @ColorInt
+    public static int getColorCompat(@NonNull Context context, @ColorRes int colorRes) {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ?
+                context.getResources().getColor(colorRes) : context.getColor(colorRes);
     }
 }

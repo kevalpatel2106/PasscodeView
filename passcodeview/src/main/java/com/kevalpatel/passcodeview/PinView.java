@@ -16,9 +16,10 @@
 
 package com.kevalpatel.passcodeview;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
@@ -28,6 +29,11 @@ import android.view.MotionEvent;
 
 import com.kevalpatel.passcodeview.indicators.Indicator;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
+import com.kevalpatel.passcodeview.internal.BasePasscodeView;
+import com.kevalpatel.passcodeview.internal.InteractiveArrayList;
+import com.kevalpatel.passcodeview.internal.box.BoxFingerprint;
+import com.kevalpatel.passcodeview.internal.box.BoxKeypad;
+import com.kevalpatel.passcodeview.internal.box.BoxTitleIndicator;
 import com.kevalpatel.passcodeview.keys.Key;
 
 /**
@@ -40,7 +46,7 @@ import com.kevalpatel.passcodeview.keys.Key;
  * <li>3. Set the callback listener. {@link #setAuthenticationListener(AuthenticationListener)}</li>
  * <br/>
  * This view is made up of three different views.
- * <li>Title with the PIN indicators. {@link BoxTitleIndicator}</li>
+ * <li>Title with the PIN indicators. {@link com.kevalpatel.passcodeview.internal.box.BoxTitleIndicator}</li>
  * <li>Keyboard. {@link BoxKeypad}</li>
  * <li>Fingerprint authentication view. {@link BoxFingerprint}</li>
  *
@@ -48,7 +54,7 @@ import com.kevalpatel.passcodeview.keys.Key;
  * @see AuthenticationListener
  */
 
-public final class PinView extends PasscodeView implements InteractiveArrayList.ChangeListener {
+public final class PinView extends BasePasscodeView implements InteractiveArrayList.ChangeListener {
     private float mDownKeyX;                                        //X coordinate of the ACTION_DOWN point
     private float mDownKeyY;                                        //Y coordinate of the ACTION_DOWN point
 
@@ -83,19 +89,22 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
      */
     @SuppressWarnings("deprecation")
     @Override
-    protected void init() {
+    public void init() {
         mPinTyped = new InteractiveArrayList<>();
         mPinTyped.setChangeListener(this);
 
         mBoxKeypad = new BoxKeypad(this);
+        mBoxKeypad.init();
+
         mBoxIndicator = new BoxTitleIndicator(this);
+        mBoxIndicator.init();
     }
 
     /**
      * Set default parameters if the theme is not set.
      */
     @Override
-    protected void setDefaultParams() {
+    public void setDefaults() {
         mBoxIndicator.setDefaults();
         mBoxKeypad.setDefaults();
     }
@@ -104,7 +113,7 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
      * Prepare all the required pain objects.
      */
     @Override
-    protected void preparePaint() {
+    public void preparePaint() {
         //Prepare paints.
         mBoxKeypad.preparePaint();
         mBoxIndicator.preparePaint();
@@ -117,23 +126,51 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
      */
     @SuppressWarnings("deprecation")
     @Override
-    protected void parseTypeArr(@NonNull AttributeSet typedArray) {
-        TypedArray a = mContext.getTheme().obtainStyledAttributes(typedArray, R.styleable.PinView, 0, 0);
-        try {
-            //Parse title params
-            mBoxIndicator.setTitle(a.hasValue(R.styleable.PinView_pin_titleText) ?
-                    a.getString(R.styleable.PinView_pin_titleText) : BoxTitleIndicator.DEF_TITLE_TEXT);
-            mBoxIndicator.setTitleColor(a.getColor(R.styleable.PinView_pin_titleTextColor,
-                    mContext.getResources().getColor(R.color.lib_key_default_color)));
-        } finally {
-            a.recycle();
-        }
+    public void parseTypeArr(@NonNull AttributeSet typedArray) {
+        //Do nothing
     }
 
+    @Override
+    public void measureView(@NonNull Rect rootViewBounds) {
+        mBoxKeypad.measureView(mRootViewBound);
+        mBoxIndicator.measureView(mRootViewBound);
+    }
 
-    ///////////////////////////////////////////////////////////////
-    //                  VIEW DRAW
-    ///////////////////////////////////////////////////////////////
+    @Override
+    public void onAuthenticationFail() {
+        if (isTactileFeedbackEnable())
+            Utils.giveTactileFeedbackForAuthFail(mContext);     //Give tactile feedback.
+
+        //Notify all the boxes for authentication success.
+        mBoxKeypad.onAuthenticationFail();
+        mBoxIndicator.onAuthenticationFail();
+
+        super.onAuthenticationFail();
+    }
+
+    @Override
+    public void onAuthenticationSuccess() {
+        if (isTactileFeedbackEnable())
+            Utils.giveTactileFeedbackForAuthSuccess(mContext);  //Give tactile feedback.
+
+        //Notify all the boxes for authentication success.
+        mBoxKeypad.onAuthenticationSuccess();
+        mBoxIndicator.onAuthenticationSuccess();
+
+        super.onAuthenticationSuccess();
+    }
+
+    /**
+     * Reset the pin code and view state.
+     */
+    @Override
+    public void reset() {
+        super.reset();
+        mPinTyped.clear();
+        mBoxKeypad.reset();
+        mBoxIndicator.reset();
+        invalidate();
+    }
 
     /**
      * Draw method of the view called every time frame refreshes.
@@ -141,26 +178,9 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
      * @param canvas view canvas
      */
     @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        mBoxKeypad.draw(canvas);
-        mBoxIndicator.draw(canvas);
-        mBoxFingerprint.draw(canvas);
-    }
-
-    ///////////////////////////////////////////////////////////////
-    //                  VIEW MEASUREMENT
-    ///////////////////////////////////////////////////////////////
-
-    /***
-     * Measure the height/width of different component in view..
-     */
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        mBoxKeypad.measure(mRootViewBound);
-        mBoxIndicator.measure(mRootViewBound);
-        mBoxFingerprint.measure(mRootViewBound);
+    public void drawView(@NonNull Canvas canvas) {
+        mBoxKeypad.drawView(canvas);
+        mBoxIndicator.drawView(canvas);
     }
 
     ///////////////////////////////////////////////////////////////
@@ -170,6 +190,7 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
     /**
      * Handle touch event.
      */
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getActionMasked()) {
@@ -222,26 +243,10 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
             //Check if the pin is matched?
             if (Utils.isPINMatched(mCorrectPin, mPinTyped)) {
                 //Hurray!!! Authentication is successful.
-
-                if (isTactileFeedbackEnable())
-                    Utils.giveTactileFeedbackForAuthSuccess(mContext);  //Give tactile feedback.
-                mAuthenticationListener.onAuthenticationSuccessful();   //Notify the parent application
-
-                //Notify all the boxes for authentication success.
-                mBoxKeypad.onAuthenticationSuccess();
-                mBoxIndicator.onAuthenticationSuccess();
-                mBoxFingerprint.onAuthenticationSuccess();
+                onAuthenticationSuccess();
             } else {
                 //:-( Authentication failed.
-
-                if (isTactileFeedbackEnable())
-                    Utils.giveTactileFeedbackForAuthFail(mContext);     //Give tactile feedback.
-                mAuthenticationListener.onAuthenticationFailed();       //Notify parent application
-
-                //Notify all the boxes for authentication success.
-                mBoxFingerprint.onAuthenticationFail();
-                mBoxKeypad.onAuthenticationFail();
-                mBoxIndicator.onAuthenticationFail();
+                onAuthenticationFail();
             }
 
             //Reset the view.
@@ -254,15 +259,6 @@ public final class PinView extends PasscodeView implements InteractiveArrayList.
         } else if (isTactileFeedbackEnable()) {
             Utils.giveTactileFeedbackForKeyPress(mContext);
         }
-    }
-
-    /**
-     * Reset the pin code and view state.
-     */
-    @Override
-    public void reset() {
-        mPinTyped.clear();
-        invalidate();
     }
 
     /**
