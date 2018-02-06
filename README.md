@@ -55,7 +55,7 @@ This library provides easy and secure PIN authentication view, which
   * Add below lines to `app/build.gradle` file of your project.
   ```
   dependencies {
-      compile 'com.kevalpatel2106:passcodeview:1.2'
+      compile 'com.kevalpatel2106:passcodeview:1.2.1'
   }
   ```
   * To integrate using maven visit this [page](https://github.com/kevalpatel2106/PasscodeView/wiki/Dependencies).
