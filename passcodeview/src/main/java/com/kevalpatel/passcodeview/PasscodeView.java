@@ -30,7 +30,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.View;
 
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
@@ -166,25 +165,18 @@ public abstract class PasscodeView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        measureMainView();
+        int viewHeight = MeasureSpec.getSize(heightMeasureSpec);
+        int viewWidth = MeasureSpec.getSize(widthMeasureSpec);
+
+        mRootViewBound.left = 0;
+        mRootViewBound.right = mRootViewBound.left + viewWidth;
+        mRootViewBound.top = 0;
+        mRootViewBound.bottom = mRootViewBound.left + viewHeight;
+
         measureDivider();
 
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    }
-
-    /**
-     * Measure the root view and get bounds.
-     */
-    private void measureMainView() {
-        getLocalVisibleRect(mRootViewBound);
-
-        //Get the height of the actionbar if we have any actionbar and add it to the top
-        TypedValue tv = new TypedValue();
-        if (mContext.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-            mRootViewBound.top = mRootViewBound.top
-                    + TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-        }
     }
 
     /**
@@ -291,13 +283,13 @@ public abstract class PasscodeView extends View {
         return mBoxFingerprint.getStatusTextSize();
     }
 
-    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(statusTextSize);
+    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
         invalidate();
     }
 
-    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
-        mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
+    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+        mBoxFingerprint.setStatusTextSize(statusTextSize);
         invalidate();
     }
 
