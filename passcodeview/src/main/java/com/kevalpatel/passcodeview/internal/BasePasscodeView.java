@@ -89,18 +89,24 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
     public BasePasscodeView(Context context) {
         super(context);
         mContext = context;
+        mBoxFingerprint = new BoxFingerprint(this);
+
         init(null);
     }
 
     public BasePasscodeView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        mBoxFingerprint = new BoxFingerprint(this);
+
         init(attrs);
     }
 
     public BasePasscodeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext = context;
+        mBoxFingerprint = new BoxFingerprint(this);
+
         init(attrs);
     }
 
@@ -108,6 +114,8 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
     public BasePasscodeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         mContext = context;
+        mBoxFingerprint = new BoxFingerprint(this);
+
         init(attrs);
     }
 
@@ -132,7 +140,7 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
      * @param attrs {@link AttributeSet}
      */
     private void init(@Nullable AttributeSet attrs) {
-        mBoxFingerprint = new BoxFingerprint(this);
+        mBoxFingerprint.init();
         init();
 
         if (attrs != null) {    //Parse all the params from the arguments.
