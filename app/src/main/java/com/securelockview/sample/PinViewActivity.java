@@ -41,7 +41,7 @@ public class PinViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pinview);
 
-        mPinView = (PinView) findViewById(R.id.pattern_view);
+        mPinView = findViewById(R.id.pattern_view);
 
         //Set the correct pin code.
         //REQUIRED
@@ -79,6 +79,8 @@ public class PinViewActivity extends AppCompatActivity {
                 .setKeyEight(this, R.string.key_8)
                 .setKeyNine(this, R.string.key_9)
                 .setKeyZero(this, R.string.key_0));
+
+        mPinView.setTitle("Enter the PIN");
 
         mPinView.setAuthenticationListener(new AuthenticationListener() {
             @Override
