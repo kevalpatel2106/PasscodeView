@@ -28,12 +28,15 @@ android:
         - extra-android-m2repository
 
 licenses:
-    - 'android-sdk-preview-license-52d11cd2'
+    - 'android-sdk-preview-license-.'
     - 'android-sdk-license-.+'
     - 'google-gdk-license-.+'
 
 before_script:
     - chmod +x gradlew      #Grand permissions
 
+before_install:
+    - yes | sdkmanager "build-tools;27.0.3"
+    
 script:
     - ./gradlew assembleDebug -PdisablePreDex --stacktrace
