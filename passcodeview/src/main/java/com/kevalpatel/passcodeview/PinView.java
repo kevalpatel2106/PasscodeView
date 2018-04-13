@@ -52,8 +52,18 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
     private int[] mCorrectPin;                                      //Current PIN with witch entered PIN will check.
     private InteractiveArrayList<Integer> mPinTyped;                //PIN typed.
 
-    private BoxKeypad mBoxKeypad;                                   //Box that will display the keyboard.
-    private BoxTitleIndicator mBoxIndicator;                        //Box that will contain title and pin indicators.
+    /**
+     * {@link BoxKeypad} that displays the numeric keyboard to display the keys.
+     */
+    private BoxKeypad mBoxKeypad;
+
+    /**
+     * Box that will contain title and pin indicators.
+     */
+    private BoxTitleIndicator mBoxIndicator;
+
+    @NonNull
+    private KeyNamesBuilder mKeyNamesBuilder = new KeyNamesBuilder();
 
     ///////////////////////////////////////////////////////////////
     //                  CONSTRUCTORS
@@ -81,12 +91,15 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
     @SuppressWarnings("deprecation")
     @Override
     public void init() {
+        //Set the typed pin numbers holder.
         mPinTyped = new InteractiveArrayList<>();
         mPinTyped.setChangeListener(this);
 
+        //Set the keyboard box.
         mBoxKeypad = new BoxKeypad(this);
         mBoxKeypad.init();
 
+        //Set the title/PIN indicator box.
         mBoxIndicator = new BoxTitleIndicator(this);
         mBoxIndicator.init();
     }
@@ -129,25 +142,17 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
 
     @Override
     public void onAuthenticationFail() {
-        if (isTactileFeedbackEnable())
-            Utils.giveTactileFeedbackForAuthFail(mContext);     //Give tactile feedback.
-
         //Notify all the boxes for authentication success.
         mBoxKeypad.onAuthenticationFail();
         mBoxIndicator.onAuthenticationFail();
-
         super.onAuthenticationFail();
     }
 
     @Override
     public void onAuthenticationSuccess() {
-        if (isTactileFeedbackEnable())
-            Utils.giveTactileFeedbackForAuthSuccess(mContext);  //Give tactile feedback.
-
         //Notify all the boxes for authentication success.
         mBoxKeypad.onAuthenticationSuccess();
         mBoxIndicator.onAuthenticationSuccess();
-
         super.onAuthenticationSuccess();
     }
 
@@ -224,7 +229,7 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
         } else {
 
             //Add new digit
-            mPinTyped.add(mBoxKeypad.getKeyNameBuilder().getValueOfKey(newDigit));
+            mPinTyped.add(mKeyNamesBuilder.getValueOfKey(newDigit));
         }
 
         invalidate();
@@ -281,7 +286,7 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
      *
      * @param isEnable true to enable one hand mode.
      */
-    public void enableOneHandOperation(boolean isEnable) {
+    public void enableOneHandOperation(final boolean isEnable) {
         mBoxKeypad.setOneHandOperation(isEnable);
         requestLayout();
         invalidate();
@@ -295,7 +300,7 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
      * @param correctPin Array if single digits of the PIN. The single digit should not be less than 0 or grater
      *                   than 9.
      */
-    public void setCorrectPin(@NonNull int[] correctPin) {
+    public void setCorrectPin(@NonNull final int[] correctPin) {
         //Validate the pin
         if (!Utils.isValidPin(correctPin)) throw new IllegalArgumentException("Invalid PIN.");
 
@@ -319,7 +324,7 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
      *
      * @param titleColor Color of the title.
      */
-    public void setTitleColor(@ColorInt int titleColor) {
+    public void setTitleColor(@ColorInt final int titleColor) {
         mBoxIndicator.setTitleColor(titleColor);
         invalidate();
     }
@@ -329,7 +334,7 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
      *
      * @param titleColor Color of the title.
      */
-    public void setTitleColorResource(@ColorRes int titleColor) {
+    public void setTitleColorResource(@ColorRes final int titleColor) {
         mBoxIndicator.setTitleColor(mContext.getResources().getColor(titleColor));
         invalidate();
     }
@@ -346,7 +351,7 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
      *
      * @param title title string
      */
-    public void setTitle(@NonNull String title) {
+    public void setTitle(@NonNull final String title) {
         mBoxIndicator.setTitle(title);
         invalidate();
     }
@@ -365,7 +370,7 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
      *
      * @param indicatorBuilder {@link com.kevalpatel.passcodeview.indicators.Indicator.Builder}
      */
-    public void setIndicator(@NonNull Indicator.Builder indicatorBuilder) {
+    public void setIndicator(@NonNull final Indicator.Builder indicatorBuilder) {
         mBoxIndicator.setIndicatorBuilder(indicatorBuilder);
         requestLayout();
         invalidate();
@@ -385,7 +390,7 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
      *
      * @param keyBuilder {@link com.kevalpatel.passcodeview.keys.Key.Builder}
      */
-    public void setKey(@NonNull Key.Builder keyBuilder) {
+    public void setKey(@NonNull final Key.Builder keyBuilder) {
         mBoxKeypad.setKeyBuilder(keyBuilder);
         requestLayout();
         invalidate();
@@ -395,10 +400,11 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
      * Set the name of the keys. So that you can support different locale.
      * https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names
      *
-     * @param keyNames {@link KeyNamesBuilder}
+     * @param keyNamesBuilder {@link KeyNamesBuilder}
      */
-    public void setKeyNames(@NonNull KeyNamesBuilder keyNames) {
-        BoxKeypad.setKeyNames(keyNames);
+    public void setKeyNames(@NonNull final KeyNamesBuilder keyNamesBuilder) {
+        mKeyNamesBuilder = keyNamesBuilder;
+        mBoxKeypad.setKeyNames(keyNamesBuilder);
 
         mPinTyped.clear(); //Need to clear the typed pin, so that change in localization don't affect the pin matching process.
 
@@ -422,7 +428,7 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
      *
      * @param currentTypedPin Array of PIN digits.
      */
-    public void setCurrentTypedPin(int[] currentTypedPin) {
+    public void setCurrentTypedPin(final int[] currentTypedPin) {
         if (mCorrectPin.length == 0) {
             throw new IllegalStateException("You must call setCorrectPattern() before calling this method.");
         } else if (currentTypedPin.length > mCorrectPin.length) {

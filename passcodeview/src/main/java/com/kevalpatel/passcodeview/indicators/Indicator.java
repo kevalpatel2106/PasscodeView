@@ -22,7 +22,7 @@ import android.graphics.Rect;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 
-import com.kevalpatel.passcodeview.PinView;
+import com.kevalpatel.passcodeview.BasePasscodeView;
 
 /**
  * Created by Keval Patel on 07/04/17.
@@ -30,68 +30,61 @@ import com.kevalpatel.passcodeview.PinView;
  * @author 'https://github.com/kevalpatel2106'
  */
 public abstract class Indicator {
+    @NonNull
+    private final Rect mBound;
 
-    private PinView mPinView;
-    private Rect mBound;
+    @NonNull
+    private final Indicator.Builder mBuilder;
 
-    private Indicator() {
-    }
-
-    Indicator(@NonNull PinView pinView,
-              @NonNull Rect bound,
-              @NonNull Indicator.Builder builder) {
-        this.mPinView = pinView;
+    Indicator(@NonNull final Indicator.Builder builder,
+              @NonNull final Rect bound) {
         mBound = bound;
+        mBuilder = builder;
     }
-
-    protected final PinView getRootView() {
-        return mPinView;
-    }
-
-    protected final Context getContext() {
-        return mPinView.getContext();
-    }
-
-    public abstract void draw(@NonNull Canvas canvas, boolean isFilled);
-
-    public abstract void onAuthFailed();
-
-    public abstract void onAuthSuccess();
 
     @NonNull
     public Rect getBound() {
         return mBound;
     }
 
+    @NonNull
+    protected final BasePasscodeView getRootView() {
+        return mBuilder.getRootView();
+    }
+
+    @NonNull
+    protected final Context getContext() {
+        return mBuilder.getContext();
+    }
+
+    public abstract void draw(@NonNull final Canvas canvas, final boolean isFilled);
+
+    public abstract void onAuthFailed();
+
+    public abstract void onAuthSuccess();
+
     public static abstract class Builder {
 
-        private PinView mPinView;
+        @NonNull
+        private final BasePasscodeView mPasscodeView;
 
-        private Builder() {
-        }
-
-        public Builder(@NonNull PinView pinView) {
-            mPinView = pinView;
-            setDefaults(pinView.getContext());
+        public Builder(@NonNull final BasePasscodeView passcodeView) {
+            mPasscodeView = passcodeView;
         }
 
         @NonNull
-        protected final PinView getRootView() {
-            return mPinView;
-        }
-
-        @NonNull
-        protected final Context getContext() {
-            return mPinView.getContext();
+        protected final BasePasscodeView getRootView() {
+            return mPasscodeView;
         }
 
         @Dimension
         public abstract float getIndicatorWidth();
 
-        public abstract Indicator.Builder build();
+        @NonNull
+        protected final Context getContext() {
+            return mPasscodeView.getContext();
+        }
 
-        protected abstract void setDefaults(@NonNull Context context);
-
-        public abstract Indicator getIndicator(@NonNull Rect bound);
+        public abstract Indicator buildInternal(@NonNull final Rect bound);
     }
 }

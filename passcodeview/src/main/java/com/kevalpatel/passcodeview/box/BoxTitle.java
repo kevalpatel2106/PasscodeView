@@ -32,24 +32,42 @@ import com.kevalpatel.passcodeview.Utils;
 public final class BoxTitle extends Box {
     private static final String DEF_TITLE_TEXT = "Enter pattern";
 
+    /**
+     * Color of the indicator title.
+     */
     @ColorInt
-    private int mTitleColor;                        //Title text color
-    private String mTitle;                          //Title color
+    private int mTitleColor;
 
-    private Paint mTitlePaint;                      //Solid indicator color
+    /**
+     * Title text of the indicator.
+     */
+    @NonNull
+    private String mTitle = DEF_TITLE_TEXT;
 
+    /**
+     * {@link android.text.TextPaint} of the title with the {@link #mTitleColor} as the text color.
+     */
+    private Paint mTitlePaint;
+
+    /**
+     * {@link Rect} containing the bound of this box.
+     */
     private Rect mBounds;
 
-    public BoxTitle(@NonNull BasePasscodeView view) {
+    /**
+     * Public constructor.
+     *
+     * @param view {@link BasePasscodeView}.
+     */
+    public BoxTitle(@NonNull final BasePasscodeView view) {
         super(view);
     }
 
     @Override
     public void init() {
-        //NO OP
+        //Do nothing
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void setDefaults() {
         mTitle = DEF_TITLE_TEXT;
@@ -72,9 +90,7 @@ public final class BoxTitle extends Box {
     }
 
     @Override
-    public void drawView(@NonNull Canvas canvas) {
-        if (mTitle == null) return;
-
+    public void drawView(@NonNull final Canvas canvas) {
         //Write title text
         canvas.drawText(mTitle,
                 mBounds.exactCenterX(),
@@ -101,7 +117,7 @@ public final class BoxTitle extends Box {
      * @param rootViewBounds {@link Rect} bounds of the main view.
      */
     @Override
-    public void measureView(@NonNull Rect rootViewBounds) {
+    public void measureView(@NonNull final Rect rootViewBounds) {
         //Title box bounds
         mBounds = new Rect();
         mBounds.left = rootViewBounds.left;
@@ -122,11 +138,12 @@ public final class BoxTitle extends Box {
     }
 
     @Override
-    public void parseTypeArr(@NonNull AttributeSet typedArray) {
+    public void parseTypeArr(@NonNull final AttributeSet typedArray) {
         TypedArray a = getContext().getTheme().obtainStyledAttributes(typedArray,
                 R.styleable.PatternView, 0, 0);
 
         try { //Parse title params
+            //noinspection ConstantConditions
             mTitle = a.hasValue(R.styleable.PatternView_titleText) ?
                     a.getString(R.styleable.PatternView_titleText) : DEF_TITLE_TEXT;
             mTitleColor = a.getColor(R.styleable.PatternView_titleTextColor,
@@ -136,11 +153,12 @@ public final class BoxTitle extends Box {
         }
     }
 
+    @NonNull
     public String getTitle() {
         return mTitle;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@NonNull final String title) {
         this.mTitle = title;
     }
 
@@ -149,7 +167,7 @@ public final class BoxTitle extends Box {
         return mTitleColor;
     }
 
-    public void setTitleColor(@ColorInt int titleColor) {
+    public void setTitleColor(@ColorInt final int titleColor) {
         this.mTitleColor = titleColor;
         preparePaint();
     }

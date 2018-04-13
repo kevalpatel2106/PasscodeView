@@ -36,7 +36,9 @@ import com.kevalpatel.passcodeview.Utils;
 
 /**
  * Created by Keval on 07-Apr-17.
- * This class create box for the finger print authentication. This is the internal class.
+ * This class create box for the finger print authentication. This box contains the finger print scanning
+ * icon and the {@link android.widget.TextView} to display the status messages for the fingerprint
+ * scanning.
  * <p>
  * ...............................................
  * .................             .................
@@ -50,6 +52,7 @@ import com.kevalpatel.passcodeview.Utils;
  */
 
 public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAuthCallback {
+    private static final long ANIMATION_DURATION = 1000;    //1 second
 
     /**
      * Default message for the finger print box.
@@ -65,11 +68,12 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
 
     /**
      * {@link Rect} bound for the {@link BoxFingerprint}. The box will be drawn between these bounds.
+     * Generally the box gets displayed at the bottom of the view.
      */
     private Rect mBounds = new Rect();
 
     /**
-     * Color of the finger print status.
+     * Color of the finger print status messages.
      */
     @ColorInt
     private int mStatusTextColor;
@@ -79,17 +83,31 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
      */
     @Dimension
     private float mStatusTextSize;
+
+    /**
+     * The text to display when fingerprint scanner is not scanning the fingerprint. When any warning
+     * or error occurs, the error/warning message will replace this in the status text.
+     */
     private String mNormalStatusText;
 
+    /**
+     * The currently displaying status message in the box.
+     */
     private String mCurrentStatusText;
 
     /**
-     * Paint for the status text.
+     * Paint for the status text. This paint will draw the text with {@link #mStatusTextSize} size
+     * and {@link #mStatusTextColor} color.
      *
      * @see Paint
      */
     private TextPaint mStatusTextPaint;
 
+    /**
+     * Helper class that handles the authentication using the fingerprint.
+     *
+     * @see FingerPrintAuthHelper
+     */
     @Nullable
     private FingerPrintAuthHelper mFingerPrintAuthHelper;
 
@@ -98,6 +116,11 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
     //                  CONSTRUCTORS
     ///////////////////////////////////////////////////////////////
 
+    /**
+     * Public constructor.
+     *
+     * @param basePasscodeView {@link BasePasscodeView} that contains this box.
+     */
     public BoxFingerprint(@NonNull BasePasscodeView basePasscodeView) {
         super(basePasscodeView);
     }
@@ -109,6 +132,7 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
     /**
      * Initialize the box.
      */
+    @Override
     public void init() {
 
         //Check if the finger print authentication is enabled?
@@ -139,11 +163,10 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
     }
 
     /**
-     * Prepare all the pains.
+     * Prepare all the paints.
      */
     @Override
     public void preparePaint() {
-
         //Status text paint.
         mStatusTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         mStatusTextPaint.setTextAlign(Paint.Align.CENTER);
@@ -151,6 +174,10 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
         mStatusTextPaint.setColor(mStatusTextColor);
     }
 
+    /**
+     * Set the default values for {@link #mStatusTextColor}, {@link #mNormalStatusText} and
+     * {@link #mStatusTextSize}.
+     */
     @Override
     public void setDefaults() {
         mStatusTextSize = getContext().getResources().getDimension(R.dimen.lib_fingerprint_status_text_size);
@@ -161,7 +188,11 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
         mStatusTextColor = Utils.getColorCompat(getContext(), R.color.lib_key_default_color);
     }
 
-
+    /**
+     * Draw the box on the canvas.
+     *
+     * @param canvas {@link Canvas} on which the view will be drawn.
+     */
     @Override
     public void drawView(@NonNull Canvas canvas) {
         if (isFingerPrintBoxVisible) {
@@ -177,7 +208,7 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
     /**
      * Draw the status text.
      *
-     * @param canvas
+     * @param canvas {@link Canvas} on which the text will be drawn.
      */
     private void drawStatusText(@NonNull Canvas canvas) {
         canvas.drawText(mCurrentStatusText,
@@ -186,6 +217,11 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
                 mStatusTextPaint);
     }
 
+    /**
+     * Draw the status text.
+     *
+     * @param canvas {@link Canvas} on which the fingerprint will be drawn.
+     */
     private void drawFingerPrintIcon(@NonNull Canvas canvas) {
         Drawable d = getContext().getResources().getDrawable(R.drawable.ic_fingerprint);
         d.setBounds((int) (mBounds.exactCenterX() - mBounds.height() / 4),
@@ -196,6 +232,11 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
         d.draw(canvas);
     }
 
+    /**
+     * Measure the box bounds.
+     *
+     * @param rootViewBounds {@link Rect} with the bounds of the root view.
+     */
     @Override
     public void measureView(@NonNull Rect rootViewBounds) {
         if (isFingerPrintBoxVisible) {
@@ -210,6 +251,12 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
         }
     }
 
+    /**
+     * Handle the fingerprint authentication failure. When fingerprint authentication fails, the
+     * status text color becomes {@link Color#RED} and shakes the view for 1 seconds.
+     *
+     * @see #playErrorAnimation()
+     */
     @Override
     public void onAuthenticationFail() {
         //Change the color to red.
@@ -220,6 +267,7 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
         animator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
+                //Do nothing
             }
 
             @Override
@@ -233,22 +281,39 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
                         if (mStatusTextPaint != null) mStatusTextPaint.setColor(mStatusTextColor);
                         getRootView().invalidate();
                     }
-                }, 1000 /* After 1 second */);
+                }, ANIMATION_DURATION /* After 1 second */);
 
                 getRootView().onAuthenticationFail();
             }
 
             @Override
             public void onAnimationCancel(Animator animation) {
-
+                //Do nothing
             }
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-
+                //Do nothing
             }
         });
         animator.start();
+    }
+
+    /**
+     * Apply the error animations which will move key left to right and after right to left for two times.
+     */
+    private ValueAnimator playErrorAnimation() {
+        ValueAnimator goLeftAnimator = ValueAnimator.ofInt(0, 10);
+        goLeftAnimator.setInterpolator(new CycleInterpolator(2));
+        goLeftAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mBounds.left += (int) animation.getAnimatedValue();
+                mBounds.right += (int) animation.getAnimatedValue();
+                getRootView().invalidate();
+            }
+        });
+        return goLeftAnimator;
     }
 
     @Override
@@ -264,7 +329,7 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
                 getRootView().onAuthenticationSuccess();
                 getRootView().invalidate();
             }
-        }, 1000);
+        }, ANIMATION_DURATION);
     }
 
     @Override
@@ -272,6 +337,8 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
         if (mFingerPrintAuthHelper != null && mFingerPrintAuthHelper.isScanning())
             mFingerPrintAuthHelper.stopAuth();
     }
+
+    ///////////////// FINGERPRINT AUTHENTICATION CALLBACKS. //////////////
 
     @Override
     public void onFingerprintAuthSuccess(FingerprintManager.CryptoObject cryptoObject) {
@@ -290,23 +357,6 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
                 onAuthenticationFail();
                 break;
         }
-    }
-
-    /**
-     * Apply the error animations which will move key left to right and after right to left for two times.
-     */
-    private ValueAnimator playErrorAnimation() {
-        ValueAnimator goLeftAnimator = ValueAnimator.ofInt(0, 10);
-        goLeftAnimator.setInterpolator(new CycleInterpolator(2));
-        goLeftAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                mBounds.left += (int) animation.getAnimatedValue();
-                mBounds.right += (int) animation.getAnimatedValue();
-                getRootView().invalidate();
-            }
-        });
-        return goLeftAnimator;
     }
 
     ///////////////// SETTERS/GETTERS //////////////

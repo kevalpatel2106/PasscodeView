@@ -9,8 +9,6 @@
 package com.kevalpatel.passcodeview.box;
 
 import android.graphics.Canvas;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -33,37 +31,51 @@ import java.util.ArrayList;
  */
 
 public final class BoxKeypad extends Box {
+
+    @NonNull
+    private final Drawable mBackSpaceIcon;
+    /**
+     * Names of all the keys to display in the key board.
+     */
     @Size(Constants.NO_OF_KEY_BOARD_ROWS * Constants.NO_OF_KEY_BOARD_COLUMNS)
-    private static String[][] sKeyNames;
-
-    private static KeyNamesBuilder sKeyNamesBuilder;
-
+    private String[][] sKeyNames;
+    /**
+     * Boolean to indicate if the keyboard in the one hand operation? If this is true, the keys will be
+     * shrieked horizontally to accommodate in small areas.
+     */
     private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
+    /**
+     * List of all the {@link Key}.
+     *
+     * @see Key
+     */
+    @NonNull
     private ArrayList<Key> mKeys;
-
+    /**
+     * {@link Rect} coordinates of the keyboard box.
+     */
+    @NonNull
     private Rect mKeyBoxBound = new Rect();
+    /**
+     * {@link Key.Builder} with the parameters of the key.
+     */
     private Key.Builder mKeyBuilder;
 
     /**
-     * Public constructor
+     * Public constructor.
      *
      * @param basePasscodeView {@link PinView} in which box will be displayed.
      */
-    public BoxKeypad(@NonNull BasePasscodeView basePasscodeView) {
+    public BoxKeypad(@NonNull final BasePasscodeView basePasscodeView) {
         super(basePasscodeView);
-        sKeyNamesBuilder = new KeyNamesBuilder();
-        sKeyNames = sKeyNamesBuilder.build();
+        //Initialize the keys list
+        mKeys = new ArrayList<>();
+        mBackSpaceIcon = getContext().getResources().getDrawable(R.drawable.ic_back_space);
     }
 
-    /**
-     * Set the name of the different keys based on the locale.
-     * This method and {@link #sKeyNames} are static to avoid duplicate object creation.
-     *
-     * @param keyNames String with the names of the key.
-     */
-    public static void setKeyNames(@NonNull KeyNamesBuilder keyNames) {
-        sKeyNamesBuilder = keyNames;
-        sKeyNames = keyNames.build();
+    @Override
+    public void init() {
+        //Do nothing
     }
 
     /**
@@ -81,13 +93,27 @@ public final class BoxKeypad extends Box {
     }
 
     @Override
-    public void parseTypeArr(@NonNull AttributeSet typedArray) {
+    public void parseTypeArr(@NonNull final AttributeSet typedArray) {
         //Do nothing
     }
 
+    /**
+     * Draw keyboard on the canvas. This will drawText all the {@link #sKeyNames} on the canvas.
+     *
+     * @param canvas canvas on which the keyboard will be drawn.
+     */
     @Override
-    public void init() {
-        mKeys = new ArrayList<>();
+    public void drawView(@NonNull final Canvas canvas) {
+        for (Key key : mKeys) {
+            if (key.getDigit().isEmpty()) continue; //Don't drawText the empty button
+
+            key.drawShape(canvas);
+            if (key.getDigit().equals(KeyNamesBuilder.BACKSPACE_TITLE)) {
+                key.drawBackSpace(canvas, mBackSpaceIcon);
+            } else {
+                key.drawText(canvas);
+            }
+        }
     }
 
     /**
@@ -118,16 +144,18 @@ public final class BoxKeypad extends Box {
      * @param rootViewBound bound of the main view.
      */
     @Override
-    public void measureView(@NonNull Rect rootViewBound) {
+    public void measureView(@NonNull final Rect rootViewBound) {
         if (mKeyBuilder == null)
             throw new NullPointerException("Set key using KeyBuilder first.");
 
+        //Prepare the bound of the key board box
         mKeyBoxBound.left = mIsOneHandOperation ? (int) (rootViewBound.width() * 0.3) : 0;
         mKeyBoxBound.right = rootViewBound.width();
         mKeyBoxBound.top = (int) (rootViewBound.top + (rootViewBound.height() * Constants.KEY_BOARD_TOP_WEIGHT));
         mKeyBoxBound.bottom = (int) (rootViewBound.bottom -
                 rootViewBound.height() * (getRootView().isFingerPrintEnable() ? Constants.KEY_BOARD_BOTTOM_WEIGHT : 0));
 
+        //Prepare the keys.
         float singleKeyHeight = mKeyBoxBound.height() / Constants.NO_OF_KEY_BOARD_ROWS;
         float singleKeyWidth = mKeyBoxBound.width() / Constants.NO_OF_KEY_BOARD_COLUMNS;
 
@@ -144,7 +172,7 @@ public final class BoxKeypad extends Box {
                 keyBound.right = (int) (keyBound.left + singleKeyWidth);
                 keyBound.top = (int) ((rowNo * singleKeyHeight) + mKeyBoxBound.top);
                 keyBound.bottom = (int) (keyBound.top + singleKeyHeight);
-                mKeys.add(mKeyBuilder.getKey(sKeyNames[colNo][rowNo], keyBound));
+                mKeys.add(mKeyBuilder.buildInternal(sKeyNames[colNo][rowNo], keyBound));
             }
         }
     }
@@ -171,29 +199,14 @@ public final class BoxKeypad extends Box {
     ///////////////// SETTERS/GETTERS //////////////
 
     /**
-     * Draw keyboard on the canvas. This will drawText all the {@link #sKeyNames} on the canvas.
+     * Set the name of the different keys based on the locale.
+     * This method and {@link #sKeyNames} are static to avoid duplicate object creation.
      *
-     * @param canvas canvas on which the keyboard will be drawn.
+     * @param keyNames String with the names of the key.
+     * @see KeyNamesBuilder
      */
-    @Override
-    public void drawView(@NonNull Canvas canvas) {
-        Drawable d = getContext().getResources().getDrawable(R.drawable.ic_back_space);
-        d.setColorFilter(new PorterDuffColorFilter(mKeyBuilder.getKeyTextPaint().getColor(), PorterDuff.Mode.SRC_ATOP));
-
-        for (Key key : mKeys) {
-            if (key.getDigit().isEmpty()) continue; //Don't drawText the empty button
-
-            key.drawShape(canvas);
-            if (key.getDigit().equals(KeyNamesBuilder.BACKSPACE_TITLE)) {
-                key.drawBackSpace(canvas, d);
-            } else {
-                key.drawText(canvas);
-            }
-        }
-    }
-
-    public KeyNamesBuilder getKeyNameBuilder() {
-        return sKeyNamesBuilder;
+    public void setKeyNames(@NonNull final KeyNamesBuilder keyNames) {
+        sKeyNames = keyNames.build();
     }
 
     /**
@@ -205,7 +218,10 @@ public final class BoxKeypad extends Box {
      * @param upEventY   ACTION_UP event Y coordinate
      */
     @Nullable
-    public String findKeyPressed(float downEventX, float downEventY, float upEventX, float upEventY) {
+    public String findKeyPressed(final float downEventX,
+                                 final float downEventY,
+                                 final float upEventX,
+                                 final float upEventY) {
         //figure out down key.
         for (Key key : mKeys) {
             if (key.getDigit().isEmpty()) continue;  //Empty key
@@ -220,10 +236,12 @@ public final class BoxKeypad extends Box {
         return null;
     }
 
+    @NonNull
     public ArrayList<Key> getKeys() {
         return mKeys;
     }
 
+    @NonNull
     public Rect getBounds() {
         return mKeyBoxBound;
     }
@@ -232,7 +250,7 @@ public final class BoxKeypad extends Box {
         return mIsOneHandOperation;
     }
 
-    public void setOneHandOperation(boolean oneHandOperation) {
+    public void setOneHandOperation(final boolean oneHandOperation) {
         mIsOneHandOperation = oneHandOperation;
     }
 
@@ -240,7 +258,7 @@ public final class BoxKeypad extends Box {
         return mKeyBuilder;
     }
 
-    public void setKeyBuilder(Key.Builder keyBuilder) {
+    public void setKeyBuilder(final Key.Builder keyBuilder) {
         mKeyBuilder = keyBuilder;
     }
 }

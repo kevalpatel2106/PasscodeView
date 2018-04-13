@@ -16,7 +16,6 @@
 
 package com.kevalpatel.passcodeview.indicators;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -37,6 +36,7 @@ import com.kevalpatel.passcodeview.R;
  */
 
 public final class CircleIndicator extends Indicator {
+    private static final long ERROR_ANIMATION_DURATION = 400;
 
     @NonNull
     private final Rect mBounds;
@@ -44,13 +44,33 @@ public final class CircleIndicator extends Indicator {
     private final Builder mBuilder;
     private boolean isDisplayError;
 
-    private CircleIndicator(@NonNull PinView pinView,
-                            @NonNull Rect bound,
-                            @NonNull CircleIndicator.Builder builder) {
-        super(pinView, bound, builder);
+    @NonNull
+    private final Paint mEmptyIndicatorPaint;
+    @NonNull
+    private final Paint mSolidIndicatorPaint;
+    @NonNull
+    private final Paint mErrorIndicatorPaint;
+
+    private CircleIndicator(@NonNull final CircleIndicator.Builder builder,
+                            @NonNull final Rect bound) {
+        super(builder, bound);
 
         mBounds = bound;
         mBuilder = builder;
+
+        //Set empty dot paint
+        mEmptyIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mEmptyIndicatorPaint.setStyle(Paint.Style.STROKE);
+        mEmptyIndicatorPaint.setColor(mBuilder.mIndicatorStrokeColor);
+        mEmptyIndicatorPaint.setStrokeWidth(mBuilder.mIndicatorStrokeWidth);
+
+        //Set filled dot paint
+        mSolidIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mSolidIndicatorPaint.setColor(mBuilder.mIndicatorFilledColor);
+
+        //Set filled dot paint
+        mErrorIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mErrorIndicatorPaint.setColor(Color.RED);
     }
 
     /**
@@ -60,12 +80,11 @@ public final class CircleIndicator extends Indicator {
      * @param isFilled True if to display filled indicator.
      */
     @Override
-    public void draw(@NonNull Canvas canvas, boolean isFilled) {
+    public void draw(@NonNull final Canvas canvas, final boolean isFilled) {
         canvas.drawCircle(mBounds.exactCenterX(),
                 mBounds.exactCenterY(),
-                mBuilder.getIndicatorRadius(),
-                isDisplayError ? mBuilder.getErrorIndicatorPaint() :
-                        isFilled ? mBuilder.getSolidIndicatorPaint() : mBuilder.getEmptyIndicatorPaint());
+                mBuilder.mIndicatorRadius,
+                isDisplayError ? mErrorIndicatorPaint : isFilled ? mSolidIndicatorPaint : mEmptyIndicatorPaint);
     }
 
     @Override
@@ -76,7 +95,7 @@ public final class CircleIndicator extends Indicator {
                 isDisplayError = false;
                 getRootView().invalidate();
             }
-        }, 400);
+        }, ERROR_ANIMATION_DURATION);
         isDisplayError = true;
     }
 
@@ -95,134 +114,75 @@ public final class CircleIndicator extends Indicator {
         @Dimension
         private float mIndicatorStrokeWidth;
 
-        private Paint mEmptyIndicatorPaint;             //Empty indicator color
-        private Paint mSolidIndicatorPaint;             //Solid indicator color
-        private Paint mErrorIndicatorPaint;             //Error indicator color
-
 
         public Builder(@NonNull PinView pinView) {
             super(pinView);
-        }
 
-        @Dimension
-        @Override
-        public float getIndicatorWidth() {
-            return mIndicatorRadius * 2;
-        }
-
-        @Override
-        public CircleIndicator.Builder build() {
-
-            //Set empty dot paint
-            mEmptyIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mEmptyIndicatorPaint.setStyle(Paint.Style.STROKE);
-            mEmptyIndicatorPaint.setColor(mIndicatorStrokeColor);
-            mEmptyIndicatorPaint.setStrokeWidth(mIndicatorStrokeWidth);
-
-            //Set filled dot paint
-            mSolidIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mSolidIndicatorPaint.setColor(mIndicatorFilledColor);
-
-            //Set filled dot paint
-            mErrorIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mErrorIndicatorPaint.setColor(Color.RED);
-            return this;
-        }
-
-        @Override
-        protected void setDefaults(@NonNull Context context) {
+            //Set defaults
             mIndicatorRadius = getContext().getResources().getDimension(R.dimen.lib_indicator_radius);
             mIndicatorStrokeWidth = getContext().getResources().getDimension(R.dimen.lib_indicator_stroke_width);
             mIndicatorFilledColor = getContext().getResources().getColor(R.color.lib_indicator_filled_color);
             mIndicatorStrokeColor = getContext().getResources().getColor(R.color.lib_indicator_stroke_color);
         }
 
-        @Override
-        public Indicator getIndicator(@NonNull Rect bound) {
-            return new CircleIndicator(getRootView(), bound, this);
-        }
-
-        @ColorInt
-        public int getIndicatorStrokeColor() {
-            return mIndicatorStrokeColor;
-        }
-
         @NonNull
-        public CircleIndicator.Builder setIndicatorStrokeColor(@ColorInt int indicatorStrokeColor) {
+        public CircleIndicator.Builder setIndicatorStrokeColor(@ColorInt final int indicatorStrokeColor) {
             mIndicatorStrokeColor = indicatorStrokeColor;
             return this;
         }
 
         @NonNull
-        public CircleIndicator.Builder setIndicatorStrokeColorResource(@ColorRes int indicatorStrokeColor) {
+        public CircleIndicator.Builder setIndicatorStrokeColorResource(@ColorRes final int indicatorStrokeColor) {
             mIndicatorStrokeColor = getContext().getResources().getColor(indicatorStrokeColor);
             return this;
         }
 
-        @ColorInt
-        public int getIndicatorFilledColor() {
-            return mIndicatorFilledColor;
-        }
-
         @NonNull
-        public CircleIndicator.Builder setIndicatorFilledColor(@ColorInt int indicatorFilledColor) {
+        public CircleIndicator.Builder setIndicatorFilledColor(@ColorInt final int indicatorFilledColor) {
             mIndicatorFilledColor = indicatorFilledColor;
             return this;
         }
 
         @NonNull
-        public CircleIndicator.Builder setIndicatorFilledColorResource(@ColorRes int indicatorFilledColor) {
+        public CircleIndicator.Builder setIndicatorFilledColorResource(@ColorRes final int indicatorFilledColor) {
             mIndicatorFilledColor = getContext().getResources().getColor(indicatorFilledColor);
             return this;
         }
 
-        @Dimension
-        public float getIndicatorRadius() {
-            return mIndicatorRadius;
-        }
-
         @NonNull
-        public CircleIndicator.Builder setIndicatorRadius(@DimenRes int indicatorRadius) {
+        public CircleIndicator.Builder setIndicatorRadius(@DimenRes final int indicatorRadius) {
             mIndicatorRadius = getContext().getResources().getDimension(indicatorRadius);
             return this;
         }
 
         @NonNull
-        public CircleIndicator.Builder setIndicatorRadius(@Dimension float indicatorRadius) {
+        public CircleIndicator.Builder setIndicatorRadius(@Dimension final float indicatorRadius) {
             mIndicatorRadius = indicatorRadius;
             return this;
         }
 
-        @Dimension
-        public float getIndicatorStrokeWidth() {
-            return mIndicatorStrokeWidth;
-        }
-
         @NonNull
-        public CircleIndicator.Builder setIndicatorStrokeWidth(@DimenRes int indicatorStrokeWidth) {
+        public CircleIndicator.Builder setIndicatorStrokeWidth(@DimenRes final int indicatorStrokeWidth) {
             mIndicatorStrokeWidth = getContext().getResources().getDimension(indicatorStrokeWidth);
             return this;
         }
 
         @NonNull
-        public CircleIndicator.Builder setIndicatorStrokeWidth(@Dimension float indicatorStrokeWidth) {
+        public CircleIndicator.Builder setIndicatorStrokeWidth(@Dimension final float indicatorStrokeWidth) {
             mIndicatorStrokeWidth = indicatorStrokeWidth;
             return this;
         }
 
-        @NonNull
-        public Paint getEmptyIndicatorPaint() {
-            return mEmptyIndicatorPaint;
+        @Dimension
+        @Override
+        public float getIndicatorWidth() {
+            return mIndicatorRadius;
         }
 
         @NonNull
-        public Paint getSolidIndicatorPaint() {
-            return mSolidIndicatorPaint;
-        }
-
-        @NonNull
-        public Paint getErrorIndicatorPaint() {
-            return mErrorIndicatorPaint;
+        @Override
+        public Indicator buildInternal(@NonNull final Rect bound) {
+            return new CircleIndicator(this, bound);
         }
     }
 }

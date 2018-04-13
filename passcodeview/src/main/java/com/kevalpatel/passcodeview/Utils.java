@@ -45,9 +45,6 @@ import java.util.ArrayList;
 
 public final class Utils {
 
-    private Utils() {
-    }
-
     /**
      * Open the Security settings screen. This settings screen will allow user to register finger
      * prints.

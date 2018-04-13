@@ -10,7 +10,6 @@ package com.kevalpatel.passcodeview.box;
 
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,6 +19,7 @@ import com.kevalpatel.passcodeview.BasePasscodeView;
 import com.kevalpatel.passcodeview.Constants;
 import com.kevalpatel.passcodeview.R;
 import com.kevalpatel.passcodeview.patternCells.PatternCell;
+import com.kevalpatel.passcodeview.patternCells.PatternPoint;
 
 import java.util.ArrayList;
 
@@ -30,23 +30,47 @@ import java.util.ArrayList;
  */
 
 public final class BoxPattern extends Box {
-    private boolean mIsOneHandOperation = false;    //Bool to set true if you want to display one hand key board.
+    /**
+     * Boolean to indicate if the keyboard in the one hand operation? If this is true, the keys will be
+     * shrieked horizontally to accommodate in small areas.
+     */
+    private boolean mIsOneHandOperation = false;
 
-    private int mNoOfColumn;
-    private int mNoOfRows;
+    /**
+     * Number of the columns in the pattern view.
+     */
+    private int mNoOfColumn = 0;
 
+    /**
+     * Number of the rows in the pattern view.
+     */
+    private int mNoOfRows = 0;
+
+    /**
+     * List of all the {@link PatternCell} in this box. The size of this array will be
+     * {@link #mNoOfColumn} * {@link #mNoOfRows}.
+     */
     private ArrayList<PatternCell> mPatternCells;
+
+    /**
+     * {@link Rect} with the bound of this box.
+     */
     private Rect mPatternBoxBound = new Rect();
 
-    private PatternCell.Builder mCellBuilder;    //Pattern indicator builder
+    /**
+     * builder of the {@link PatternCell}.
+     *
+     * @see PatternCell.Builder
+     */
+    private PatternCell.Builder mCellBuilder;
 
     /**
      * Public constructor
      *
-     * @param basePasscodeView {@link BasePasscodeView} in which box will be displayed.
+     * @param passcodeView {@link BasePasscodeView} in which box will be displayed.
      */
-    public BoxPattern(@NonNull BasePasscodeView basePasscodeView) {
-        super(basePasscodeView);
+    public BoxPattern(@NonNull final BasePasscodeView passcodeView) {
+        super(passcodeView);
     }
 
     @Override
@@ -84,12 +108,14 @@ public final class BoxPattern extends Box {
      */
     @Override
     public void measureView(@NonNull Rect rootViewBound) {
+        //Pattern box bounds.
         mPatternBoxBound.left = mIsOneHandOperation ? (int) (rootViewBound.width() * 0.3) : 0;
         mPatternBoxBound.right = rootViewBound.width();
         mPatternBoxBound.top = (int) (rootViewBound.top + (rootViewBound.height() * Constants.KEY_BOARD_TOP_WEIGHT));
         mPatternBoxBound.bottom = (int) (rootViewBound.bottom -
                 rootViewBound.height() * (getRootView().isFingerPrintEnable() ? Constants.KEY_BOARD_BOTTOM_WEIGHT : 0));
 
+        //Prepare the list of indicators.
         float singleIndicatorHeight = mPatternBoxBound.height() / mNoOfRows;
         float singleIndicatorWidth = mPatternBoxBound.width() / mNoOfColumn;
 
@@ -102,7 +128,7 @@ public final class BoxPattern extends Box {
                 indicatorBound.top = (int) ((rowNo * singleIndicatorHeight) + mPatternBoxBound.top);
                 indicatorBound.bottom = (int) (indicatorBound.top + singleIndicatorHeight);
 
-                mPatternCells.add(mCellBuilder.getCell(indicatorBound, new Point(rowNo, colNo)));
+                mPatternCells.add(mCellBuilder.buildInternal(indicatorBound, new PatternPoint(rowNo, colNo)));
             }
         }
     }
@@ -162,8 +188,6 @@ public final class BoxPattern extends Box {
         for (PatternCell patternCell : mPatternCells) patternCell.draw(canvas);
     }
 
-    ///////////////// SETTERS/GETTERS //////////////
-
     /**
      * Find which key is pressed based on the ACTION_DOWN and ACTION_UP coordinates.
      */
@@ -174,10 +198,14 @@ public final class BoxPattern extends Box {
         return null;
     }
 
+    ///////////////// SETTERS/GETTERS //////////////
+
+    @NonNull
     public ArrayList<PatternCell> getPatternCells() {
         return mPatternCells;
     }
 
+    @NonNull
     public Rect getBounds() {
         return mPatternBoxBound;
     }
@@ -186,15 +214,16 @@ public final class BoxPattern extends Box {
         return mIsOneHandOperation;
     }
 
-    public void setOneHandOperation(boolean oneHandOperation) {
+    public void setOneHandOperation(final boolean oneHandOperation) {
         mIsOneHandOperation = oneHandOperation;
     }
 
+    @NonNull
     public PatternCell.Builder getCellBuilder() {
         return mCellBuilder;
     }
 
-    public void setCellBuilder(@NonNull PatternCell.Builder mIndicatorBuilder) {
+    public void setCellBuilder(@NonNull final PatternCell.Builder mIndicatorBuilder) {
         this.mCellBuilder = mIndicatorBuilder;
     }
 
@@ -202,7 +231,7 @@ public final class BoxPattern extends Box {
         return mNoOfColumn;
     }
 
-    public void setNoOfColumn(int noOfColumn) {
+    public void setNoOfColumn(final int noOfColumn) {
         mNoOfColumn = noOfColumn;
     }
 
@@ -210,7 +239,7 @@ public final class BoxPattern extends Box {
         return mNoOfRows;
     }
 
-    public void setNoOfRows(int noOfRows) {
+    public void setNoOfRows(final int noOfRows) {
         mNoOfRows = noOfRows;
     }
 }

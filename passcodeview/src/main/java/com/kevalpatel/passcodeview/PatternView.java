@@ -49,12 +49,34 @@ public final class PatternView extends BasePasscodeView {
     @ColorInt
     private int mPatternPathColor;
 
+    /**
+     * {@link BoxPattern} to display the {@link PatternPoint}. User can enter the correct pattern
+     * in this box.
+     */
     private BoxPattern mBoxPattern;
+
+    /**
+     * {@link BoxTitle} to display the title message.
+     */
     private BoxTitle mBoxTitle;
 
-    private Paint mNormalPaint;
-    private Paint mErrorPaint;
+    /**
+     * {@link Paint} for the path between two {@link PatternPoint} while user is entering the pattern.
+     *
+     * @see PatternPoint
+     */
+    private Paint mNormalPathPaint;
 
+    /**
+     * {@link Paint} for the path between two {@link PatternPoint} when entered pattern is wrong.
+     *
+     * @see PatternPoint
+     */
+    private Paint mErrorPathPaint;
+
+    /**
+     * Boolean to set <code>true</code> if the error animations are currently being played or <code>false</code>.
+     */
     private boolean isErrorShowing = false;
 
     ///////////////////////////////////////////////////////////////
@@ -94,6 +116,9 @@ public final class PatternView extends BasePasscodeView {
         mBoxTitle.init();
     }
 
+    /**
+     * Set the default values.
+     */
     @Override
     public void setDefaults() {
         mBoxTitle.setDefaults();
@@ -102,15 +127,18 @@ public final class PatternView extends BasePasscodeView {
         mPatternPathColor = mContext.getResources().getColor(android.R.color.holo_green_dark);
     }
 
+    /**
+     * Prepare the {@link #mNormalPathPaint} and {@link #mErrorPathPaint}.
+     */
     @Override
     public void preparePaint() {
-        mNormalPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mNormalPaint.setStrokeWidth(10);
-        mNormalPaint.setColor(mPatternPathColor);
+        mNormalPathPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mNormalPathPaint.setStrokeWidth(10);
+        mNormalPathPaint.setColor(mPatternPathColor);
 
-        mErrorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mErrorPaint.setStrokeWidth(10);
-        mErrorPaint.setColor(Color.RED);
+        mErrorPathPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mErrorPathPaint.setStrokeWidth(10);
+        mErrorPathPaint.setColor(Color.RED);
 
         //Prepare paints.
         mBoxPattern.preparePaint();
@@ -125,7 +153,8 @@ public final class PatternView extends BasePasscodeView {
     @SuppressWarnings("deprecation")
     @Override
     public void parseTypeArr(@NonNull AttributeSet typedArray) {
-        TypedArray a = mContext.getTheme().obtainStyledAttributes(typedArray, R.styleable.PatternView, 0, 0);
+        TypedArray a = mContext.getTheme()
+                .obtainStyledAttributes(typedArray, R.styleable.PatternView, 0, 0);
 
         try { //Parse title params
             mPatternPathColor = a.getColor(R.styleable.PatternView_patternLineColor,
@@ -147,8 +176,6 @@ public final class PatternView extends BasePasscodeView {
         mBoxPattern.onAuthenticationFail();
         mBoxTitle.onAuthenticationFail();
         isErrorShowing = true;
-
-        if (isTactileFeedbackEnable()) Utils.giveTactileFeedbackForAuthFail(mContext);
     }
 
     @Override
@@ -157,8 +184,6 @@ public final class PatternView extends BasePasscodeView {
         mBoxPattern.onAuthenticationSuccess();
         mBoxTitle.onAuthenticationSuccess();
         isErrorShowing = false;
-
-        if (isTactileFeedbackEnable()) Utils.giveTactileFeedbackForAuthSuccess(mContext);
     }
 
     /**
@@ -183,13 +208,13 @@ public final class PatternView extends BasePasscodeView {
             PatternCell endCell = mPatternTyped.get(i + 1);
             canvas.drawLine(startCell.getCenterX(), startCell.getCenterY(),
                     endCell.getCenterX(), endCell.getCenterY(),
-                    isErrorShowing ? mErrorPaint : mNormalPaint);
+                    isErrorShowing ? mErrorPathPaint : mNormalPathPaint);
         }
 
         canvas.drawLine(mPatternTyped.get(lastElementPos).getCenterX(),
                 mPatternTyped.get(lastElementPos).getCenterY(),
                 mPatternPathEndX, mPatternPathEndY,
-                isErrorShowing ? mErrorPaint : mNormalPaint);
+                isErrorShowing ? mErrorPathPaint : mNormalPathPaint);
     }
 
     /**

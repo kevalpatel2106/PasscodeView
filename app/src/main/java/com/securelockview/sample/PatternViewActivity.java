@@ -58,8 +58,7 @@ public class PatternViewActivity extends AppCompatActivity {
         //REQUIRED
         patternView.setPatternCell(new CirclePatternCell.Builder(patternView)
                 .setRadius(R.dimen.pattern_cell_radius)
-                .setCellColorResource(R.color.colorAccent)
-                .build());
+                .setCellColorResource(R.color.colorAccent));
 
         patternView.setAuthenticationListener(new AuthenticationListener() {
             @Override

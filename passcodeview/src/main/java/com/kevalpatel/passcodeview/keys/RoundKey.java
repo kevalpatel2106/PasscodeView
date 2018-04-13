@@ -21,6 +21,8 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
@@ -29,10 +31,9 @@ import android.support.annotation.DimenRes;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
-import android.view.View;
 import android.view.animation.CycleInterpolator;
 
-import com.kevalpatel.passcodeview.PinView;
+import com.kevalpatel.passcodeview.BasePasscodeView;
 import com.kevalpatel.passcodeview.R;
 
 /**
@@ -43,37 +44,89 @@ import com.kevalpatel.passcodeview.R;
  */
 
 public final class RoundKey extends Key {
+    /**
+     * Maximum alpha value in the ripple animation.
+     */
     private static final int MAX_RIPPLE_ALPHA = 100;
+    /**
+     * Ripple animation duration in milli seconds.
+     */
     private static final int RIPPLE_DURATION = 350;
+    /**
+     * {@link Paint} of the key.
+     */
+    @NonNull
+    private final Paint mKeyPaint;
+    /**
+     * {@link TextPaint} of the key title text.
+     */
+    @NonNull
+    private final TextPaint mKeyTextPaint;
+    /**
+     * {@link Paint} of the ripple animations.
+     */
+    @NonNull
+    private final Paint mRipplePaint;
+    /**
+     * Radius of the round key. This radius is decided by the key bound width and key padding.
+     *
+     * @see #calculateKeyRadius(Rect, float)
+     */
+    private final float mKeyRadius;
 
-    private final Rect mBounds;                         //RoundKey bound.
-    private final View mView;                           //Pin view
-    private final float mKeyRadius;                     //Radius of the key background.
-    private Builder mBuilder;
-
-    private ValueAnimator mRippleValueAnimator;         //Ripple animator
+    /**
+     * {@link ValueAnimator} for the key ripple animations.
+     */
+    private ValueAnimator mRippleValueAnimator;
+    /**
+     * {@link ValueAnimator} for the authentication error. This animator will shake the view left-right
+     * for two times.
+     */
     private ValueAnimator mErrorAnimator;               //Left-Right animator
 
-    private boolean isRippleEffectRunning = false;      //Bool to indicate if the ripple effect is currently running?
-    private int mCurrentRippleRadius = 0;               //Current ripple radius
-    private int mCurrentAlpha;                          //Current ripple alpha.
+    /**
+     * Boolean to set <code>true</code> if the ripple animation is running else <code>false</code>.
+     */
+    private boolean isRippleEffectRunning = false;
+
+    /**
+     * Current ripple radius.
+     */
+    private int mCurrentRippleRadius = 0;
+    /**
+     * Value of the alpha in the ripple color.
+     */
+    private int mCurrentAlpha;
 
     /**
      * Public constructor.
      *
-     * @param view   {@link PinView}
-     * @param digit  title of the key. (-1 for the backspace key)
-     * @param bounds {@link Rect} bound.
+     * @param builder {@link Builder}.
      */
-    private RoundKey(@NonNull PinView view,
-                     @NonNull String digit,
-                     @NonNull Rect bounds,
-                     @NonNull RoundKey.Builder builder) {
-        super(view, digit, bounds, builder);
-        mBounds = bounds;
-        mView = view;
-        mBuilder = builder;
-        mKeyRadius = calculateKeyRadius(bounds, mBuilder.getKeyPadding());
+    private RoundKey(@NonNull final RoundKey.Builder builder,
+                     @NonNull final String keyTitle,
+                     @NonNull final Rect bound) {
+        super(builder, keyTitle, bound);
+
+        //Set the keyboard paint
+        mKeyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mKeyPaint.setStyle(Paint.Style.STROKE);
+        mKeyPaint.setColor(builder.mKeyStrokeColor);
+        mKeyPaint.setTextSize(builder.mKeyTextSize);
+        mKeyPaint.setStrokeWidth(builder.mKeyStrokeWidth);
+
+        //Set the keyboard text paint
+        mKeyTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        mKeyTextPaint.setColor(builder.mKeyTextColor);
+        mKeyTextPaint.setTextSize(builder.mKeyTextSize);
+        mKeyTextPaint.setFakeBoldText(true);
+        mKeyTextPaint.setTextAlign(Paint.Align.CENTER);
+
+        //Prepare ripple paint
+        mRipplePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mRipplePaint.setStyle(Paint.Style.FILL);
+
+        mKeyRadius = calculateKeyRadius(getBounds(), builder.mKeyPadding);
 
         setUpAnimator();
     }
@@ -94,7 +147,7 @@ public final class RoundKey extends Key {
                     float animatedValue = (float) animation.getAnimatedValue();
                     mCurrentRippleRadius = (int) animatedValue;
                     mCurrentAlpha = (int) (MAX_RIPPLE_ALPHA - (animatedValue * circleAlphaOffset));
-                    mView.invalidate();
+                    getPasscodeView().invalidate();
                 }
             }
         });
@@ -112,12 +165,12 @@ public final class RoundKey extends Key {
 
             @Override
             public void onAnimationCancel(Animator animation) {
-
+                //Do nothing
             }
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-
+                //Do nothing
             }
         });
 
@@ -127,9 +180,9 @@ public final class RoundKey extends Key {
         mErrorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                mBounds.left += (int) animation.getAnimatedValue();
-                mBounds.right += (int) animation.getAnimatedValue();
-                mView.invalidate();
+                getBounds().left += (int) animation.getAnimatedValue();
+                getBounds().right += (int) animation.getAnimatedValue();
+                getPasscodeView().invalidate();
             }
         });
     }
@@ -179,35 +232,36 @@ public final class RoundKey extends Key {
     public void drawText(@NonNull Canvas canvas) {
         //Draw key text
         canvas.drawText(getDigit() + "",                //Text to display on key
-                mBounds.exactCenterX(),             //Set start point at center width of key
-                mBounds.exactCenterY() - (mBuilder.getKeyTextPaint().descent() + mBuilder.getKeyTextPaint().ascent()) / 2,    //center height of key - text height/2
-                mBuilder.getKeyTextPaint());
+                getBounds().exactCenterX(),             //Set start point at center width of key
+                getBounds().exactCenterY() - (mKeyTextPaint.descent() + mKeyTextPaint.ascent()) / 2,    //center height of key - text height/2
+                mKeyTextPaint);
     }
 
     @Override
     public void drawShape(@NonNull Canvas canvas) {
         //Draw circle background
-        canvas.drawCircle(mBounds.exactCenterX(),   //Set center width of key
-                mBounds.exactCenterY(),             //Set center height of key
+        canvas.drawCircle(getBounds().exactCenterX(),   //Set center width of key
+                getBounds().exactCenterY(),             //Set center height of key
                 mKeyRadius,
-                mBuilder.getKeyPaint());
+                mKeyPaint);
 
         //Play ripple effect if the key has ripple effect enabled.
         if (isRippleEffectRunning) {
-            mBuilder.getRipplePaint().setAlpha(mCurrentAlpha);
-            canvas.drawCircle(mBounds.exactCenterX(),
-                    mBounds.exactCenterY(),
+            mRipplePaint.setAlpha(mCurrentAlpha);
+            canvas.drawCircle(getBounds().exactCenterX(),
+                    getBounds().exactCenterY(),
                     mCurrentRippleRadius,
-                    mBuilder.getRipplePaint());
+                    mRipplePaint);
         }
     }
 
     @Override
     public void drawBackSpace(@NonNull Canvas canvas, @NonNull Drawable backSpaceIcon) {
-        backSpaceIcon.setBounds((int) (mBounds.exactCenterX() - mKeyRadius / 2),
-                (int) (mBounds.exactCenterY() - mKeyRadius / 2),
-                (int) (mBounds.exactCenterX() + mKeyRadius / 2),
-                (int) (mBounds.exactCenterY() + mKeyRadius / 2));
+        backSpaceIcon.setColorFilter(new PorterDuffColorFilter(mKeyTextPaint.getColor(), PorterDuff.Mode.SRC_ATOP));
+        backSpaceIcon.setBounds((int) (getBounds().exactCenterX() - mKeyRadius / 2),
+                (int) (getBounds().exactCenterY() - mKeyRadius / 2),
+                (int) (getBounds().exactCenterX() + mKeyRadius / 2),
+                (int) (getBounds().exactCenterY() + mKeyRadius / 2));
         backSpaceIcon.draw(canvas);
     }
 
@@ -223,171 +277,125 @@ public final class RoundKey extends Key {
         if (getDigit().isEmpty()) return false;  //Empty key
 
         //Check if the click is between the width bounds
-        if (touchX > mBounds.exactCenterX() - mKeyRadius
-                && touchX < mBounds.exactCenterX() + mKeyRadius) {
+        //noinspection SimplifiableIfStatement
+        if (touchX > getBounds().exactCenterX() - mKeyRadius
+                && touchX < getBounds().exactCenterX() + mKeyRadius) {
 
             //Check if the click is between the height bounds
-            if (touchY > mBounds.exactCenterY() - mKeyRadius
-                    && touchY < mBounds.exactCenterY() + mKeyRadius) {
-                return true;
-            }
+            return touchY > getBounds().exactCenterY() - mKeyRadius
+                    && touchY < getBounds().exactCenterY() + mKeyRadius;
         }
         return false;
     }
 
-    @SuppressWarnings("NullableProblems")
     public static class Builder extends Key.Builder {
+        /**
+         * Surround padding to each single key.
+         */
         @Dimension
         private float mKeyPadding;
+
+        /**
+         * Size of the key title text in pixels.
+         */
         @Dimension
-        private float mKeyTextSize;                     //Surround padding to each single key
+        private float mKeyTextSize;
+
+        /**
+         * Size of the width of the key border in pixels.
+         */
         @Dimension
-        private float mKeyStrokeWidth;                   //Surround padding to each single key
+        private float mKeyStrokeWidth;
+
+        /**
+         * Key background stroke color.
+         */
         @ColorInt
-        private int mKeyStrokeColor;                    //RoundKey background stroke color
+        private int mKeyStrokeColor;
+
+        /**
+         * Key title text color.
+         */
         @ColorInt
-        private int mKeyTextColor;                      //RoundKey text color
+        private int mKeyTextColor;
 
-        @NonNull
-        private Paint mKeyPaint;
-        @NonNull
-        private TextPaint mKeyTextPaint;
-        @NonNull
-        private Paint mRipplePaint;
-
-
-        public Builder(@NonNull PinView pinView) {
-            super(pinView);
+        public Builder(@NonNull final BasePasscodeView passcodeView) {
+            super(passcodeView);
+            setDefaults(getContext());
         }
 
-        @Dimension
-        public float getKeyPadding() {
-            return mKeyPadding;
-        }
-
-        public RoundKey.Builder setKeyPadding(@Dimension float keyPadding) {
+        @NonNull
+        public RoundKey.Builder setKeyPadding(@Dimension final float keyPadding) {
             mKeyPadding = keyPadding;
             return this;
         }
 
-        public RoundKey.Builder setKeyPadding(@DimenRes int keyPaddingRes) {
+        @NonNull
+        public RoundKey.Builder setKeyPadding(@DimenRes final int keyPaddingRes) {
             mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
             return this;
         }
 
-        public float getKeyTextSize() {
-            return mKeyTextSize;
-        }
-
-        public RoundKey.Builder setKeyTextSize(float keyTextSize) {
+        @NonNull
+        public RoundKey.Builder setKeyTextSize(final float keyTextSize) {
             mKeyTextSize = keyTextSize;
             return this;
         }
 
-        public RoundKey.Builder setKeyTextSize(@DimenRes int keyTextSize) {
+        @NonNull
+        public RoundKey.Builder setKeyTextSize(@DimenRes final int keyTextSize) {
             mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
             return this;
         }
 
-        public float getKeyStrokeWidth() {
-            return mKeyStrokeWidth;
-        }
-
-        @Dimension
-        public RoundKey.Builder setKeyStrokeWidth(float keyStrokeWidth) {
+        @NonNull
+        public RoundKey.Builder setKeyStrokeWidth(final float keyStrokeWidth) {
             mKeyStrokeWidth = keyStrokeWidth;
             return this;
         }
 
-        @Dimension
-        public RoundKey.Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
+        @NonNull
+        public RoundKey.Builder setKeyStrokeWidth(@DimenRes final int keyStrokeWidth) {
             mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
             return this;
         }
 
-        @ColorInt
-        public int getKeyStrokeColor() {
-            return mKeyStrokeColor;
-        }
-
-        public RoundKey.Builder setKeyStrokeColor(@ColorInt int keyStrokeColor) {
+        @NonNull
+        public RoundKey.Builder setKeyStrokeColor(@ColorInt final int keyStrokeColor) {
             mKeyStrokeColor = keyStrokeColor;
             return this;
         }
 
-        public RoundKey.Builder setKeyStrokeColorResource(@ColorRes int keyStrokeColor) {
+        @NonNull
+        public RoundKey.Builder setKeyStrokeColorResource(@ColorRes final int keyStrokeColor) {
             mKeyStrokeColor = getContext().getResources().getColor(keyStrokeColor);
             return this;
         }
 
-        @ColorInt
-        public int getKeyTextColor() {
-            return mKeyTextColor;
-        }
-
-        public RoundKey.Builder setKeyTextColor(@ColorInt int keyTextColor) {
+        @NonNull
+        public RoundKey.Builder setKeyTextColor(@ColorInt final int keyTextColor) {
             mKeyTextColor = keyTextColor;
             return this;
         }
 
-        public RoundKey.Builder setKeyTextColorResource(@ColorRes int keyTextColor) {
+        @NonNull
+        public RoundKey.Builder setKeyTextColorResource(@ColorRes final int keyTextColor) {
             mKeyTextColor = getContext().getResources().getColor(keyTextColor);
             return this;
         }
 
         @Override
-        public Builder build() {
-            //Set the keyboard paint
-            mKeyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mKeyPaint.setStyle(Paint.Style.STROKE);
-            mKeyPaint.setColor(mKeyStrokeColor);
-            mKeyPaint.setTextSize(mKeyTextSize);
-            mKeyPaint.setStrokeWidth(mKeyStrokeWidth);
-
-            //Set the keyboard text paint
-            mKeyTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-            mKeyTextPaint.setColor(mKeyTextColor);
-            mKeyTextPaint.setTextSize(mKeyTextSize);
-            mKeyTextPaint.setFakeBoldText(true);
-            mKeyTextPaint.setTextAlign(Paint.Align.CENTER);
-
-            return this;
+        public Key buildInternal(@NonNull final String keyTitle,
+                                 @NonNull final Rect bound) {
+            return new RoundKey(this, keyTitle, bound);
         }
 
-        @Override
-        protected void setDefaults(@NonNull Context context) {
+        private void setDefaults(@NonNull Context context) {
             mKeyTextColor = context.getResources().getColor(R.color.lib_key_default_color);
             mKeyStrokeColor = context.getResources().getColor(R.color.lib_key_background_color);
             mKeyTextSize = context.getResources().getDimension(R.dimen.lib_key_text_size);
             mKeyStrokeWidth = context.getResources().getDimension(R.dimen.lib_key_stroke_width);
             mKeyPadding = getContext().getResources().getDimension(R.dimen.lib_key_padding);
-
-            //Prepare ripple paint
-            mRipplePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mRipplePaint.setStyle(Paint.Style.FILL);
-        }
-
-        @NonNull
-        @Override
-        public Paint getKeyPaint() {
-            return mKeyPaint;
-        }
-
-        @NonNull
-        @Override
-        public Paint getKeyTextPaint() {
-            return mKeyTextPaint;
-        }
-
-        @NonNull
-        protected Paint getRipplePaint() {
-            return mRipplePaint;
-        }
-
-        @NonNull
-        @Override
-        public RoundKey getKey(@NonNull String digit, @NonNull Rect bound) {
-            return new RoundKey(super.getPinView(), digit, bound, this);
         }
     }
 }

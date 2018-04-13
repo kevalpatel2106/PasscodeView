@@ -33,23 +33,47 @@ import java.util.ArrayList;
  */
 
 public final class BoxTitleIndicator extends Box {
+    private static final long ERROR_ANIMATION_DURATION = 400;
+    /**
+     * Default title text.
+     */
     private static final String DEF_TITLE_TEXT = "Enter PIN";
 
+    /**
+     * Size of the PIN.
+     */
     private int mPinLength;
+
+    /**
+     * Size of the currently typed PIN.
+     */
     private int mTypedPinLength;
 
+    /**
+     * Color of the title text.
+     */
     @ColorInt
-    private int mTitleColor;                        //Title text color
-    private String mTitle;                          //Title color
+    private int mTitleColor;
+    /**
+     * Text of the title.
+     */
+    private String mTitle;
 
-    private Paint mTitlePaint;                      //Solid indicator color
+    /**
+     * {@link android.text.TextPaint} of the title with {@link #mTitleColor} ast thetext color.
+     */
+    private Paint mTitlePaint;
 
+    /**
+     * List of all the {@link Indicator}. The length of this array will be same as {@link #mPinLength}.
+     */
     private ArrayList<Indicator> mIndicators;
+
 
     private Rect mDotsIndicatorBound;
     private Indicator.Builder mIndicatorBuilder;
 
-    public BoxTitleIndicator(@NonNull BasePasscodeView view) {
+    public BoxTitleIndicator(@NonNull final BasePasscodeView view) {
         super(view);
     }
 
@@ -66,7 +90,7 @@ public final class BoxTitleIndicator extends Box {
     }
 
     @Override
-    public void parseTypeArr(@NonNull AttributeSet typedArray) {
+    public void parseTypeArr(@NonNull final AttributeSet typedArray) {
         TypedArray a = getContext().getTheme().obtainStyledAttributes(typedArray, R.styleable.PinView, 0, 0);
         try {
             //Parse title params
@@ -88,7 +112,7 @@ public final class BoxTitleIndicator extends Box {
                 for (Indicator indicator : mIndicators) indicator.onAuthFailed();
                 getRootView().invalidate();
             }
-        }, 100);
+        }, ERROR_ANIMATION_DURATION);
     }
 
     @Override
@@ -100,7 +124,7 @@ public final class BoxTitleIndicator extends Box {
                 for (Indicator indicator : mIndicators) indicator.onAuthSuccess();
                 getRootView().invalidate();
             }
-        }, 100);
+        }, ERROR_ANIMATION_DURATION);
     }
 
     @Override
@@ -109,7 +133,7 @@ public final class BoxTitleIndicator extends Box {
     }
 
     @Override
-    public void drawView(@NonNull Canvas canvas) {
+    public void drawView(@NonNull final Canvas canvas) {
         if (mIndicatorBuilder == null)
             throw new NullPointerException("Build indicator before using it.");
 
@@ -144,11 +168,11 @@ public final class BoxTitleIndicator extends Box {
      * @param rootViewBounds {@link Rect} bounds of the main view.
      */
     @Override
-    public void measureView(@NonNull Rect rootViewBounds) {
+    public void measureView(@NonNull final Rect rootViewBounds) {
         int indicatorWidth = (int) (mIndicatorBuilder.getIndicatorWidth() + 2 * getContext().getResources().getDimension(R.dimen.lib_indicator_padding));
         int totalSpace = indicatorWidth * mPinLength;
 
-        //Dots indicator
+        //Calculate the bound of this box.
         mDotsIndicatorBound = new Rect();
         mDotsIndicatorBound.left = (rootViewBounds.width() - totalSpace) / 2;
         mDotsIndicatorBound.right = mDotsIndicatorBound.left + totalSpace;
@@ -157,6 +181,7 @@ public final class BoxTitleIndicator extends Box {
                 - 2 * getContext().getResources().getDimension(R.dimen.lib_divider_vertical_margin));
         mDotsIndicatorBound.top = mDotsIndicatorBound.bottom - indicatorWidth;
 
+        //Prepare all the indicators.
         mIndicators = new ArrayList<>();
         for (int i = 0; i < mPinLength; i++) {
             Rect rect = new Rect();
@@ -164,7 +189,7 @@ public final class BoxTitleIndicator extends Box {
             rect.right = rect.left + indicatorWidth;
             rect.top = mDotsIndicatorBound.top;
             rect.bottom = mDotsIndicatorBound.bottom;
-            mIndicators.add(mIndicatorBuilder.getIndicator(rect));
+            mIndicators.add(mIndicatorBuilder.buildInternal(rect));
         }
     }
 
@@ -177,27 +202,29 @@ public final class BoxTitleIndicator extends Box {
         mTitlePaint.setTextSize(getContext().getResources().getDimension(R.dimen.lib_title_text_size));
     }
 
-    public void onPinDigitEntered(int newLength) {
+    public void onPinDigitEntered(final int newLength) {
         mTypedPinLength = newLength;
     }
 
-    public void setPinLength(int pinLength) {
+    public void setPinLength(final int pinLength) {
         mPinLength = pinLength;
     }
 
+    @NonNull
     public String getTitle() {
         return mTitle;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@NonNull final String title) {
         this.mTitle = title;
     }
 
+    @ColorInt
     public int getTitleColor() {
         return mTitleColor;
     }
 
-    public void setTitleColor(@ColorInt int titleColor) {
+    public void setTitleColor(@ColorInt final int titleColor) {
         this.mTitleColor = titleColor;
         preparePaint();
     }
@@ -206,7 +233,7 @@ public final class BoxTitleIndicator extends Box {
         return mIndicatorBuilder;
     }
 
-    public void setIndicatorBuilder(@NonNull Indicator.Builder mIndicatorBuilder) {
+    public void setIndicatorBuilder(@NonNull final Indicator.Builder mIndicatorBuilder) {
         this.mIndicatorBuilder = mIndicatorBuilder;
     }
 }

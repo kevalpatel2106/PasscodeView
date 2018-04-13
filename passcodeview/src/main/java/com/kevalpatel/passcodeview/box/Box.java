@@ -16,13 +16,17 @@ import com.kevalpatel.passcodeview.PasscodeViewLifeCycle;
 
 /**
  * Created by Keval Patel on 09/04/17.
+ * This class defines a box inside the {@link BasePasscodeView}. The {@link BasePasscodeView} is made
+ * up of these small boxes fitted together. Some example of the implementation of this class are
+ * {@link BoxFingerprint} and {@link BoxKeypad}. Box follows the {@link PasscodeViewLifeCycle}.
  *
  * @author 'https://github.com/kevalpatel2106'
+ * @see PasscodeViewLifeCycle
  */
 abstract class Box implements PasscodeViewLifeCycle {
 
     /**
-     * Reference to the root {@link BasePasscodeView}.
+     * Reference to the {@link BasePasscodeView}.
      */
     private final BasePasscodeView mView;
 
@@ -31,7 +35,7 @@ abstract class Box implements PasscodeViewLifeCycle {
      *
      * @param rootView {@link BasePasscodeView} that contains this box.
      */
-    Box(@NonNull BasePasscodeView rootView) {
+    Box(@NonNull final BasePasscodeView rootView) {
         mView = rootView;
     }
 
@@ -39,13 +43,12 @@ abstract class Box implements PasscodeViewLifeCycle {
      * @return The root {@link BasePasscodeView} that contains this box.
      */
     @NonNull
-    public final BasePasscodeView getRootView() {
+    protected final BasePasscodeView getRootView() {
         return mView;
     }
 
     @NonNull
-    public final Context getContext() {
+    protected final Context getContext() {
         return mView.getContext();
     }
-
 }

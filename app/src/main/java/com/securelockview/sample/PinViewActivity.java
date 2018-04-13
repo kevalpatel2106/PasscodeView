@@ -46,8 +46,7 @@ public class PinViewActivity extends AppCompatActivity {
                 .setKeyStrokeColorResource(R.color.colorAccent)
                 .setKeyStrokeWidth(R.dimen.key_stroke_width)
                 .setKeyTextColorResource(R.color.colorAccent)
-                .setKeyTextSize(R.dimen.key_text_size)
-                .build());
+                .setKeyTextSize(R.dimen.key_text_size));
 
         //Build the desired indicator shape and pass the theme attributes.
         //REQUIRED
@@ -55,8 +54,7 @@ public class PinViewActivity extends AppCompatActivity {
                 .setIndicatorRadius(R.dimen.indicator_radius)
                 .setIndicatorFilledColorResource(R.color.colorAccent)
                 .setIndicatorStrokeColorResource(R.color.colorAccent)
-                .setIndicatorStrokeWidth(R.dimen.indicator_stroke_width)
-                .build());
+                .setIndicatorStrokeWidth(R.dimen.indicator_stroke_width));
 
         //Set the name of the keys based on your locale.
         //OPTIONAL. If not passed key names will be displayed based on english locale.

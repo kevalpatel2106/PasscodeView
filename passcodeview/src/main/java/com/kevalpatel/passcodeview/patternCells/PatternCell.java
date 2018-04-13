@@ -10,13 +10,10 @@ package com.kevalpatel.passcodeview.patternCells;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Point;
 import android.graphics.Rect;
-import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 
 import com.kevalpatel.passcodeview.BasePasscodeView;
-import com.kevalpatel.passcodeview.PatternView;
 
 /**
  * Created by Keval Patel on 07/04/17.
@@ -25,43 +22,34 @@ import com.kevalpatel.passcodeview.PatternView;
  */
 public abstract class PatternCell {
 
-    private PatternView mPatternView;
+    @NonNull
+    private final BasePasscodeView mPasscodeView;
 
-    private Rect mBound;
-    private Point mPoint;
+    @NonNull
+    private final Rect mBound;
 
-    private PatternCell() {
-    }
+    @NonNull
+    private final PatternPoint mPoint;
 
-    protected PatternCell(@NonNull PatternView pinView,
-                          @NonNull Rect bound,
-                          @NonNull PatternCell.Builder builder,
-                          Point location) {
-        this.mPatternView = pinView;
+    protected PatternCell(@NonNull final PatternCell.Builder builder,
+                          @NonNull final Rect bound,
+                          @NonNull final PatternPoint location) {
+        mPasscodeView = builder.mBasePasscodeView;
         mBound = bound;
         mPoint = location;
     }
 
     protected final BasePasscodeView getRootView() {
-        return mPatternView;
+        return mPasscodeView;
     }
 
     protected final Context getContext() {
-        return mPatternView.getContext();
+        return mPasscodeView.getContext();
     }
 
-    public abstract void draw(@NonNull Canvas canvas);
-
-    public abstract void onAuthFailed();
-
-    public abstract void onAuthSuccess();
-
-    public float getCenterX() {
-        return getBound().exactCenterX();
-    }
-
-    public float getCenterY() {
-        return getBound().exactCenterY();
+    @NonNull
+    public PatternPoint getPoint() {
+        return mPoint;
     }
 
     @NonNull
@@ -69,41 +57,44 @@ public abstract class PatternCell {
         return mBound;
     }
 
-    public abstract boolean isIndicatorTouched(float touchX, float touchY);
-
-    public Point getPoint() {
-        return mPoint;
+    public float getCenterX() {
+        return mBound.exactCenterX();
     }
+
+    public float getCenterY() {
+        return mBound.exactCenterY();
+    }
+
+    public abstract void draw(@NonNull final Canvas canvas);
+
+    public abstract void onAuthFailed();
+
+    public abstract void onAuthSuccess();
+
+    public abstract boolean isIndicatorTouched(final float touchX, final float touchY);
+
 
     public static abstract class Builder {
 
-        private PatternView mPatternView;
+        @NonNull
+        private final BasePasscodeView mBasePasscodeView;
 
-        private Builder() {
-        }
-
-        public Builder(@NonNull PatternView pinView) {
-            mPatternView = pinView;
-            setDefaults(pinView.getContext());
+        public Builder(@NonNull final BasePasscodeView passcodeView) {
+            mBasePasscodeView = passcodeView;
         }
 
         @NonNull
-        protected final PatternView getRootView() {
-            return mPatternView;
+        protected final BasePasscodeView getRootView() {
+            return mBasePasscodeView;
         }
 
         @NonNull
         protected final Context getContext() {
-            return mPatternView.getContext();
+            return mBasePasscodeView.getContext();
         }
 
-        @Dimension
-        public abstract float getCellRadius();
-
-        public abstract PatternCell.Builder build();
-
-        protected abstract void setDefaults(@NonNull Context context);
-
-        public abstract PatternCell getCell(@NonNull Rect bound, Point point);
+        @NonNull
+        public abstract PatternCell buildInternal(@NonNull final Rect bound,
+                                                  @NonNull final PatternPoint point);
     }
 }

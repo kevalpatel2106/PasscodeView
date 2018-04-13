@@ -41,39 +41,52 @@ import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 public abstract class BasePasscodeView extends View implements PasscodeViewLifeCycle {
 
     /**
-     * Context of the view.
+     * {@link Context} of the view.
      */
+    @NonNull
     protected final Context mContext;
-
+    /**
+     * Finger print box.
+     *
+     * @see BoxFingerprint
+     */
+    @NonNull
+    private final BoxFingerprint mBoxFingerprint;
+    /**
+     * Bounds of the divider between the title and the keypad or the pattern box.
+     */
+    @NonNull
+    private final Rect mDividerBound = new Rect();
     /**
      * Bounds of the whole {@link BasePasscodeView}.
      */
+    @NonNull
     protected Rect mRootViewBound = new Rect();             //Bounds for the root view
-
     /**
-     * A listener to notify the user when the authentication successful or ffailed.
+     * A listener to notify the user when the authentication successful or failed.
      *
      * @see AuthenticationListener
      */
     protected AuthenticationListener mAuthenticationListener;
-
     /**
-     * Finger print box.
+     * Integer color of the divider between title and divider.
      */
-    private BoxFingerprint mBoxFingerprint;               //Fingerprint box
-
-    //Title divider
     @ColorInt
-    private int mDividerColor;                              //Horizontal divider color
-    private Paint mDividerPaint;                            //Horizontal divider paint color
-    private Rect mDividerBound = new Rect();                //Divider bound
-    private boolean mIsTactileFeedbackEnabled = true;       //Bool to indicate weather to enable tactile feedback
+    private int mDividerColor;
+    /**
+     * {@link Paint} of the horizontal divider within the view.
+     */
+    private Paint mDividerPaint;
+    /**
+     * Boolean to set true of the tactile feedback on the key is press is enabled or not?
+     */
+    private boolean mIsTactileFeedbackEnabled = true;
 
     ///////////////////////////////////////////////////////////////
     //                  CONSTRUCTORS
     ///////////////////////////////////////////////////////////////
 
-    public BasePasscodeView(Context context) {
+    public BasePasscodeView(@NonNull final Context context) {
         super(context);
         mContext = context;
         mBoxFingerprint = new BoxFingerprint(this);
@@ -81,7 +94,7 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
         init(null);
     }
 
-    public BasePasscodeView(Context context, @Nullable AttributeSet attrs) {
+    public BasePasscodeView(@NonNull final Context context, @Nullable final AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
         mBoxFingerprint = new BoxFingerprint(this);
@@ -89,7 +102,9 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
         init(attrs);
     }
 
-    public BasePasscodeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public BasePasscodeView(@NonNull final Context context,
+                            @Nullable final AttributeSet attrs,
+                            final int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext = context;
         mBoxFingerprint = new BoxFingerprint(this);
@@ -98,7 +113,10 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public BasePasscodeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public BasePasscodeView(@NonNull final Context context,
+                            @Nullable final AttributeSet attrs,
+                            final int defStyleAttr,
+                            final int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         mContext = context;
         mBoxFingerprint = new BoxFingerprint(this);
@@ -126,9 +144,9 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
      *
      * @param attrs {@link AttributeSet}
      */
-    private void init(@Nullable AttributeSet attrs) {
+    private void init(@Nullable final AttributeSet attrs) {
         mBoxFingerprint.init();
-        init();
+        init(); //Call init for the concrete class
 
         if (attrs != null) {    //Parse all the params from the arguments.
             TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.BasePasscodeView, 0, 0);
@@ -188,7 +206,7 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
         //Measure the finger print
         mBoxFingerprint.measureView(mRootViewBound);
 
-        //Pass it to the implementation box
+        //Pass it to the implementation class
         measureView(mRootViewBound);
 
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
@@ -223,10 +241,15 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
         //Draw the finger print box
         mBoxFingerprint.drawView(canvas);
 
-        //Pass it to the implementation
+        //Pass it to the implementation class
         drawView(canvas);
     }
 
+    /**
+     * Draw the divider between title and the keyboard/pin box.
+     *
+     * @param canvas {@link Canvas} on which the divider is to draw.
+     */
     private void drawDivider(Canvas canvas) {
         canvas.drawLine(mDividerBound.left,
                 mDividerBound.top,
@@ -246,12 +269,18 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
     @Override
     @CallSuper
     public void onAuthenticationSuccess() {
+        if (isTactileFeedbackEnable())
+            Utils.giveTactileFeedbackForAuthSuccess(mContext);  //Give tactile feedback.
+
         if (mAuthenticationListener != null) mAuthenticationListener.onAuthenticationSuccessful();
     }
 
     @Override
     @CallSuper
     public void onAuthenticationFail() {
+        if (isTactileFeedbackEnable())
+            Utils.giveTactileFeedbackForAuthFail(mContext);  //Give tactile feedback.
+
         if (mAuthenticationListener != null) mAuthenticationListener.onAuthenticationFailed();
     }
 
@@ -266,7 +295,7 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
     ///////////////////////////////////////////////////////////////
 
 
-    public void setAuthenticationListener(@NonNull AuthenticationListener authenticationListener) {
+    public void setAuthenticationListener(@NonNull final AuthenticationListener authenticationListener) {
         mAuthenticationListener = authenticationListener;
     }
 
@@ -278,13 +307,13 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
         return mDividerColor;
     }
 
-    public void setDividerColor(@ColorInt int dividerColor) {
+    public void setDividerColor(@ColorInt final int dividerColor) {
         mDividerColor = dividerColor;
         prepareDividerPaint();
         invalidate();
     }
 
-    public void setDividerColorRes(@ColorRes int dividerColor) {
+    public void setDividerColorRes(@ColorRes final int dividerColor) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             setDividerColor(mContext.getColor(dividerColor));
         } else {
@@ -296,7 +325,7 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
         return mIsTactileFeedbackEnabled;
     }
 
-    public void setTactileFeedback(boolean enable) {
+    public void setTactileFeedback(final boolean enable) {
         mIsTactileFeedbackEnabled = enable;
     }
 
@@ -305,7 +334,7 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
         return mBoxFingerprint.isFingerPrintEnable();
     }
 
-    public void setIsFingerPrintEnable(boolean isEnable) {
+    public void setIsFingerPrintEnable(final boolean isEnable) {
         mBoxFingerprint.setFingerPrintEnable(isEnable);
         requestLayout();
         invalidate();
@@ -316,7 +345,7 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
         return mBoxFingerprint.getStatusText();
     }
 
-    public void setFingerPrintStatusText(@NonNull String statusText) {
+    public void setFingerPrintStatusText(@NonNull final String statusText) {
         mBoxFingerprint.setStatusText(statusText);
         invalidate();
     }
@@ -325,12 +354,12 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
         return mBoxFingerprint.getStatusTextColor();
     }
 
-    public void setFingerPrintStatusTextColor(@ColorInt int statusTextColor) {
+    public void setFingerPrintStatusTextColor(@ColorInt final int statusTextColor) {
         mBoxFingerprint.setStatusTextColor(statusTextColor);
         invalidate();
     }
 
-    public void setFingerPrintStatusTextColorRes(@ColorRes int statusTextColor) {
+    public void setFingerPrintStatusTextColorRes(@ColorRes final int statusTextColor) {
         mBoxFingerprint.setStatusTextColor(mContext.getResources().getColor(statusTextColor));
         invalidate();
     }
@@ -339,12 +368,12 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
         return mBoxFingerprint.getStatusTextSize();
     }
 
-    public void setFingerPrintStatusTextSize(@Dimension float statusTextSize) {
+    public void setFingerPrintStatusTextSize(@Dimension final float statusTextSize) {
         mBoxFingerprint.setStatusTextSize(statusTextSize);
         invalidate();
     }
 
-    public void setFingerPrintStatusTextSize(@DimenRes int statusTextSize) {
+    public void setFingerPrintStatusTextSize(@DimenRes final int statusTextSize) {
         mBoxFingerprint.setStatusTextSize(getResources().getDimension(statusTextSize));
         invalidate();
     }

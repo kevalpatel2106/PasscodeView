@@ -13,7 +13,7 @@ android {
     compileSdkVersion 27
     buildToolsVersion "27.0.3"
 
-    // This is important, it will run lint checks but won't abort build
+    // This is important, it will run lint checks but won't abort buildInternal
     lintOptions {
         abortOnError false
     }
