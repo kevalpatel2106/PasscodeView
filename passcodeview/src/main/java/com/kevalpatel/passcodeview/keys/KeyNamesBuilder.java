@@ -6,14 +6,11 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.kevalpatel.passcodeview.box;
+package com.kevalpatel.passcodeview.keys;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Size;
 import android.support.annotation.StringRes;
-
-import com.kevalpatel.passcodeview.Constants;
 
 /**
  * Created by Keval Patel on 13/04/17.
@@ -97,7 +94,7 @@ public final class KeyNamesBuilder {
         return this;
     }
 
-    public String getmKeyFour() {
+    public String getKeyFour() {
         return mKeyFour;
     }
 
@@ -193,14 +190,6 @@ public final class KeyNamesBuilder {
     public KeyNamesBuilder setKeyZero(@NonNull Context context, @StringRes int keyZero) {
         mKeyZero = context.getString(keyZero);
         return this;
-    }
-
-    @SuppressWarnings("Range")
-    @Size(Constants.NO_OF_KEY_BOARD_ROWS * Constants.NO_OF_KEY_BOARD_COLUMNS)
-    String[][] build() {
-        return new String[][]{{mKeyOne, mKeyFour, mKeySeven, ""},
-                {mKeyTwo, mKeyFive, mKeyEight, mKeyZero},
-                {mKeyThree, mKeySix, mKeyNine, BACKSPACE_TITLE}};
     }
 
     /**

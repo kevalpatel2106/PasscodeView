@@ -6,7 +6,7 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.kevalpatel.passcodeview.box;
+package com.kevalpatel.passcodeview.internal;
 
 import android.annotation.TargetApi;
 import android.content.Context;

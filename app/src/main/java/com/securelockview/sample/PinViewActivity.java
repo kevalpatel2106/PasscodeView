@@ -14,9 +14,9 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.authenticator.PasscodeViewPinAuthenticator;
-import com.kevalpatel.passcodeview.box.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.indicators.CircleIndicator;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
+import com.kevalpatel.passcodeview.keys.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.keys.RoundKey;
 
 /**
@@ -57,6 +57,8 @@ public class PinViewActivity extends AppCompatActivity {
                 .setIndicatorFilledColorResource(R.color.colorAccent)
                 .setIndicatorStrokeColorResource(R.color.colorAccent)
                 .setIndicatorStrokeWidth(R.dimen.indicator_stroke_width));
+
+        mPinView.setPinLength(PinView.DYNAMIC_PIN_LENGTH);
 
         //Set the name of the keys based on your locale.
         //OPTIONAL. If not passed key names will be displayed based on english locale.

@@ -6,7 +6,7 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.kevalpatel.passcodeview.box;
+package com.kevalpatel.passcodeview.internal;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -19,8 +19,8 @@ import android.util.AttributeSet;
 import com.kevalpatel.passcodeview.Constants;
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.R;
-import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 import com.kevalpatel.passcodeview.keys.Key;
+import com.kevalpatel.passcodeview.keys.KeyNamesBuilder;
 
 import java.util.ArrayList;
 
@@ -181,14 +181,12 @@ public final class BoxKeypad extends Box {
     public void onAuthenticationFail() {
         //Play failed animation for all keys
         for (Key key : mKeys) key.onAuthFail();
-        getRootView().invalidate();
     }
 
     @Override
     public void onAuthenticationSuccess() {
         //Play success animation for all keys
         for (Key key : mKeys) key.onAuthSuccess();
-        getRootView().invalidate();
     }
 
     @Override
@@ -206,7 +204,11 @@ public final class BoxKeypad extends Box {
      * @see KeyNamesBuilder
      */
     public void setKeyNames(@NonNull final KeyNamesBuilder keyNames) {
-        sKeyNames = keyNames.build();
+        sKeyNames = new String[][]{
+                {keyNames.getKeyOne(), keyNames.getKeyFour(), keyNames.getKeySeven(), ""},
+                {keyNames.getKeyTwo(), keyNames.getKeyFive(), keyNames.getKeyEight(), keyNames.getKeyZero()},
+                {keyNames.getKeyThree(), keyNames.getKeySix(), keyNames.getKeyNine(), KeyNamesBuilder.BACKSPACE_TITLE}
+        };
     }
 
     /**

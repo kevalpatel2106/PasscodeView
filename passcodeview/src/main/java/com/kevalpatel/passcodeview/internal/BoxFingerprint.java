@@ -6,7 +6,7 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.kevalpatel.passcodeview.box;
+package com.kevalpatel.passcodeview.internal;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
@@ -32,7 +32,6 @@ import android.view.animation.CycleInterpolator;
 import com.kevalpatel.passcodeview.Constants;
 import com.kevalpatel.passcodeview.R;
 import com.kevalpatel.passcodeview.Utils;
-import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 
 /**
  * Created by Keval on 07-Apr-17.
@@ -51,7 +50,7 @@ import com.kevalpatel.passcodeview.internal.BasePasscodeView;
  * @author 'https://github.com/kevalpatel2106'
  */
 
-public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAuthCallback {
+final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPrintAuthCallback {
     private static final long ANIMATION_DURATION = 1000;    //1 second
 
     /**
@@ -319,13 +318,11 @@ public final class BoxFingerprint extends Box implements FingerPrintAuthHelper.F
     @Override
     public void onAuthenticationSuccess() {
         mCurrentStatusText = "Fingerprint recognized.";
-        getRootView().invalidate();
 
         new android.os.Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 mCurrentStatusText = mNormalStatusText;
-
                 getRootView().onAuthenticationSuccess();
                 getRootView().invalidate();
             }

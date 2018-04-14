@@ -6,7 +6,7 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.kevalpatel.passcodeview.box;
+package com.kevalpatel.passcodeview.internal;
 
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -17,10 +17,10 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 
 import com.kevalpatel.passcodeview.Constants;
+import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.R;
 import com.kevalpatel.passcodeview.Utils;
 import com.kevalpatel.passcodeview.indicators.Indicator;
-import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 
 import java.util.ArrayList;
 
@@ -33,6 +33,7 @@ import java.util.ArrayList;
  */
 
 public final class BoxTitleIndicator extends Box {
+
     private static final long ERROR_ANIMATION_DURATION = 400;
     /**
      * Default title text.
@@ -42,7 +43,7 @@ public final class BoxTitleIndicator extends Box {
     /**
      * Size of the PIN.
      */
-    private int mPinLength;
+    private int mPinLength = PinView.DYNAMIC_PIN_LENGTH;
 
     /**
      * Size of the currently typed PIN.
@@ -142,7 +143,7 @@ public final class BoxTitleIndicator extends Box {
                 mDotsIndicatorBound.top - (int) getContext().getResources().getDimension(R.dimen.lib_divider_vertical_margin),
                 mTitlePaint);
 
-        for (int i = 0; i < mPinLength; i++)
+        for (int i = 0; i < mIndicators.size(); i++)
             mIndicators.get(i).draw(canvas, i < mTypedPinLength);
     }
 
@@ -169,8 +170,9 @@ public final class BoxTitleIndicator extends Box {
      */
     @Override
     public void measureView(@NonNull final Rect rootViewBounds) {
+        final int numOfIndicators = mPinLength == PinView.DYNAMIC_PIN_LENGTH ? mTypedPinLength : mPinLength;
         int indicatorWidth = (int) (mIndicatorBuilder.getIndicatorWidth() + 2 * getContext().getResources().getDimension(R.dimen.lib_indicator_padding));
-        int totalSpace = indicatorWidth * mPinLength;
+        int totalSpace = indicatorWidth * numOfIndicators;
 
         //Calculate the bound of this box.
         mDotsIndicatorBound = new Rect();
@@ -183,7 +185,7 @@ public final class BoxTitleIndicator extends Box {
 
         //Prepare all the indicators.
         mIndicators = new ArrayList<>();
-        for (int i = 0; i < mPinLength; i++) {
+        for (int i = 0; i < numOfIndicators; i++) {
             Rect rect = new Rect();
             rect.left = mDotsIndicatorBound.left + i * indicatorWidth;
             rect.right = rect.left + indicatorWidth;
@@ -210,6 +212,10 @@ public final class BoxTitleIndicator extends Box {
         mPinLength = pinLength;
     }
 
+    public boolean isDynamicPinEnabled() {
+        return mPinLength == PinView.DYNAMIC_PIN_LENGTH;
+    }
+
     @NonNull
     public String getTitle() {
         return mTitle;
@@ -229,6 +235,7 @@ public final class BoxTitleIndicator extends Box {
         preparePaint();
     }
 
+    @NonNull
     public Indicator.Builder getIndicatorBuilder() {
         return mIndicatorBuilder;
     }

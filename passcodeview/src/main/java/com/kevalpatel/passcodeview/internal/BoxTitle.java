@@ -6,7 +6,7 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.kevalpatel.passcodeview.box;
+package com.kevalpatel.passcodeview.internal;
 
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -19,7 +19,6 @@ import android.util.AttributeSet;
 import com.kevalpatel.passcodeview.Constants;
 import com.kevalpatel.passcodeview.R;
 import com.kevalpatel.passcodeview.Utils;
-import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 
 /**
  * Created by Keval Patel on 09/04/17.

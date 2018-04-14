@@ -20,14 +20,13 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.kevalpatel.passcodeview.authenticator.PinAuthenticator;
-import com.kevalpatel.passcodeview.box.BoxFingerprint;
-import com.kevalpatel.passcodeview.box.BoxKeypad;
-import com.kevalpatel.passcodeview.box.BoxTitleIndicator;
-import com.kevalpatel.passcodeview.box.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.indicators.Indicator;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 import com.kevalpatel.passcodeview.internal.BasePasscodeView;
+import com.kevalpatel.passcodeview.internal.BoxKeypad;
+import com.kevalpatel.passcodeview.internal.BoxTitleIndicator;
 import com.kevalpatel.passcodeview.keys.Key;
+import com.kevalpatel.passcodeview.keys.KeyNamesBuilder;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -38,15 +37,16 @@ import com.kevalpatel.passcodeview.keys.Key;
  * <li>2. Set the callback listener. {@link #setAuthenticationListener(AuthenticationListener)}</li>
  * <br/>
  * This view is made up of three different views.
- * <li>Title with the PIN indicators. {@link com.kevalpatel.passcodeview.box.BoxTitleIndicator}</li>
+ * <li>Title with the PIN indicators. {@link BoxTitleIndicator}</li>
  * <li>Keyboard. {@link BoxKeypad}</li>
- * <li>Fingerprint authentication view. {@link BoxFingerprint}</li>
+ * <li>Fingerprint authentication view.</li>
  *
  * @author 'https://github.com/kevalpatel2106'
  * @see AuthenticationListener
  */
 
 public final class PinView extends BasePasscodeView implements InteractiveArrayList.ChangeListener {
+    public static final int DYNAMIC_PIN_LENGTH = 0;
 
     /**
      * X coordinate for the touch down event.
@@ -280,6 +280,7 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
     @Override
     public void onArrayValueChange(int size) {
         mBoxIndicator.onPinDigitEntered(size);
+        if (mBoxIndicator.isDynamicPinEnabled()) mBoxIndicator.measureView(mRootViewBound);
     }
 
     ///////////////////////////////////////////////////////////////
@@ -318,6 +319,10 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
 
         requestLayout();
         invalidate();
+    }
+
+    public void setPinLength(final int pinLength) {
+        mBoxIndicator.setPinLength(pinLength);
     }
 
     //********************** For keyboard box

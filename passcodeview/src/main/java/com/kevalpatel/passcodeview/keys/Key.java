@@ -15,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 
 import com.kevalpatel.passcodeview.internal.BasePasscodeView;
+import com.kevalpatel.passcodeview.internal.BoxKeypad;
 
 /**
  * Created by Keval Patel on 07/04/17.
@@ -64,7 +65,7 @@ public abstract class Key {
 
     /**
      * Implement this method with the description on how to draw the text on the canvas. This method
-     * will be called by the {@link com.kevalpatel.passcodeview.box.BoxKeypad} when ever it's time to
+     * will be called by the {@link BoxKeypad} when ever it's time to
      * draw the text on the {@link Canvas}. Application should draw only the key ranging from 0 to 9.
      * Backspace key is drawn separately using {@link #drawBackSpace(Canvas, Drawable)}.
      *
@@ -75,7 +76,7 @@ public abstract class Key {
 
     /**
      * Implement this method with the description on how to draw the shape of the key on the canvas.
-     * This method will be called by the {@link com.kevalpatel.passcodeview.box.BoxKeypad} when ever
+     * This method will be called by the {@link BoxKeypad} when ever
      * it's time to draw the shape of the key on the {@link Canvas}. Application daw any shape such
      * as round or square.
      *

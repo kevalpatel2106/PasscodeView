@@ -32,7 +32,6 @@ import com.kevalpatel.passcodeview.PatternView;
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.R;
 import com.kevalpatel.passcodeview.Utils;
-import com.kevalpatel.passcodeview.box.BoxFingerprint;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 
 /**
@@ -268,6 +267,7 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
     public void onAuthenticationSuccess() {
         giveTactileFeedbackForAuthSuccess();  //Give tactile feedback.
         if (mAuthenticationListener != null) mAuthenticationListener.onAuthenticationSuccessful();
+        invalidate();
     }
 
     @Override
@@ -275,6 +275,7 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
     public void onAuthenticationFail() {
         giveTactileFeedbackForAuthFail();  //Give tactile feedback.
         if (mAuthenticationListener != null) mAuthenticationListener.onAuthenticationFailed();
+        invalidate();
     }
 
     @Override
@@ -374,11 +375,7 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
      * @see #setDividerColor(int)
      */
     public void setDividerColorRes(@ColorRes final int dividerColor) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            setDividerColor(getContext().getColor(dividerColor));
-        } else {
-            setDividerColor(getResources().getColor(dividerColor));
-        }
+        setDividerColor(Utils.getColorCompat(getContext(), dividerColor));
     }
 
     /**
@@ -400,6 +397,8 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
      */
     public void setTactileFeedback(final boolean enable) {
         mIsTactileFeedbackEnabled = enable;
+        requestLayout();
+        invalidate();
     }
 
     /**

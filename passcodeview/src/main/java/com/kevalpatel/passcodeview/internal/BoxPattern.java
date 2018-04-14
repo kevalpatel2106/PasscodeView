@@ -6,7 +6,7 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.kevalpatel.passcodeview.box;
+package com.kevalpatel.passcodeview.internal;
 
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -17,7 +17,6 @@ import android.util.AttributeSet;
 
 import com.kevalpatel.passcodeview.Constants;
 import com.kevalpatel.passcodeview.R;
-import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 import com.kevalpatel.passcodeview.patternCells.PatternCell;
 import com.kevalpatel.passcodeview.patternCells.PatternPoint;
 
@@ -164,14 +163,12 @@ public final class BoxPattern extends Box {
     public void onAuthenticationFail() {
         //Play failed animation for all keys
         for (PatternCell patternCell : mPatternCells) patternCell.onAuthFailed();
-        getRootView().invalidate();
     }
 
     @Override
     public void onAuthenticationSuccess() {
         //Play success animation for all keys
         for (PatternCell patternCell : mPatternCells) patternCell.onAuthSuccess();
-        getRootView().invalidate();
     }
 
     @Override

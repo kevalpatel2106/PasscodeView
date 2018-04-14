@@ -24,9 +24,9 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.kevalpatel.passcodeview.authenticator.PatternAuthenticator;
-import com.kevalpatel.passcodeview.box.BoxPattern;
-import com.kevalpatel.passcodeview.box.BoxTitle;
 import com.kevalpatel.passcodeview.internal.BasePasscodeView;
+import com.kevalpatel.passcodeview.internal.BoxPattern;
+import com.kevalpatel.passcodeview.internal.BoxTitle;
 import com.kevalpatel.passcodeview.patternCells.PatternCell;
 import com.kevalpatel.passcodeview.patternCells.PatternPoint;
 
