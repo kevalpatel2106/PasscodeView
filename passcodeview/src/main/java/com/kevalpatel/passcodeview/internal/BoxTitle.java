@@ -152,20 +152,26 @@ public final class BoxTitle extends Box {
         }
     }
 
+    ///////////////// SETTERS/GETTERS //////////////
+
+    @InternalApi
     @NonNull
     public String getTitle() {
         return mTitle;
     }
 
+    @InternalApi
     public void setTitle(@NonNull final String title) {
         this.mTitle = title;
     }
 
+    @InternalApi
     @ColorInt
     public int getTitleColor() {
         return mTitleColor;
     }
 
+    @InternalApi
     public void setTitleColor(@ColorInt final int titleColor) {
         this.mTitleColor = titleColor;
         preparePaint();

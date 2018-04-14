@@ -20,8 +20,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.hardware.fingerprint.FingerprintManager;
 import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DimenRes;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -359,40 +357,32 @@ final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPr
     ///////////////// SETTERS/GETTERS //////////////
 
     @NonNull
-    public String getStatusText() {
+    String getStatusText() {
         return mNormalStatusText;
     }
 
-    public void setStatusText(@Nullable String statusText) {
+    void setStatusText(@Nullable String statusText) {
         this.mNormalStatusText = statusText == null ? DEF_FINGERPRINT_STATUS : statusText;
         mCurrentStatusText = mNormalStatusText;
     }
 
-    public int getStatusTextColor() {
+    int getStatusTextColor() {
         return mStatusTextColor;
     }
 
-    public void setStatusTextColor(@ColorInt int statusTextColor) {
+    void setStatusTextColor(@ColorInt int statusTextColor) {
         this.mStatusTextColor = statusTextColor;
     }
 
-    public void setStatusTextColorRes(@ColorRes int statusTextColor) {
-        this.mStatusTextColor = Utils.getColorCompat(getContext(), statusTextColor);
-    }
-
-    public float getStatusTextSize() {
+    float getStatusTextSize() {
         return mStatusTextSize;
     }
 
-    public void setStatusTextSize(float statusTextSizePx) {
+    void setStatusTextSize(float statusTextSizePx) {
         this.mStatusTextSize = statusTextSizePx;
     }
 
-    public void setStatusTextSize(@DimenRes int statusTextSize) {
-        this.mStatusTextSize = getContext().getResources().getDimension(statusTextSize);
-    }
-
-    public Boolean isFingerPrintEnable() {
+    Boolean isFingerPrintEnable() {
         return isFingerPrintBoxVisible;
     }
 
@@ -401,7 +391,7 @@ final class BoxFingerprint extends Box implements FingerPrintAuthHelper.FingerPr
      *
      * @param isEnable true if the fingerprint scanning is enabled.
      */
-    public void setFingerPrintEnable(boolean isEnable) {
+    void setFingerPrintEnable(boolean isEnable) {
         this.isFingerPrintBoxVisible = isEnable && Utils.isFingerPrintEnrolled(getContext());
     }
 }

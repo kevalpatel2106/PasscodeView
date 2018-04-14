@@ -15,6 +15,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
@@ -98,6 +101,14 @@ public final class PatternView extends BasePasscodeView {
      */
     private PatternAuthenticator mAuthenticator;
 
+    /**
+     * Instance of the currently running {@link PatternAuthenticatorTask}. If the value is null that indicates,
+     * no {@link PatternAuthenticatorTask} is running currently.
+     *
+     * @see PatternAuthenticatorTask
+     */
+    @Nullable
+    private PatternAuthenticatorTask mPatternAuthenticatorTask;
 
     ///////////////////////////////////////////////////////////////
     //                  CONSTRUCTORS
@@ -248,6 +259,12 @@ public final class PatternView extends BasePasscodeView {
         invalidate();
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (mPatternAuthenticatorTask != null) mPatternAuthenticatorTask.cancel(true);
+    }
+
     ///////////////////////////////////////////////////////////////
     //                  TOUCH HANDLER
     ///////////////////////////////////////////////////////////////
@@ -283,26 +300,13 @@ public final class PatternView extends BasePasscodeView {
                     throw new IllegalStateException("Set authenticator first.");
                 }
 
-                //Prepare the pattern points
-                final ArrayList<PatternPoint> patternPoints = new ArrayList<>(mPatternTyped.size());
-                for (PatternCell cell : mPatternTyped) {
-                    patternPoints.add(cell.getPoint());
-                }
+                if (mPatternAuthenticatorTask != null
+                        && mPatternAuthenticatorTask.getStatus() == AsyncTask.Status.RUNNING)
+                    mPatternAuthenticatorTask.cancel(true);
 
-                //Validate using authenticator,
-                if (mAuthenticator.isValidPattern(patternPoints)) {
-                    onAuthenticationSuccess();
-                } else {
-                    onAuthenticationFail();
-                }
-
-                //Reset the view.
-                new android.os.Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        reset();
-                    }
-                }, 350);
+                mPatternAuthenticatorTask = new PatternAuthenticatorTask(mAuthenticator);
+                //noinspection unchecked
+                mPatternAuthenticatorTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mPatternTyped);
                 break;
             default:
                 return false;
@@ -423,5 +427,66 @@ public final class PatternView extends BasePasscodeView {
     public void setTitle(@NonNull String title) {
         mBoxTitle.setTitle(title);
         invalidate();
+    }
+
+
+    @SuppressLint("StaticFieldLeak")
+    private final class PatternAuthenticatorTask extends AsyncTask<ArrayList<PatternCell>, Void, Boolean> {
+
+        @NonNull
+        private final PatternAuthenticator mAuthenticator;
+
+        @NonNull
+        private final Handler mHandler;
+
+        @NonNull
+        private final Runnable mResetRunnable;
+
+        private PatternAuthenticatorTask(@NonNull final PatternAuthenticator authenticator) {
+            mAuthenticator = authenticator;
+            mHandler = new Handler(Looper.getMainLooper());
+            mResetRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    reset();
+                }
+            };
+        }
+
+        @SafeVarargs
+        @Override
+        protected final Boolean doInBackground(final ArrayList<PatternCell>... pinTyped) {
+            //Prepare the pattern points
+            final ArrayList<PatternPoint> patternPoints = new ArrayList<>(pinTyped[0].size());
+            for (PatternCell cell : pinTyped[0]) {
+                patternPoints.add(cell.getPoint());
+            }
+
+            return this.mAuthenticator.isValidPattern(patternPoints);
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean isAuthenticated) {
+            super.onPostExecute(isAuthenticated);
+
+            if (isAuthenticated) {
+                //Hurray!!! Authentication is successful.
+                onAuthenticationSuccess();
+            } else {
+                //:-( Authentication failed.
+                onAuthenticationFail();
+            }
+
+            //Reset the view.
+            mHandler.postDelayed(mResetRunnable, 350);
+            mPatternAuthenticatorTask = null;
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            mHandler.removeCallbacks(mResetRunnable);
+            mPatternAuthenticatorTask = null;
+        }
     }
 }

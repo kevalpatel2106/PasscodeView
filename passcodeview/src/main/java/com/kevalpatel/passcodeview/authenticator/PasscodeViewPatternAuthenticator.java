@@ -9,6 +9,7 @@
 package com.kevalpatel.passcodeview.authenticator;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.WorkerThread;
 
 import com.kevalpatel.passcodeview.patternCells.PatternPoint;
 
@@ -28,8 +29,11 @@ public final class PasscodeViewPatternAuthenticator implements PatternAuthentica
         mCorrectPattern = correctPattern;
     }
 
+    @WorkerThread
     @Override
     public boolean isValidPattern(@NonNull final ArrayList<PatternPoint> patternPoints) {
+        //This calculations won't take much time.
+        //We are not blocking the UI.
         for (int i = 0; i < mCorrectPattern.length; i++)
             if (!mCorrectPattern[i].equals(patternPoints.get(i))) return false;
 

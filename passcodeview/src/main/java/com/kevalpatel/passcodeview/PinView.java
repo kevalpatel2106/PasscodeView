@@ -12,6 +12,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
@@ -27,6 +30,8 @@ import com.kevalpatel.passcodeview.internal.BoxKeypad;
 import com.kevalpatel.passcodeview.internal.BoxTitleIndicator;
 import com.kevalpatel.passcodeview.keys.Key;
 import com.kevalpatel.passcodeview.keys.KeyNamesBuilder;
+
+import java.util.ArrayList;
 
 /**
  * Created by Keval on 06-Apr-17.
@@ -81,7 +86,21 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
     @NonNull
     private KeyNamesBuilder mKeyNamesBuilder = new KeyNamesBuilder();
 
-    private PinAuthenticator mAuthenticator;
+    /**
+     * {@link PinAuthenticator} that will perform the authentication for the user pin.
+     *
+     * @see PinAuthenticator
+     */
+    private volatile PinAuthenticator mAuthenticator;
+
+    /**
+     * Instance of the currently running {@link PinAuthenticatorTask}. If the value is null that indicates,
+     * no {@link PinAuthenticatorTask} is running currently.
+     *
+     * @see PinAuthenticatorTask
+     */
+    @Nullable
+    private PinAuthenticatorTask mPinAuthenticatorTask;
 
     ///////////////////////////////////////////////////////////////
     //                  CONSTRUCTORS
@@ -197,6 +216,12 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
         mBoxIndicator.drawView(canvas);
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (mPinAuthenticatorTask != null) mPinAuthenticatorTask.cancel(true);
+    }
+
     ///////////////////////////////////////////////////////////////
     //                  TOUCH HANDLER
     ///////////////////////////////////////////////////////////////
@@ -248,27 +273,17 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
 
         invalidate();
 
-        if (mAuthenticator.isValidPinLength(mPinTyped.size())) {
+        if (isDynamicPinEnabled() || mPinTyped.size() == mBoxIndicator.getPinLength()) {
+            if (mPinAuthenticatorTask != null && mPinAuthenticatorTask.getStatus() == AsyncTask.Status.RUNNING)
+                mPinAuthenticatorTask.cancel(true);
 
-            //Check if the pin is matched?
-            if (mAuthenticator.isValidPin(mPinTyped)) {
-                //Hurray!!! Authentication is successful.
-                onAuthenticationSuccess();
-            } else {
-                //:-( Authentication failed.
-                onAuthenticationFail();
-            }
-
-            //Reset the view.
-            new android.os.Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    reset();
-                }
-            }, 350);
+            mPinAuthenticatorTask = new PinAuthenticatorTask(mAuthenticator);
+            //noinspection unchecked
+            mPinAuthenticatorTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mPinTyped);
         } else {
             giveTactileFeedbackForKeyPress();
         }
+
     }
 
     /**
@@ -280,7 +295,7 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
     @Override
     public void onArrayValueChange(int size) {
         mBoxIndicator.onPinDigitEntered(size);
-        if (mBoxIndicator.isDynamicPinEnabled()) mBoxIndicator.measureView(mRootViewBound);
+        if (isDynamicPinEnabled()) mBoxIndicator.measureView(mRootViewBound);
     }
 
     ///////////////////////////////////////////////////////////////
@@ -288,11 +303,11 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
     ///////////////////////////////////////////////////////////////
 
     @Nullable
-    public PinAuthenticator getAuthenticator() {
+    public PinAuthenticator getPinAuthenticator() {
         return mAuthenticator;
     }
 
-    public void setAuthenticator(final PinAuthenticator authenticator) {
+    public void setPinAuthenticator(final PinAuthenticator authenticator) {
         mAuthenticator = authenticator;
     }
 
@@ -323,6 +338,14 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
 
     public void setPinLength(final int pinLength) {
         mBoxIndicator.setPinLength(pinLength);
+    }
+
+    public int getPinLength() {
+        return mBoxIndicator.getPinLength();
+    }
+
+    public boolean isDynamicPinEnabled() {
+        return mBoxIndicator.getPinLength() == PinView.DYNAMIC_PIN_LENGTH;
     }
 
     //********************** For keyboard box
@@ -445,8 +468,65 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
     /**
      * @return {@link com.kevalpatel.passcodeview.indicators.Indicator.Builder}
      */
-    @Nullable
     public Indicator.Builder getIndicatorBuilder() {
         return mBoxIndicator.getIndicatorBuilder();
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private final class PinAuthenticatorTask extends AsyncTask<ArrayList<Integer>, Void, PinAuthenticator.PinAuthenticationState> {
+
+        @NonNull
+        private final PinAuthenticator mAuthenticator;
+
+        @NonNull
+        private final Handler mHandler;
+
+        @NonNull
+        private final Runnable mResetRunnable;
+
+        private PinAuthenticatorTask(@NonNull final PinAuthenticator authenticator) {
+            mAuthenticator = authenticator;
+            mHandler = new Handler(Looper.getMainLooper());
+            mResetRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    reset();
+                }
+            };
+        }
+
+        @SafeVarargs
+        @Override
+        protected final PinAuthenticator.PinAuthenticationState doInBackground(final ArrayList<Integer>... pinTyped) {
+            return this.mAuthenticator.isValidPin(pinTyped[0]);
+        }
+
+        @Override
+        protected void onPostExecute(final PinAuthenticator.PinAuthenticationState authenticationState) {
+            super.onPostExecute(authenticationState);
+
+            if (authenticationState == PinAuthenticator.PinAuthenticationState.NEED_MORE_DIGIT) {
+                //This is just a key press.
+                giveTactileFeedbackForKeyPress();
+                return;
+            } else if (authenticationState == PinAuthenticator.PinAuthenticationState.SUCCESS) {
+                //Hurray!!! Authentication is successful.
+                onAuthenticationSuccess();
+            } else if (authenticationState == PinAuthenticator.PinAuthenticationState.FAIL) {
+                //:-( Authentication failed.
+                onAuthenticationFail();
+            }
+
+            //Reset the view.
+            mHandler.postDelayed(mResetRunnable, 350);
+            mPinAuthenticatorTask = null;
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            mHandler.removeCallbacks(mResetRunnable);
+            mPinAuthenticatorTask = null;
+        }
     }
 }

@@ -203,6 +203,7 @@ public final class BoxKeypad extends Box {
      * @param keyNames String with the names of the key.
      * @see KeyNamesBuilder
      */
+    @InternalApi
     public void setKeyNames(@NonNull final KeyNamesBuilder keyNames) {
         sKeyNames = new String[][]{
                 {keyNames.getKeyOne(), keyNames.getKeyFour(), keyNames.getKeySeven(), ""},
@@ -219,6 +220,7 @@ public final class BoxKeypad extends Box {
      * @param upEventX   ACTION_UP event X coordinate
      * @param upEventY   ACTION_UP event Y coordinate
      */
+    @InternalApi
     @Nullable
     public String findKeyPressed(final float downEventX,
                                  final float downEventY,
@@ -238,28 +240,28 @@ public final class BoxKeypad extends Box {
         return null;
     }
 
-    @NonNull
-    public ArrayList<Key> getKeys() {
-        return mKeys;
-    }
-
+    @InternalApi
     @NonNull
     public Rect getBounds() {
         return mKeyBoxBound;
     }
 
+    @InternalApi
     public boolean isOneHandOperation() {
         return mIsOneHandOperation;
     }
 
+    @InternalApi
     public void setOneHandOperation(final boolean oneHandOperation) {
         mIsOneHandOperation = oneHandOperation;
     }
 
+    @InternalApi
     public Key.Builder getKeyBuilder() {
         return mKeyBuilder;
     }
 
+    @InternalApi
     public void setKeyBuilder(final Key.Builder keyBuilder) {
         mKeyBuilder = keyBuilder;
     }

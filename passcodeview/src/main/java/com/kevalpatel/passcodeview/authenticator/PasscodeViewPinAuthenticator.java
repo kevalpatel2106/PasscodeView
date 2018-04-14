@@ -9,6 +9,7 @@
 package com.kevalpatel.passcodeview.authenticator;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.WorkerThread;
 
 import java.util.ArrayList;
 
@@ -25,15 +26,28 @@ public final class PasscodeViewPinAuthenticator implements PinAuthenticator {
         mCorrectPin = correctPin;
     }
 
+    @WorkerThread
     @Override
-    public boolean isValidPin(@NonNull final ArrayList<Integer> pinDigits) {
-        for (int i = 0; i < mCorrectPin.length; i++)
-            if (mCorrectPin[i] != pinDigits.get(i)) return false;
-        return mCorrectPin.length == pinDigits.size();
+    public PinAuthenticationState isValidPin(@NonNull final ArrayList<Integer> pinDigits) {
+        //Check if the size of the entered pin matches the correct pin
+        if (!isValidPinLength(pinDigits.size())) return PinAuthenticationState.NEED_MORE_DIGIT;
+
+        //This calculations won't take much time.
+        //We are not blocking the UI.
+        for (int i = 0; i < mCorrectPin.length; i++) {
+            if (mCorrectPin[i] != pinDigits.get(i)) {
+
+                //Digit did not matched
+                //Wrong PIN
+                return PinAuthenticationState.FAIL;
+            }
+        }
+
+        //PIN is correct¬
+        return PinAuthenticationState.SUCCESS;
     }
 
-    @Override
-    public boolean isValidPinLength(final int typedLength) {
+    private boolean isValidPinLength(final int typedLength) {
         return typedLength == mCorrectPin.length;
     }
 }

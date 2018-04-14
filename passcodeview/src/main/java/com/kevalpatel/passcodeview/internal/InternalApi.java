@@ -6,26 +6,12 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.kevalpatel.passcodeview.authenticator;
-
-import android.support.annotation.NonNull;
-import android.support.annotation.WorkerThread;
-
-import java.util.ArrayList;
+package com.kevalpatel.passcodeview.internal;
 
 /**
  * Created by Keval on 14/04/18.
  *
  * @author [kevalpatel2106](https : / / github.com / kevalpatel2106)
  */
-public interface PinAuthenticator {
-
-    @WorkerThread
-    PinAuthenticationState isValidPin(@NonNull final ArrayList<Integer> pinDigits);
-
-    enum PinAuthenticationState {
-        SUCCESS,
-        FAIL,
-        NEED_MORE_DIGIT
-    }
+@interface InternalApi {
 }

@@ -197,45 +197,43 @@ public final class BoxPattern extends Box {
 
     ///////////////// SETTERS/GETTERS //////////////
 
-    @NonNull
-    public ArrayList<PatternCell> getPatternCells() {
-        return mPatternCells;
-    }
-
-    @NonNull
-    public Rect getBounds() {
-        return mPatternBoxBound;
-    }
-
+    @InternalApi
     public boolean isOneHandOperation() {
         return mIsOneHandOperation;
     }
 
+    @InternalApi
     public void setOneHandOperation(final boolean oneHandOperation) {
         mIsOneHandOperation = oneHandOperation;
     }
 
+    @InternalApi
     @NonNull
     public PatternCell.Builder getCellBuilder() {
         return mCellBuilder;
     }
 
+    @InternalApi
     public void setCellBuilder(@NonNull final PatternCell.Builder mIndicatorBuilder) {
         this.mCellBuilder = mIndicatorBuilder;
     }
 
+    @InternalApi
     public int getNoOfColumn() {
         return mNoOfColumn;
     }
 
+    @InternalApi
     public void setNoOfColumn(final int noOfColumn) {
         mNoOfColumn = noOfColumn;
     }
 
+    @InternalApi
     public int getNoOfRows() {
         return mNoOfRows;
     }
 
+    @InternalApi
     public void setNoOfRows(final int noOfRows) {
         mNoOfRows = noOfRows;
     }

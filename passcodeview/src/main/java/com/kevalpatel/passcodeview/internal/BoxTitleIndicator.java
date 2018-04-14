@@ -204,42 +204,51 @@ public final class BoxTitleIndicator extends Box {
         mTitlePaint.setTextSize(getContext().getResources().getDimension(R.dimen.lib_title_text_size));
     }
 
+    @InternalApi
     public void onPinDigitEntered(final int newLength) {
         mTypedPinLength = newLength;
     }
 
+    @InternalApi
+    public int getPinLength() {
+        return mPinLength;
+    }
+
+    @InternalApi
     public void setPinLength(final int pinLength) {
         mPinLength = pinLength;
     }
 
-    public boolean isDynamicPinEnabled() {
-        return mPinLength == PinView.DYNAMIC_PIN_LENGTH;
-    }
-
+    @InternalApi
     @NonNull
     public String getTitle() {
         return mTitle;
     }
 
+    @InternalApi
     public void setTitle(@NonNull final String title) {
         this.mTitle = title;
     }
 
+    @InternalApi
     @ColorInt
     public int getTitleColor() {
         return mTitleColor;
     }
 
+    @InternalApi
     public void setTitleColor(@ColorInt final int titleColor) {
         this.mTitleColor = titleColor;
         preparePaint();
     }
 
+    @InternalApi
     @NonNull
     public Indicator.Builder getIndicatorBuilder() {
         return mIndicatorBuilder;
     }
 
+    @InternalApi
     public void setIndicatorBuilder(@NonNull final Indicator.Builder mIndicatorBuilder) {
         this.mIndicatorBuilder = mIndicatorBuilder;
     }

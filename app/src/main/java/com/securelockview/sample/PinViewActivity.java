@@ -39,7 +39,7 @@ public class PinViewActivity extends AppCompatActivity {
         //Set the correct pin code.
         //REQUIRED
         final int[] correctPattern = new int[]{1, 2, 3, 4};
-        mPinView.setAuthenticator(new PasscodeViewPinAuthenticator(correctPattern));
+        mPinView.setPinAuthenticator(new PasscodeViewPinAuthenticator(correctPattern));
 
         //Build the desired key shape and pass the theme parameters.
         //REQUIRED
