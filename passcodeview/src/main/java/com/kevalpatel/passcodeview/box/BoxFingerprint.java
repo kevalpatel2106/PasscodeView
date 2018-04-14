@@ -29,10 +29,10 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.animation.CycleInterpolator;
 
-import com.kevalpatel.passcodeview.BasePasscodeView;
 import com.kevalpatel.passcodeview.Constants;
 import com.kevalpatel.passcodeview.R;
 import com.kevalpatel.passcodeview.Utils;
+import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 
 /**
  * Created by Keval on 07-Apr-17.

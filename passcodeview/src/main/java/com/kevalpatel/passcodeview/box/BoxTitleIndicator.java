@@ -16,11 +16,11 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 
-import com.kevalpatel.passcodeview.BasePasscodeView;
 import com.kevalpatel.passcodeview.Constants;
 import com.kevalpatel.passcodeview.R;
 import com.kevalpatel.passcodeview.Utils;
 import com.kevalpatel.passcodeview.indicators.Indicator;
+import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 
 import java.util.ArrayList;
 

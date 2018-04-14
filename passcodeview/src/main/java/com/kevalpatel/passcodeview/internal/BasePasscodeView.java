@@ -6,7 +6,7 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.kevalpatel.passcodeview;
+package com.kevalpatel.passcodeview.internal;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -14,6 +14,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Build;
+import android.os.Vibrator;
 import android.support.annotation.CallSuper;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
@@ -23,8 +24,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
+import com.kevalpatel.passcodeview.Constants;
+import com.kevalpatel.passcodeview.PatternView;
+import com.kevalpatel.passcodeview.PinView;
+import com.kevalpatel.passcodeview.R;
+import com.kevalpatel.passcodeview.Utils;
 import com.kevalpatel.passcodeview.box.BoxFingerprint;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 
@@ -39,12 +46,6 @@ import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
  */
 
 public abstract class BasePasscodeView extends View implements PasscodeViewLifeCycle {
-
-    /**
-     * {@link Context} of the view.
-     */
-    @NonNull
-    protected final Context mContext;
     /**
      * Finger print box.
      *
@@ -88,7 +89,6 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
 
     public BasePasscodeView(@NonNull final Context context) {
         super(context);
-        mContext = context;
         mBoxFingerprint = new BoxFingerprint(this);
 
         init(null);
@@ -96,7 +96,6 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
 
     public BasePasscodeView(@NonNull final Context context, @Nullable final AttributeSet attrs) {
         super(context, attrs);
-        mContext = context;
         mBoxFingerprint = new BoxFingerprint(this);
 
         init(attrs);
@@ -106,7 +105,6 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
                             @Nullable final AttributeSet attrs,
                             final int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mContext = context;
         mBoxFingerprint = new BoxFingerprint(this);
 
         init(attrs);
@@ -118,7 +116,6 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
                             final int defStyleAttr,
                             final int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        mContext = context;
         mBoxFingerprint = new BoxFingerprint(this);
 
         init(attrs);
@@ -149,13 +146,13 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
         init(); //Call init for the concrete class
 
         if (attrs != null) {    //Parse all the params from the arguments.
-            TypedArray a = mContext.getTheme().obtainStyledAttributes(attrs, R.styleable.BasePasscodeView, 0, 0);
+            TypedArray a = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.BasePasscodeView, 0, 0);
             try {
                 mIsTactileFeedbackEnabled = a.getBoolean(R.styleable.BasePasscodeView_giveTactileFeedback, true);
 
                 //Parse divider params
                 mDividerColor = a.getColor(R.styleable.BasePasscodeView_dividerColor,
-                        Utils.getColorCompat(mContext, R.color.lib_divider_color));
+                        Utils.getColorCompat(getContext(), R.color.lib_divider_color));
 
                 //Fet fingerprint params
                 mBoxFingerprint.parseTypeArr(attrs);
@@ -219,13 +216,13 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
      */
     private void measureDivider() {
         mDividerBound.left = (int) (mRootViewBound.left
-                + mContext.getResources().getDimension(R.dimen.lib_divider_horizontal_margin));
+                + getResources().getDimension(R.dimen.lib_divider_horizontal_margin));
         mDividerBound.right = (int) (mRootViewBound.right
-                - mContext.getResources().getDimension(R.dimen.lib_divider_horizontal_margin));
+                - getResources().getDimension(R.dimen.lib_divider_horizontal_margin));
         mDividerBound.top = (int) (mRootViewBound.top + (mRootViewBound.height() * Constants.KEY_BOARD_TOP_WEIGHT)
-                - mContext.getResources().getDimension(R.dimen.lib_divider_vertical_margin));
+                - getResources().getDimension(R.dimen.lib_divider_vertical_margin));
         mDividerBound.bottom = (int) (mRootViewBound.top + (mRootViewBound.height() * Constants.KEY_BOARD_TOP_WEIGHT)
-                - mContext.getResources().getDimension(R.dimen.lib_divider_vertical_margin));
+                - getResources().getDimension(R.dimen.lib_divider_vertical_margin));
     }
 
     ///////////////////////////////////////////////////////////////
@@ -269,18 +266,14 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
     @Override
     @CallSuper
     public void onAuthenticationSuccess() {
-        if (isTactileFeedbackEnable())
-            Utils.giveTactileFeedbackForAuthSuccess(mContext);  //Give tactile feedback.
-
+        giveTactileFeedbackForAuthSuccess();  //Give tactile feedback.
         if (mAuthenticationListener != null) mAuthenticationListener.onAuthenticationSuccessful();
     }
 
     @Override
     @CallSuper
     public void onAuthenticationFail() {
-        if (isTactileFeedbackEnable())
-            Utils.giveTactileFeedbackForAuthFail(mContext);  //Give tactile feedback.
-
+        giveTactileFeedbackForAuthFail();  //Give tactile feedback.
         if (mAuthenticationListener != null) mAuthenticationListener.onAuthenticationFailed();
     }
 
@@ -290,50 +283,148 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
         mBoxFingerprint.reset();
     }
 
+
+    /**
+     * Run the vibrator to give tactile feedback for 350ms when user authentication is successful.
+     */
+    private void giveTactileFeedbackForAuthFail() {
+        if (!mIsTactileFeedbackEnabled) return;
+
+        final Vibrator v = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+        if (v == null) {
+            Log.w("PasscodeView", "Vibrator service not found.");
+            return;
+        }
+
+        if (v.hasVibrator()) v.vibrate(350);
+    }
+
+    /**
+     * Run the vibrator to give tactile feedback for 100ms at difference of 50ms for two times when
+     * user authentication is failed.
+     */
+    private void giveTactileFeedbackForAuthSuccess() {
+        if (!mIsTactileFeedbackEnabled) return;
+
+        final Vibrator v = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+        if (v == null) {
+            Log.w("PasscodeView", "Vibrator service not found.");
+            return;
+        }
+
+        if (v.hasVibrator()) v.vibrate(new long[]{50, 100, 50, 100}, -1);
+    }
+
+
+    /**
+     * Run the vibrator to give tactile feedback for 50ms when any key is pressed.
+     */
+    protected void giveTactileFeedbackForKeyPress() {
+        if (!mIsTactileFeedbackEnabled) return;
+
+        final Vibrator v = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+
+        if (v == null) {
+            Log.w("PasscodeView", "Vibrator service not found.");
+            return;
+        }
+
+        if (v.hasVibrator()) v.vibrate(50);
+    }
+
+
     ///////////////////////////////////////////////////////////////
     //                  GETTERS/SETTERS
     ///////////////////////////////////////////////////////////////
 
-
+    /**
+     * Set the {@link AuthenticationListener} to get callbacks when the user is authenticated or
+     * not. This is the required parameter to set.
+     *
+     * @param authenticationListener {@link AuthenticationListener}.
+     */
     public void setAuthenticationListener(@NonNull final AuthenticationListener authenticationListener) {
         mAuthenticationListener = authenticationListener;
     }
 
     /**
-     * Get the colors of the dividers.
+     * Get the integer color of the dividers.
      */
     @ColorInt
     public int getDividerColor() {
         return mDividerColor;
     }
 
+    /**
+     * Set the integer color of the divider.
+     *
+     * @param dividerColor Integer color.
+     * @see #setDividerColorRes(int)
+     */
     public void setDividerColor(@ColorInt final int dividerColor) {
         mDividerColor = dividerColor;
         prepareDividerPaint();
         invalidate();
     }
 
+    /**
+     * Set the color resource for the color of the divider.
+     *
+     * @param dividerColor color resource.
+     * @see #setDividerColor(int)
+     */
     public void setDividerColorRes(@ColorRes final int dividerColor) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            setDividerColor(mContext.getColor(dividerColor));
+            setDividerColor(getContext().getColor(dividerColor));
         } else {
-            setDividerColor(mContext.getResources().getColor(dividerColor));
+            setDividerColor(getResources().getColor(dividerColor));
         }
     }
 
+    /**
+     * Check if the tactile feedback is enabled when the user presses the key or authentication goes
+     * successful or fail.
+     *
+     * @return True if the tactile feedback is enabled else false.
+     */
     public boolean isTactileFeedbackEnable() {
         return mIsTactileFeedbackEnabled;
     }
 
+    /**
+     * Enable or disable the tactile feedback. If the tactile feedback is enabled, application will
+     * vibrate the device whenever the user presses any key or pattern cell or whenever authentication
+     * completes.
+     *
+     * @param enable True if application wants to enable tactile feedback else false.
+     */
     public void setTactileFeedback(final boolean enable) {
         mIsTactileFeedbackEnabled = enable;
     }
 
-
+    /**
+     * Check if the library enabled to fingerprint scanner to authenticate user using his/her fingerprints
+     * or not. If this method returns false, it indicates that {@link PinView} or {@link PatternView}
+     * are not displaying fingerprint scanning view.
+     *
+     * @return Returns false if the device doesn't support the fingerprint scanning hardware, user
+     * hasn't enrolled any fingerprints or application disabled fingerprint authentication using
+     * {@link #setIsFingerPrintEnable(boolean)} else true.
+     */
     public Boolean isFingerPrintEnable() {
         return mBoxFingerprint.isFingerPrintEnable();
     }
 
+    /**
+     * Enable or disable the fingerprint authentication manually. Setting the value true doesn't
+     * grantee that user will be able to authenticate using fingerprint. Fingerprint scanning will
+     * only be enabled if device has supported hardware for fingerprint scanning and user has enrolled
+     * at least one finger print. Application can check if the finger print scanning is running using
+     * {@link #isFingerPrintEnable()}.
+     *
+     * @param isEnable True to enable fingerprint scanning else false.
+     * @see #isFingerPrintEnable()
+     */
     public void setIsFingerPrintEnable(final boolean isEnable) {
         mBoxFingerprint.setFingerPrintEnable(isEnable);
         requestLayout();
@@ -350,6 +441,7 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
         invalidate();
     }
 
+    @ColorInt
     public int getFingerPrintStatusTextColor() {
         return mBoxFingerprint.getStatusTextColor();
     }
@@ -360,10 +452,11 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
     }
 
     public void setFingerPrintStatusTextColorRes(@ColorRes final int statusTextColor) {
-        mBoxFingerprint.setStatusTextColor(mContext.getResources().getColor(statusTextColor));
+        mBoxFingerprint.setStatusTextColor(getResources().getColor(statusTextColor));
         invalidate();
     }
 
+    @Dimension
     public float getFingerPrintStatusTextSize() {
         return mBoxFingerprint.getStatusTextSize();
     }

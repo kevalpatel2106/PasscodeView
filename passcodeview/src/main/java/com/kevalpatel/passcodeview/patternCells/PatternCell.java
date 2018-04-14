@@ -13,7 +13,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 
-import com.kevalpatel.passcodeview.BasePasscodeView;
+import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 
 /**
  * Created by Keval Patel on 07/04/17.

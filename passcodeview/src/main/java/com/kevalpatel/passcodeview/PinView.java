@@ -19,12 +19,14 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.kevalpatel.passcodeview.authenticator.PinAuthenticator;
 import com.kevalpatel.passcodeview.box.BoxFingerprint;
 import com.kevalpatel.passcodeview.box.BoxKeypad;
 import com.kevalpatel.passcodeview.box.BoxTitleIndicator;
 import com.kevalpatel.passcodeview.box.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.indicators.Indicator;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
+import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 import com.kevalpatel.passcodeview.keys.Key;
 
 /**
@@ -32,9 +34,8 @@ import com.kevalpatel.passcodeview.keys.Key;
  * <p>
  * This view will perform the PIN based authentication. This view also support fingerprint authentication.
  * To set this view application has to
- * <li>1. Set the correct PIN using {@link #setCorrectPin(int[])}.</li>
- * <li>2. Set key shape using {@link #setKey(Key.Builder)}.</li>
- * <li>3. Set the callback listener. {@link #setAuthenticationListener(AuthenticationListener)}</li>
+ * <li>1. Set key shape using {@link #setKey(Key.Builder)}.</li>
+ * <li>2. Set the callback listener. {@link #setAuthenticationListener(AuthenticationListener)}</li>
  * <br/>
  * This view is made up of three different views.
  * <li>Title with the PIN indicators. {@link com.kevalpatel.passcodeview.box.BoxTitleIndicator}</li>
@@ -46,10 +47,22 @@ import com.kevalpatel.passcodeview.keys.Key;
  */
 
 public final class PinView extends BasePasscodeView implements InteractiveArrayList.ChangeListener {
-    private float mDownKeyX;                                        //X coordinate of the ACTION_DOWN point
-    private float mDownKeyY;                                        //Y coordinate of the ACTION_DOWN point
 
-    private int[] mCorrectPin;                                      //Current PIN with witch entered PIN will check.
+    /**
+     * X coordinate for the touch down event.
+     */
+    private float mDownKeyX;
+    /**
+     * Y coordinate for the touch down event.
+     */
+    private float mDownKeyY;
+
+    /**
+     * {@link java.util.ArrayList} of the currently typed pin. At any given time this array will
+     * hold the digits of the PIN that user typed.
+     *
+     * @see InteractiveArrayList
+     */
     private InteractiveArrayList<Integer> mPinTyped;                //PIN typed.
 
     /**
@@ -62,8 +75,13 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
      */
     private BoxTitleIndicator mBoxIndicator;
 
+    /**
+     * {@link KeyNamesBuilder} that holds the title name of all the keys for keyboard digits.
+     */
     @NonNull
     private KeyNamesBuilder mKeyNamesBuilder = new KeyNamesBuilder();
+
+    private PinAuthenticator mAuthenticator;
 
     ///////////////////////////////////////////////////////////////
     //                  CONSTRUCTORS
@@ -209,8 +227,6 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
     /**
      * Handle the newly added key digit. Append the digit to {@link #mPinTyped}.
      * If the new digit is {@link KeyNamesBuilder#BACKSPACE_TITLE}, remove the last digit of the {@link #mPinTyped}.
-     * If the {@link #mPinTyped} has length of {@link #mCorrectPin} and equals to {@link #mCorrectPin}
-     * notify application as authenticated.
      *
      * @param newDigit newly pressed digit
      */
@@ -220,8 +236,6 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
         //Check for the state
         if (mAuthenticationListener == null) {
             throw new IllegalStateException("Set AuthenticationListener to receive callbacks.");
-        } else if (mCorrectPin == null || mCorrectPin.length == 0) {
-            throw new IllegalStateException("Please set current PIN to check with the entered value.");
         }
 
         if (newDigit.equals(KeyNamesBuilder.BACKSPACE_TITLE)) { //Back space key is pressed.
@@ -234,10 +248,10 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
 
         invalidate();
 
-        if (mCorrectPin.length == mPinTyped.size()) {   //Only check for the pin validity if typed pin has the length of correct pin.
+        if (mAuthenticator.isValidPinLength(mPinTyped.size())) {
 
             //Check if the pin is matched?
-            if (Utils.isPINMatched(mCorrectPin, mPinTyped)) {
+            if (mAuthenticator.isValidPin(mPinTyped)) {
                 //Hurray!!! Authentication is successful.
                 onAuthenticationSuccess();
             } else {
@@ -252,8 +266,8 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
                     reset();
                 }
             }, 350);
-        } else if (isTactileFeedbackEnable()) {
-            Utils.giveTactileFeedbackForKeyPress(mContext);
+        } else {
+            giveTactileFeedbackForKeyPress();
         }
     }
 
@@ -271,6 +285,42 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
     ///////////////////////////////////////////////////////////////
     //                  GETTERS/SETTERS
     ///////////////////////////////////////////////////////////////
+
+    @Nullable
+    public PinAuthenticator getAuthenticator() {
+        return mAuthenticator;
+    }
+
+    public void setAuthenticator(final PinAuthenticator authenticator) {
+        mAuthenticator = authenticator;
+    }
+
+    /**
+     * Get the currently typed PIN numbers.
+     *
+     * @return Array of PIN digits.
+     */
+    public int[] getCurrentTypedPin() {
+        int[] arr = new int[mPinTyped.size()];
+        for (int i = 0; i < mPinTyped.size(); i++) arr[i] = mPinTyped.get(i);
+        return arr;
+    }
+
+    /**
+     * Set the currently typed PIN numbers.
+     *
+     * @param currentTypedPin Array of PIN digits.
+     */
+    public void setCurrentTypedPin(final int[] currentTypedPin) {
+        //Add the pin to pin typed
+        mPinTyped.clear();
+        for (int i : currentTypedPin) mPinTyped.add(i);
+
+        requestLayout();
+        invalidate();
+    }
+
+    //********************** For keyboard box
 
     /**
      * @return true if the one hand operation is enabled.
@@ -290,98 +340,6 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
         mBoxKeypad.setOneHandOperation(isEnable);
         requestLayout();
         invalidate();
-    }
-
-    /**
-     * Set the correct PIN. If the PIN entered by the user matches this correct PIN, authentication will
-     * successful. The length of the PIN and hence the number of the indicators in title will update
-     * based on this PIN length automatically.
-     *
-     * @param correctPin Array if single digits of the PIN. The single digit should not be less than 0 or grater
-     *                   than 9.
-     */
-    public void setCorrectPin(@NonNull final int[] correctPin) {
-        //Validate the pin
-        if (!Utils.isValidPin(correctPin)) throw new IllegalArgumentException("Invalid PIN.");
-
-        mCorrectPin = correctPin;
-        mBoxIndicator.setPinLength(mCorrectPin.length);
-
-        mPinTyped.clear();
-        invalidate();
-    }
-
-    /**
-     * @return Title color of the view.
-     */
-    @ColorInt
-    public int getTitleColor() {
-        return mBoxIndicator.getTitleColor();
-    }
-
-    /**
-     * Set the color of the view title.
-     *
-     * @param titleColor Color of the title.
-     */
-    public void setTitleColor(@ColorInt final int titleColor) {
-        mBoxIndicator.setTitleColor(titleColor);
-        invalidate();
-    }
-
-    /**
-     * Set the color of the view title.
-     *
-     * @param titleColor Color of the title.
-     */
-    public void setTitleColorResource(@ColorRes final int titleColor) {
-        mBoxIndicator.setTitleColor(mContext.getResources().getColor(titleColor));
-        invalidate();
-    }
-
-    /**
-     * @return Current title of the view.
-     */
-    public String getTitle() {
-        return mBoxIndicator.getTitle();
-    }
-
-    /**
-     * Set the title at the top of view.
-     *
-     * @param title title string
-     */
-    public void setTitle(@NonNull final String title) {
-        mBoxIndicator.setTitle(title);
-        invalidate();
-    }
-
-    /**
-     * @return {@link com.kevalpatel.passcodeview.keys.Key.Builder}
-     */
-    @Nullable
-    public Key.Builder getKeyBuilder() {
-        return mBoxKeypad.getKeyBuilder();
-    }
-
-    /**
-     * Set the PIN change indicator. Use {@link com.kevalpatel.passcodeview.indicators.Indicator.Builder}
-     * to use different indicators.
-     *
-     * @param indicatorBuilder {@link com.kevalpatel.passcodeview.indicators.Indicator.Builder}
-     */
-    public void setIndicator(@NonNull final Indicator.Builder indicatorBuilder) {
-        mBoxIndicator.setIndicatorBuilder(indicatorBuilder);
-        requestLayout();
-        invalidate();
-    }
-
-    /**
-     * @return {@link com.kevalpatel.passcodeview.indicators.Indicator.Builder}
-     */
-    @Nullable
-    public Indicator.Builder getIndicatorBuilder() {
-        return mBoxIndicator.getIndicatorBuilder();
     }
 
     /**
@@ -412,34 +370,78 @@ public final class PinView extends BasePasscodeView implements InteractiveArrayL
         invalidate();
     }
 
+    //********************** For title and indicator box
+
     /**
-     * Get the currently typed PIN numbers.
-     *
-     * @return Array of PIN digits.
+     * @return Title color of the view.
      */
-    public int[] getCurrentTypedPin() {
-        int[] arr = new int[mPinTyped.size()];
-        for (int i = 0; i < mPinTyped.size(); i++) arr[i] = mPinTyped.get(i);
-        return arr;
+    @ColorInt
+    public int getTitleColor() {
+        return mBoxIndicator.getTitleColor();
     }
 
     /**
-     * Set the currently typed PIN numbers.
-     *
-     * @param currentTypedPin Array of PIN digits.
+     * @return {@link com.kevalpatel.passcodeview.keys.Key.Builder}
      */
-    public void setCurrentTypedPin(final int[] currentTypedPin) {
-        if (mCorrectPin.length == 0) {
-            throw new IllegalStateException("You must call setCorrectPattern() before calling this method.");
-        } else if (currentTypedPin.length > mCorrectPin.length) {
-            throw new IllegalArgumentException("Invalid pin length.");
-        }
+    @Nullable
+    public Key.Builder getKeyBuilder() {
+        return mBoxKeypad.getKeyBuilder();
+    }
 
-        //Add the pin to pin typed
-        mPinTyped.clear();
-        for (int i : currentTypedPin) mPinTyped.add(i);
+    /**
+     * Set the color of the view title.
+     *
+     * @param titleColor Color of the title.
+     */
+    public void setTitleColor(@ColorInt final int titleColor) {
+        mBoxIndicator.setTitleColor(titleColor);
+        invalidate();
+    }
 
+    /**
+     * Set the color of the view title.
+     *
+     * @param titleColor Color of the title.
+     */
+    public void setTitleColorResource(@ColorRes final int titleColor) {
+        mBoxIndicator.setTitleColor(getResources().getColor(titleColor));
+        invalidate();
+    }
+
+    /**
+     * @return Current title of the view.
+     */
+    public String getTitle() {
+        return mBoxIndicator.getTitle();
+    }
+
+    /**
+     * Set the title at the top of view.
+     *
+     * @param title title string
+     */
+    public void setTitle(@NonNull final String title) {
+        mBoxIndicator.setTitle(title);
+        invalidate();
+    }
+
+    /**
+     * Set the PIN change indicator. Use {@link com.kevalpatel.passcodeview.indicators.Indicator.Builder}
+     * to use different indicators.
+     *
+     * @param indicatorBuilder {@link com.kevalpatel.passcodeview.indicators.Indicator.Builder}
+     */
+    public void setIndicator(@NonNull final Indicator.Builder indicatorBuilder) {
+        mBoxIndicator.setIndicatorBuilder(indicatorBuilder);
         requestLayout();
         invalidate();
+    }
+
+    /**
+     * @return {@link com.kevalpatel.passcodeview.indicators.Indicator.Builder}
+     */
+    @Nullable
+    public Indicator.Builder getIndicatorBuilder() {
+        return mBoxIndicator.getIndicatorBuilder();
     }
 }

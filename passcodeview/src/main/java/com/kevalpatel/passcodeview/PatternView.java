@@ -23,8 +23,10 @@ import android.support.annotation.StringRes;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.kevalpatel.passcodeview.authenticator.PatternAuthenticator;
 import com.kevalpatel.passcodeview.box.BoxPattern;
 import com.kevalpatel.passcodeview.box.BoxTitle;
+import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 import com.kevalpatel.passcodeview.patternCells.PatternCell;
 import com.kevalpatel.passcodeview.patternCells.PatternPoint;
 
@@ -37,8 +39,12 @@ import java.util.ArrayList;
  */
 
 public final class PatternView extends BasePasscodeView {
-    private PatternPoint[] mCorrectPattern;                  //Current PIN with witch entered PIN will check.
-    private ArrayList<PatternCell> mPatternTyped;            //PIN typed.
+
+    /**
+     * {@link ArrayList} that holds the list of all the {@link PatternCell} touched by the user
+     * while drawing the pattern.
+     */
+    private ArrayList<PatternCell> mPatternTyped;
 
     private float mPatternPathEndX;
     private float mPatternPathEndY;
@@ -52,11 +58,15 @@ public final class PatternView extends BasePasscodeView {
     /**
      * {@link BoxPattern} to display the {@link PatternPoint}. User can enter the correct pattern
      * in this box.
+     *
+     * @see BoxPattern
      */
     private BoxPattern mBoxPattern;
 
     /**
      * {@link BoxTitle} to display the title message.
+     *
+     * @see BoxTitle
      */
     private BoxTitle mBoxTitle;
 
@@ -78,6 +88,16 @@ public final class PatternView extends BasePasscodeView {
      * Boolean to set <code>true</code> if the error animations are currently being played or <code>false</code>.
      */
     private boolean isErrorShowing = false;
+
+    /**
+     * {@link PatternAuthenticator} to perform authentication on the pattern entered by the user.
+     * This field is required to set.
+     *
+     * @see #setAuthenticator(PatternAuthenticator)
+     * @see #getAuthenticator()
+     */
+    private PatternAuthenticator mAuthenticator;
+
 
     ///////////////////////////////////////////////////////////////
     //                  CONSTRUCTORS
@@ -124,7 +144,7 @@ public final class PatternView extends BasePasscodeView {
         mBoxTitle.setDefaults();
         mBoxPattern.setDefaults();
 
-        mPatternPathColor = mContext.getResources().getColor(android.R.color.holo_green_dark);
+        mPatternPathColor = getResources().getColor(android.R.color.holo_green_dark);
     }
 
     /**
@@ -153,12 +173,12 @@ public final class PatternView extends BasePasscodeView {
     @SuppressWarnings("deprecation")
     @Override
     public void parseTypeArr(@NonNull AttributeSet typedArray) {
-        TypedArray a = mContext.getTheme()
+        final TypedArray a = getContext().getTheme()
                 .obtainStyledAttributes(typedArray, R.styleable.PatternView, 0, 0);
 
         try { //Parse title params
             mPatternPathColor = a.getColor(R.styleable.PatternView_patternLineColor,
-                    mContext.getResources().getColor(android.R.color.holo_green_dark));
+                    getResources().getColor(android.R.color.holo_green_dark));
         } finally {
             a.recycle();
         }
@@ -243,10 +263,12 @@ public final class PatternView extends BasePasscodeView {
             case MotionEvent.ACTION_DOWN:
                 reset();
             case MotionEvent.ACTION_MOVE:
-                PatternCell cellNumber = mBoxPattern.findCell(touchX, touchY);
+
+                final PatternCell cellNumber = mBoxPattern.findCell(touchX, touchY);
+
                 if (cellNumber != null && !mPatternTyped.contains(cellNumber)) {
                     mPatternTyped.add(cellNumber);
-                    if (isTactileFeedbackEnable()) Utils.giveTactileFeedbackForKeyPress(mContext);
+                    giveTactileFeedbackForKeyPress();
                 }
 
                 mPatternPathEndX = touchX;
@@ -255,9 +277,24 @@ public final class PatternView extends BasePasscodeView {
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
+                //Validate the current state
                 if (mPatternTyped.size() == 0) return true;
+                if (mAuthenticator == null) {
+                    throw new IllegalStateException("Set authenticator first.");
+                }
 
-                validatePattern();
+                //Prepare the pattern points
+                final ArrayList<PatternPoint> patternPoints = new ArrayList<>(mPatternTyped.size());
+                for (PatternCell cell : mPatternTyped) {
+                    patternPoints.add(cell.getPoint());
+                }
+
+                //Validate using authenticator,
+                if (mAuthenticator.isValidPattern(patternPoints)) {
+                    onAuthenticationSuccess();
+                } else {
+                    onAuthenticationFail();
+                }
 
                 //Reset the view.
                 new android.os.Handler().postDelayed(new Runnable() {
@@ -273,30 +310,20 @@ public final class PatternView extends BasePasscodeView {
         return true;
     }
 
-    private void validatePattern() {
-        if (mCorrectPattern.length == mPatternTyped.size() && Utils.isPatternMatched(mCorrectPattern, mPatternTyped)) {
-            onAuthenticationSuccess();
-        } else {
-            onAuthenticationFail();
-        }
-        invalidate();
-    }
-
     ///////////////////////////////////////////////////////////////
     //                  GETTERS/SETTERS
     ///////////////////////////////////////////////////////////////
 
-    public void setCorrectPattern(@NonNull PatternPoint[] correctPattern) {
-        mCorrectPattern = correctPattern;
 
-        mPatternTyped.clear();
-        invalidate();
+    public PatternAuthenticator getAuthenticator() {
+        return mAuthenticator;
     }
 
-    @Nullable
-    public PatternCell.Builder getPatternCellBuilder() {
-        return mBoxPattern.getCellBuilder();
+    public void setAuthenticator(final PatternAuthenticator authenticator) {
+        mAuthenticator = authenticator;
     }
+
+    //********************** For pattern box
 
     public boolean isOneHandOperationEnabled() {
         return mBoxPattern.isOneHandOperation();
@@ -308,21 +335,16 @@ public final class PatternView extends BasePasscodeView {
         invalidate();
     }
 
-    public int getTitleColor() {
-        return mBoxTitle.getTitleColor();
-    }
-
-    public void setTitleColor(@ColorInt int titleColor) {
-        mBoxTitle.setTitleColor(titleColor);
+    public void setPatternCell(@NonNull PatternCell.Builder indicatorBuilder) {
+        mBoxPattern.setCellBuilder(indicatorBuilder);
+        requestLayout();
         invalidate();
     }
 
-    @SuppressWarnings("deprecation")
-    public void setTitleColorRes(@ColorRes int titleColor) {
-        mBoxTitle.setTitleColor(Utils.getColorCompat(getContext(), titleColor));
-        invalidate();
+    @Nullable
+    public PatternCell.Builder getPatternCellBuilder() {
+        return mBoxPattern.getCellBuilder();
     }
-
 
     public int getPatternPathColor() {
         return mPatternPathColor;
@@ -336,6 +358,43 @@ public final class PatternView extends BasePasscodeView {
     @SuppressWarnings("deprecation")
     public void setPatternPathColorRes(@ColorRes int pathColor) {
         mPatternPathColor = Utils.getColorCompat(getContext(), pathColor);
+        invalidate();
+    }
+
+    public int getNoOfColumn() {
+        return mBoxPattern.getNoOfColumn();
+    }
+
+    public void setNoOfColumn(int noOfColumn) {
+        mBoxPattern.setNoOfColumn(noOfColumn);
+        requestLayout();
+        invalidate();
+    }
+
+    public int getNoOfRows() {
+        return mBoxPattern.getNoOfRows();
+    }
+
+    public void setNoOfRows(int noOfRows) {
+        mBoxPattern.setNoOfRows(noOfRows);
+        requestLayout();
+        invalidate();
+    }
+
+    //********************** For title box
+
+    public int getTitleColor() {
+        return mBoxTitle.getTitleColor();
+    }
+
+    public void setTitleColor(@ColorInt int titleColor) {
+        mBoxTitle.setTitleColor(titleColor);
+        invalidate();
+    }
+
+    @SuppressWarnings("deprecation")
+    public void setTitleColorRes(@ColorRes int titleColor) {
+        mBoxTitle.setTitleColor(Utils.getColorCompat(getContext(), titleColor));
         invalidate();
     }
 
@@ -363,32 +422,6 @@ public final class PatternView extends BasePasscodeView {
      */
     public void setTitle(@NonNull String title) {
         mBoxTitle.setTitle(title);
-        invalidate();
-    }
-
-    public void setPatternCell(@NonNull PatternCell.Builder indicatorBuilder) {
-        mBoxPattern.setCellBuilder(indicatorBuilder);
-        requestLayout();
-        invalidate();
-    }
-
-    public int getNoOfColumn() {
-        return mBoxPattern.getNoOfColumn();
-    }
-
-    public void setNoOfColumn(int noOfColumn) {
-        mBoxPattern.setNoOfColumn(noOfColumn);
-        requestLayout();
-        invalidate();
-    }
-
-    public int getNoOfRows() {
-        return mBoxPattern.getNoOfRows();
-    }
-
-    public void setNoOfRows(int noOfRows) {
-        mBoxPattern.setNoOfRows(noOfRows);
-        requestLayout();
         invalidate();
     }
 }

@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.kevalpatel.passcodeview.PinView;
+import com.kevalpatel.passcodeview.authenticator.PasscodeViewPinAuthenticator;
 import com.kevalpatel.passcodeview.box.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.indicators.CircleIndicator;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
@@ -37,7 +38,8 @@ public class PinViewActivity extends AppCompatActivity {
 
         //Set the correct pin code.
         //REQUIRED
-        mPinView.setCorrectPin(new int[]{1, 2, 3, 4});
+        final int[] correctPattern = new int[]{1, 2, 3, 4};
+        mPinView.setAuthenticator(new PasscodeViewPinAuthenticator(correctPattern));
 
         //Build the desired key shape and pass the theme parameters.
         //REQUIRED

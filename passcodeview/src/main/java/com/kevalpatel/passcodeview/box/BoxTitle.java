@@ -16,10 +16,10 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 
-import com.kevalpatel.passcodeview.BasePasscodeView;
 import com.kevalpatel.passcodeview.Constants;
 import com.kevalpatel.passcodeview.R;
 import com.kevalpatel.passcodeview.Utils;
+import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 
 /**
  * Created by Keval Patel on 09/04/17.

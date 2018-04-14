@@ -11,8 +11,8 @@ package com.kevalpatel.passcodeview.box;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.kevalpatel.passcodeview.BasePasscodeView;
-import com.kevalpatel.passcodeview.PasscodeViewLifeCycle;
+import com.kevalpatel.passcodeview.internal.BasePasscodeView;
+import com.kevalpatel.passcodeview.internal.PasscodeViewLifeCycle;
 
 /**
  * Created by Keval Patel on 09/04/17.
