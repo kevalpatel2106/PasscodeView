@@ -32,7 +32,12 @@ android {
     }
 }
 
+configurations {
+    javadocDeps
+}
+
 dependencies {
     implementation 'com.android.support:support-annotations:27.1.1'
+    javadocDeps 'com.android.support:support-annotations:27.1.1'
 }
 apply from: '../bintray.gradle'

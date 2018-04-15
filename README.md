@@ -12,18 +12,22 @@
 - With the use of *PasscodeView*, you can easily integrate PIN & Fingerprint based authentication in your application. 
 
 
-## Features:
-This library provides easy and secure PIN authentication view, which
-- provides access to built-in fingerprint-based authentication. This handles all the complexities of integrating the fingerprint API with your application.
-- provide error feedback when PIN entered is wrong.
-- is highly customizable. So that you can match it with your application them. It provides you control over,
-  * color and shape of each key. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Diffrent-Key-Shapes)
-  * localized name of each key in pin keyboard. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names)
-  * size of the each single key.
-  * color and shape of pin indicators.👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators)
-  * Control over tactile feedback for key press and authentication success/failure events.
-  * Authenticate using the pattern.
-
+### Features:
+ This library provides an easy and secure PIN and Pattern based authentication view, which
+ - It provides access to built-in fingerprint-based authentication if the device supports fingerprint hardware. This handles all the complexities of integrating the fingerprint API with your application.
+ - It provides error feedback when PIN or pattern entered is wrong.
+ - Extremely lightweight.
+ - Supports dynamic PIN sizes for PIN-based authentication. That means you don't have to provide a number of PIN digits at runtime. 
+ - Supports custom authentication logic for PIN and Pattern. That means you can send the PIN or pattern to the server for authentication too.
+ - It is highly customizable. So that you can match it with your application them. It provides you control over,
+   * color and shape of each key. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Diffrent-Key-Shapes)
+   * localized name of each key in pin keyboard. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names)
+   * size of every single key.
+   * color and shape of indicators to display a number of digits in the PIN.👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators)
+   * color and shape of pattern indicators.
+   * tactile feedback for key press and authentication success/failure events.
+   
+   
 ## Demo: 
 **Authentication using PIN/Fingerprint**
 
@@ -47,7 +51,7 @@ This library provides easy and secure PIN authentication view, which
   * Add below lines to `app/build.gradle` file of your project.
   ```
   dependencies {
-      compile 'com.kevalpatel2106:passcodeview:1.2.1'
+      compile 'com.kevalpatel2106:passcodeview:2.0.0'
   }
   ```
   * To integrate using maven visit this [page](https://github.com/kevalpatel2106/PasscodeView/wiki/Dependencies).
