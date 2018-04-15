@@ -1,11 +1,9 @@
 /*
- * Copyright 2017 Keval Patel.
+ * Copyright 2018 Keval Patel.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,11 +14,9 @@
 
 package com.kevalpatel.passcodeview.patternCells;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
@@ -28,14 +24,14 @@ import android.support.annotation.DimenRes;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 
-import com.kevalpatel.passcodeview.PatternView;
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.R;
+import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 
 /**
  * Created by Keval on 06-Apr-17.
  *
- * @author 'https://github.com/kevalpatel2106'
+ *@author <a href="https://github.com/kevalpatel2106">kevalpatel2106</a>
  */
 
 public final class CirclePatternCell extends PatternCell {
@@ -46,27 +42,43 @@ public final class CirclePatternCell extends PatternCell {
 
     private float mTouchRadius;
 
-    private CirclePatternCell(@NonNull PatternView patternView,
-                              @NonNull Rect bound,
-                              @NonNull CirclePatternCell.Builder builder,
-                              Point point) {
-        super(patternView, bound, builder, point);
+    @NonNull
+    private final Paint mCellPaint;             //Empty indicator color
+
+    @NonNull
+    private final Paint mErrorPaint;             //Error indicator color
+
+    private CirclePatternCell(@NonNull final CirclePatternCell.Builder builder,
+                              @NonNull final Rect bound,
+                              @NonNull final PatternPoint point) {
+        super(builder, bound, point);
         mBuilder = builder;
-        mTouchRadius = mBuilder.getRadius() < getContext().getResources().getDimension(R.dimen.lib_min_touch_radius) ?
-                mBuilder.getRadius() + 20 : mBuilder.getRadius();
+
+        mTouchRadius = mBuilder.mRadius < getContext().getResources().getDimension(R.dimen.lib_min_touch_radius)
+                ? mBuilder.mRadius + 20 : mBuilder.mRadius;
+
+        //Set empty dot paint
+        mCellPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mCellPaint.setStyle(Paint.Style.STROKE);
+        mCellPaint.setColor(builder.mNormalColor);
+        mCellPaint.setStrokeWidth(builder.mStrokeWidth);
+
+        //Set filled dot paint
+        mErrorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mErrorPaint.setColor(Color.RED);
     }
 
     /**
      * Draw the indicator.
      *
-     * @param canvas     Canvas of {@link PinView}.
+     * @param canvas Canvas of {@link PinView}.
      */
     @Override
     public void draw(@NonNull Canvas canvas) {
         canvas.drawCircle(getBound().exactCenterX(),
                 getBound().exactCenterY(),
-                mBuilder.getRadius(),
-                isDisplayError ? mBuilder.getErrorPaint() : mBuilder.getCellPaint());
+                mBuilder.mRadius,
+                isDisplayError ? mErrorPaint : mCellPaint);
     }
 
     @Override
@@ -89,14 +101,13 @@ public final class CirclePatternCell extends PatternCell {
     @Override
     public boolean isIndicatorTouched(float touchX, float touchY) {
         //Check if the click is between the width bounds
+        //noinspection SimplifiableIfStatement
         if (touchX > getBound().exactCenterX() - mTouchRadius
                 && touchX < getBound().exactCenterX() + mTouchRadius) {
 
             //Check if the click is between the height bounds
-            if (touchY > getBound().exactCenterY() - mTouchRadius
-                    && touchY < getBound().exactCenterY() + mTouchRadius) {
-                return true;
-            }
+            return touchY > getBound().exactCenterY() - mTouchRadius
+                    && touchY < getBound().exactCenterY() + mTouchRadius;
         }
         return false;
     }
@@ -109,105 +120,57 @@ public final class CirclePatternCell extends PatternCell {
         @Dimension
         private float mStrokeWidth;
 
-        private Paint mCellPaint;             //Empty indicator color
-        private Paint mErrorPaint;             //Error indicator color
-
-        public Builder(@NonNull PatternView patternView) {
-            super(patternView);
+        public Builder(@NonNull final BasePasscodeView basePasscodeView) {
+            super(basePasscodeView);
+            setDefaults();
         }
 
-        @Dimension
-        @Override
-        public float getCellRadius() {
-            return mRadius * 2;
-        }
-
-        @Override
-        public CirclePatternCell.Builder build() {
-
-            //Set empty dot paint
-            mCellPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mCellPaint.setStyle(Paint.Style.STROKE);
-            mCellPaint.setColor(mNormalColor);
-            mCellPaint.setStrokeWidth(mStrokeWidth);
-
-            //Set filled dot paint
-            mErrorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mErrorPaint.setColor(Color.RED);
-            return this;
-        }
-
-        @Override
-        protected void setDefaults(@NonNull Context context) {
+        private void setDefaults() {
             mRadius = getContext().getResources().getDimension(R.dimen.lib_indicator_radius);
             mStrokeWidth = getContext().getResources().getDimension(R.dimen.lib_indicator_stroke_width);
             mNormalColor = getContext().getResources().getColor(R.color.lib_indicator_stroke_color);
         }
 
-        @Override
-        public PatternCell getCell(@NonNull Rect bound, Point point) {
-            return new CirclePatternCell(getRootView(), bound, this, point);
-        }
-
-        @ColorInt
-        public int getNormalColor() {
-            return mNormalColor;
-        }
-
         @NonNull
-        public CirclePatternCell.Builder setNormalColor(@ColorInt int normalColor) {
+        public CirclePatternCell.Builder setNormalColor(@ColorInt final int normalColor) {
             mNormalColor = normalColor;
             return this;
         }
 
         @NonNull
-        public CirclePatternCell.Builder setCellColorResource(@ColorRes int indicatorStrokeColor) {
+        public CirclePatternCell.Builder setCellColorResource(@ColorRes final int indicatorStrokeColor) {
             mNormalColor = getContext().getResources().getColor(indicatorStrokeColor);
             return this;
         }
 
-        @Dimension
-        public float getRadius() {
-            return mRadius;
-        }
-
         @NonNull
-        public CirclePatternCell.Builder setRadius(@Dimension float radius) {
+        public CirclePatternCell.Builder setRadius(@Dimension final float radius) {
             mRadius = radius;
             return this;
         }
 
         @NonNull
-        public CirclePatternCell.Builder setRadius(@DimenRes int indicatorRadius) {
+        public CirclePatternCell.Builder setRadius(@DimenRes final int indicatorRadius) {
             mRadius = getContext().getResources().getDimension(indicatorRadius);
             return this;
         }
 
-        @Dimension
-        public float getStrokeWidth() {
-            return mStrokeWidth;
-        }
-
         @NonNull
-        public CirclePatternCell.Builder setStrokeWidth(@Dimension float strokeWidth) {
+        public CirclePatternCell.Builder setStrokeWidth(@Dimension final float strokeWidth) {
             mStrokeWidth = strokeWidth;
             return this;
         }
 
         @NonNull
-        public CirclePatternCell.Builder setStrokeWidth(@DimenRes int indicatorStrokeWidth) {
+        public CirclePatternCell.Builder setStrokeWidth(@DimenRes final int indicatorStrokeWidth) {
             mStrokeWidth = getContext().getResources().getDimension(indicatorStrokeWidth);
             return this;
         }
 
         @NonNull
-        public Paint getCellPaint() {
-            return mCellPaint;
-        }
-
-        @NonNull
-        public Paint getErrorPaint() {
-            return mErrorPaint;
+        @Override
+        public PatternCell buildInternal(@NonNull Rect bound, @NonNull PatternPoint point) {
+            return new CirclePatternCell(this, bound, point);
         }
     }
 }

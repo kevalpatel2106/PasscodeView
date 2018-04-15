@@ -12,18 +12,22 @@
 - With the use of *PasscodeView*, you can easily integrate PIN & Fingerprint based authentication in your application. 
 
 
-## Features:
-This library provides easy and secure PIN authentication view, which
-- provides access to built-in fingerprint-based authentication. This handles all the complexities of integrating the fingerprint API with your application.
-- provide error feedback when PIN entered is wrong.
-- is highly customizable. So that you can match it with your application them. It provides you control over,
-  * color and shape of each key. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Diffrent-Key-Shapes)
-  * localized name of each key in pin keyboard. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names)
-  * size of the each single key.
-  * color and shape of pin indicators.👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators)
-  * Control over tactile feedback for key press and authentication success/failure events.
-  * Authenticate using the pattern.
-
+### Features:
+ This library provides an easy and secure PIN and Pattern based authentication view, which
+ - It provides access to built-in fingerprint-based authentication if the device supports fingerprint hardware. This handles all the complexities of integrating the fingerprint API with your application.
+ - It provides error feedback when PIN or pattern entered is wrong.
+ - Extremely lightweight.
+ - Supports dynamic PIN sizes for PIN-based authentication. That means you don't have to provide a number of PIN digits at runtime. 
+ - Supports custom authentication logic for PIN and Pattern. That means you can send the PIN or pattern to the server for authentication too.
+ - It is highly customizable. So that you can match it with your application them. It provides you control over,
+   * color and shape of each key. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Diffrent-Key-Shapes)
+   * localized name of each key in pin keyboard. 👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names)
+   * size of every single key.
+   * color and shape of indicators to display a number of digits in the PIN.👉 [Guide](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators)
+   * color and shape of pattern indicators.
+   * tactile feedback for key press and authentication success/failure events.
+   
+   
 ## Demo: 
 **Authentication using PIN/Fingerprint**
 
@@ -47,7 +51,7 @@ This library provides easy and secure PIN authentication view, which
   * Add below lines to `app/build.gradle` file of your project.
   ```
   dependencies {
-      compile 'com.kevalpatel2106:passcodeview:1.2.1'
+      compile 'com.kevalpatel2106:passcodeview:2.0.0'
   }
   ```
   * To integrate using maven visit this [page](https://github.com/kevalpatel2106/PasscodeView/wiki/Dependencies).
@@ -69,49 +73,52 @@ This library provides easy and secure PIN authentication view, which
           app:titleTextColor="@android:color/white"/>
   ```
   
-- ### Set the correct pin code to authenticate the user in your activity/fragment.
+- ### Get the instance of the view in your activity/fragment.
   ```java
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    //....
-    //...
-          
+    //....          
     PinView pinView = (PinView) findViewById(R.id.pin_view);
-    pinView.setCorrectPin(new int[]{1, 2, 3, 4});
     //...
   }
   ```
+
+- ### Set the authenticator which will tell if your pin is correct or not. 
+  - The library provides inbuilt `PasscodeViewPinAuthenticator`. This authenticator will match the pin entered by the user with the correct PIN provided.
+  - You can write your custom authenticator to customize the authentication logic.
+   ```java    
+      //Set the authenticator.
+      //REQUIRED
+      final int[] correctPin = new int[]{1, 2, 3,4}; 
+      pinView.setPinAuthenticator(new PasscodeViewPinAuthenticator(correctPin));
+  ```
+
+- ### Set the PIN length. 
+  - If you know the number of digits in the PIN you can set it. 
+  - But if you don't know the size of the PIN in advance you can set it to `PinView.DYNAMIC_PIN_LENGTH`. By default, if you don't set the size `PinView` will consider it dynamic PIN length.
+  ```java
+    pinView.setPinLength(PinView.DYNAMIC_PIN_LENGTH);
+  ```
+
 
 - ### Set the shape of the key you want to use. 
   - There are three built-in key shapes. You can also generate your own key by extending [`Key`](https://github.com/kevalpatel2106/PasscodeView/blob/master/passcodeview/src/main/java/com/kevalpatel/passcodeview/keys/Key.java) class.
     * Round key
     * Rectangle key
     * Square key
+  - You can create your custom key using this guide. 👉 [Custom key wiki](https://github.com/kevalpatel2106/PasscodeView/wiki/Custom-key-shape)
   - Here is the example for the round keys.
-  ```java
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      //....
-      //...
-            
-      PinView pinView = (PinView) findViewById(R.id.pin_view);
-      pinView.setCorrectPin(new int[]{1, 2, 3, 4});
-    
-      //Build the desired key shape and pass the theme parameters.
-      //REQUIRED
-      pinView.setKey(new RoundKey.Builder(pinView)
-              .setKeyPadding(R.dimen.key_padding)
-              .setKeyStrokeColorResource(R.color.colorAccent)
-              .setKeyStrokeWidth(R.dimen.key_stroke_width)
-              .setKeyTextColorResource(R.color.colorAccent)
-              .setKeyTextSize(R.dimen.key_text_size)
-              .build());
-      
-      //...
-    }
-    ```
+   ```java
+    //Build the desired key shape and pass the theme parameters.
+    //REQUIRED
+    pinView.setKey(new RoundKey.Builder(pinView)
+            .setKeyPadding(R.dimen.key_padding)
+            .setKeyStrokeColorResource(R.color.colorAccent)
+            .setKeyStrokeWidth(R.dimen.key_stroke_width)
+            .setKeyTextColorResource(R.color.colorAccent)
+            .setKeyTextSize(R.dimen.key_text_size));
+   ```
   **Different Key Shape**
     
   |Rectangle|Circle|Square|
@@ -123,46 +130,22 @@ This library provides easy and secure PIN authentication view, which
     * Round indicator
     * Dot indicator
     * Circle indicator
-  - Here is the example for the round indicator. You can learn more about other indicators from [here](https://github.com/kevalpatel2106/PasscodeView/wiki/Indicators).
+  - If you want to create custom indicator with the custom shape, see [How to create custom indicator?](https://github.com/kevalpatel2106/PasscodeView/wiki/Custom-indicator).
+  - Here is the example for the round indicator.
   ```java
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      //....
-      //...
-            
-      PinView pinView = (PinView) findViewById(R.id.pin_view);
-      pinView.setCorrectPin(new int[]{1, 2, 3, 4});
-      pinView.setKey(...);
-            
       //Build the desired indicator shape and pass the theme attributes.
       //REQUIRED
       pinView.setIndicator(new CircleIndicator.Builder(pinView)
               .setIndicatorRadius(R.dimen.indicator_radius)
               .setIndicatorFilledColorResource(R.color.colorAccent)
               .setIndicatorStrokeColorResource(R.color.colorAccent)
-              .setIndicatorStrokeWidth(R.dimen.indicator_stroke_width)
-              .build());
-      
-      //...
-    }
+              .setIndicatorStrokeWidth(R.dimen.indicator_stroke_width));
     ```
 
 - ### Set key names.
   - Set the texts to display on different keys. This is an optional step. If you don't set the key names, by default `PINView` will display English locale digits.
   - If you want to learn more about key name localization visit [here](https://github.com/kevalpatel2106/PasscodeView/wiki/Add-localized-key-names).
   ```java
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      //....
-      //...
-            
-      PinView pinView = (PinView) findViewById(R.id.pin_view);
-      pinView.setCorrectPin(new int[]{1, 2, 3, 4});
-      pinView.setKey(...);
-      pinView.setIndicator(...);
-      
       //Set the name of the keys based on your locale.
       //OPTIONAL. If not passed key names will be displayed based on english locale.
       pinView.setKeyNames(new KeyNamesBuilder()
@@ -176,9 +159,6 @@ This library provides easy and secure PIN authentication view, which
             .setKeyEight(this, R.string.key_8)
             .setKeyNine(this, R.string.key_9)
             .setKeyZero(this, R.string.key_0));
-
-      //...
-    }
     ```
   
   **Localized Texts**
@@ -190,34 +170,19 @@ This library provides easy and secure PIN authentication view, which
 
 - ### Set callback listener to get callbacks when the user is authenticated or authentication fails.
   ```java
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      //....
-      //...
-            
-      PinView pinView = (PinView) findViewById(R.id.pin_view);
-      pinView.setCorrectPin(new int[]{1, 2, 3, 4});
-      pinView.setKey(...);            //REQUIRED
-      pinView.setIndicator(...);      //REQUIRED
-      pinView.setKeyNames(...)        //OPTIONAL
-
       pinView.setAuthenticationListener(new AuthenticationListener() {
-                 @Override
-                 public void onAuthenticationSuccessful() {
-                     //User authenticated successfully.
-                     //Navigate to next screens.
-                 }
-     
-                 @Override
-                 public void onAuthenticationFailed() {
-                     //Calls whenever authentication is failed or user is unauthorized.
-                     //Do something if you want to handle unauthorized user.
-                 }
-             });
-             
-      //...
-    }
+          @Override
+          public void onAuthenticationSuccessful() {
+              //User authenticated successfully.
+              //Navigate to next screens.
+          }
+
+          @Override
+          public void onAuthenticationFailed() {
+              //Calls whenever authentication is failed or user is unauthorized.
+              //Do something if you want to handle unauthorized user.
+          }  
+      });
   ```
 
 
@@ -240,96 +205,59 @@ This library provides easy and secure PIN authentication view, which
           app:titleTextColor="@android:color/white"/>
   ```
 
-- ### Set the number of rows and columns of the pattern in your activity/fragment.
+
+- ### Get the instance of the view in your activity/fragment.
   ```java
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    //....
-    //...
-
     PatternView patternView = (PatternView) findViewById(R.id.pattern_view);
-
-    //Set number of pattern counts.
-    //REQUIRED
-    patternView.setNoOfColumn(3);   //Number of columns
-    patternView.setNoOfRows(3);     //Number of rows
-
     //...
   }
   ```
 
-- ### Set the correct pattern to authenticate the user in your activity/fragment.
+- ### Set the number of rows and columns of the pattern in your activity/fragment.
   ```java
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    //....
-    //...
-
-    PatternView patternView = (PatternView) findViewById(R.id.pattern_view);
-
     //Set number of pattern counts.
     //REQUIRED
     patternView.setNoOfColumn(3);   //Number of columns
     patternView.setNoOfRows(3);     //Number of rows
+  ```
 
-    //Set the correct pin code.
-    //Display row and column number of the pattern point sequence.
-    //REQUIRED
-    patternView.setCorrectPattern(new PatternPoint[]{
-            new PatternPoint(0, 0),
-            new PatternPoint(1, 0),
-            new PatternPoint(2, 0),
-            new PatternPoint(2, 1)
-    });
-    //...
-  }
+- ### Set the authenticator
+  - Set the authenticator which will tell if your pattern is correct or not. 
+  - The library provides inbuilt `PasscodeViewPatternAuthenticator `. This authenticator will match the pattern entered by the user with the correct pattern provided.
+  - You can write your custom authenticator to customize the authentication logic.
+  - Here is the example with the inbuilt pattern authenticator. Make sure your `PatternPiont` row or column number is not greater than the number of row and number of columns from the previous step.
+   ```java    
+      //Set the correct pin code.
+      //Display row and column number of the pattern point sequence.
+      //REQUIRED
+      final PatternPoint[] correctPattern = new PatternPoint[]{
+              new PatternPoint(0, 0),
+              new PatternPoint(1, 0),
+              new PatternPoint(2, 0),
+              new PatternPoint(2, 1)
+      };
+      patternView.setAuthenticator(new PasscodeViewPatternAuthenticator(correctPattern));
   ```
 
 - ### Set the pattern cell shape.
-  - There are two built in pattern cells available.
+  - There are two built-in pattern cells available.
     * Circle indicator
     * Dot indicator
-
+  - If you want to create custom pattern cell with the custom shape, see [How to create custom indicator?](https://github.com/kevalpatel2106/PasscodeView/wiki/Custom-indicator).
+  - Here is the example of the round indicator. 
   ```java
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    //....
-    //...
-
-    PatternView patternView = (PatternView) findViewById(R.id.pattern_view);
-    patternView.setNoOfColumn(3);   //Number of columns
-    patternView.setNoOfRows(3);     //Number of rows
-    patternView.setCorrectPattern(new PatternPoint[]{...});
-
-
     //Build the desired indicator shape and pass the theme attributes.
     //REQUIRED
     patternView.setPatternCell(new CirclePatternCell.Builder(patternView)
             .setRadius(R.dimen.pattern_cell_radius)
-            .setCellColorResource(R.color.colorAccent)
-            .build());
-
-    //...
-  }
+            .setCellColorResource(R.color.colorAccent));
   ```
 
-- ### Set callback listener to get callbacks when user is authenticated or authentication fails.
+- ### Set callback listener to get callbacks when the user is authenticated or authentication fails.
 ```java
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    //....
-    //...
-
-    PatternView patternView = (PatternView) findViewById(R.id.pattern_view);
-    patternView.setNoOfColumn(3);   //Number of columns
-    patternView.setNoOfRows(3);     //Number of rows
-    patternView.setCorrectPattern(new PatternPoint[]{...});
-    patternView.setPatternCell(...);
-
     patternView.setAuthenticationListener(new AuthenticationListener() {
         @Override
         public void onAuthenticationSuccessful() {
@@ -342,19 +270,12 @@ This library provides easy and secure PIN authentication view, which
             //Do something
         }
     });
-    //...
-  }
   ```
 
 *[**Visit our wiki page for more information.**](https://github.com/kevalpatel2106/PasscodeView/wiki)*
 
 ## How to contribute?
 * Check out contribution guidelines 👉[CONTRIBUTING.md](https://github.com/kevalpatel2106/PasscodeView/blob/master/CONTRIBUTING.md)
-
-
-## What's next?
-- Build more customisation parameters to provide granular control over the theme of the view. 
-
 
 ## Questions?🤔
 Hit me on twitter [![Twitter](https://img.shields.io/badge/Twitter-@kevalpatel2106-blue.svg?style=flat)](https://twitter.com/kevalpatel2106)
@@ -369,3 +290,6 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
+<div align="center">
+<img src="https://cloud.githubusercontent.com/assets/370176/26526332/03bb8ac2-432c-11e7-89aa-da3cd1c0e9cb.png">
+</div>

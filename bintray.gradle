@@ -1,11 +1,9 @@
 /*
- * Copyright 2017 Keval Patel.
+ * Copyright 2018 Keval Patel.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +16,7 @@
 if (project.rootProject.file('local.properties').exists()) {
     apply plugin: 'com.jfrog.bintray'
 
-    version = "1.2.1"     // This is the library version used when deploying the artifact
+    version = "2.0.0"     // This is the library version used when deploying the artifact
 
     def siteUrl = 'https://github.com/kevalpatel2106/PasscodeView'
     // Homepage URL of the library
@@ -70,6 +68,8 @@ if (project.rootProject.file('local.properties').exists()) {
     task javadoc(type: Javadoc) {
         source = android.sourceSets.main.java.srcDirs
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        classpath += configurations.javadocDeps
+        options.encoding = 'UTF-8'
         failOnError false
     }
 

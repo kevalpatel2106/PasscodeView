@@ -1,11 +1,9 @@
 /*
- * Copyright 2017 Keval Patel.
+ * Copyright 2018 Keval Patel.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +19,7 @@ android {
     compileSdkVersion 27
     buildToolsVersion "27.0.3"
 
-    // This is important, it will run lint checks but won't abort build
+    // This is important, it will run lint checks but won't abort buildInternal
     lintOptions {
         abortOnError false
     }
@@ -34,7 +32,12 @@ android {
     }
 }
 
+configurations {
+    javadocDeps
+}
+
 dependencies {
-    implementation 'com.android.support:support-annotations:27.1.0'
+    implementation 'com.android.support:support-annotations:27.1.1'
+    javadocDeps 'com.android.support:support-annotations:27.1.1'
 }
 apply from: '../bintray.gradle'

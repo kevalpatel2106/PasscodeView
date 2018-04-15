@@ -1,11 +1,9 @@
 /*
- * Copyright 2017 Keval Patel.
+ * Copyright 2018 Keval Patel.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +19,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.kevalpatel.passcodeview.PatternView;
+import com.kevalpatel.passcodeview.authenticator.PasscodeViewPatternAuthenticator;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 import com.kevalpatel.passcodeview.patternCells.CirclePatternCell;
 import com.kevalpatel.passcodeview.patternCells.PatternPoint;
@@ -28,7 +27,7 @@ import com.kevalpatel.passcodeview.patternCells.PatternPoint;
 /**
  * Created by Keval on 06-Apr-17.
  *
- * @author 'https://github.com/kevalpatel2106'
+ *@author <a href="https://github.com/kevalpatel2106">kevalpatel2106</a>
  */
 public class PatternViewActivity extends AppCompatActivity {
 
@@ -47,19 +46,19 @@ public class PatternViewActivity extends AppCompatActivity {
         //Set the correct pin code.
         //Display row and column number of the pattern point sequence.
         //REQUIRED
-        patternView.setCorrectPattern(new PatternPoint[]{
+        final PatternPoint[] correctPattern = new PatternPoint[]{
                 new PatternPoint(0, 0),
                 new PatternPoint(1, 0),
                 new PatternPoint(2, 0),
                 new PatternPoint(2, 1)
-        });
+        };
+        patternView.setAuthenticator(new PasscodeViewPatternAuthenticator(correctPattern));
 
         //Build the desired indicator shape and pass the theme attributes.
         //REQUIRED
         patternView.setPatternCell(new CirclePatternCell.Builder(patternView)
                 .setRadius(R.dimen.pattern_cell_radius)
-                .setCellColorResource(R.color.colorAccent)
-                .build());
+                .setCellColorResource(R.color.colorAccent));
 
         patternView.setAuthenticationListener(new AuthenticationListener() {
             @Override

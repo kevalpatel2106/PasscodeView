@@ -1,11 +1,9 @@
 /*
- * Copyright 2017 Keval Patel.
+ * Copyright 2018 Keval Patel.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,31 +20,21 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
-import android.os.Vibrator;
 import android.provider.Settings;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.RequiresPermission;
-import android.util.Log;
-
-import com.kevalpatel.passcodeview.patternCells.PatternCell;
-import com.kevalpatel.passcodeview.patternCells.PatternPoint;
-
-import java.util.ArrayList;
 
 /**
  * Created by Keval on 07-Oct-16.
  * This class contains utility methods for the library.
  *
- * @author 'https://github.com/kevalpatel2106'
+ *@author <a href="https://github.com/kevalpatel2106">kevalpatel2106</a>
  */
 
 public final class Utils {
-
-    private Utils() {
-    }
 
     /**
      * Open the Security settings screen. This settings screen will allow user to register finger
@@ -99,48 +87,6 @@ public final class Utils {
     }
 
     /**
-     * Check if the given pin is valid or not?
-     *
-     * @param pinToCheck pin to validate
-     * @return true if the entered pin is valid.
-     */
-    static boolean isValidPin(int[] pinToCheck) {
-        for (int i : pinToCheck) if (i > 9 && i < 0) return false;
-        return true;
-    }
-
-    /**
-     * Compare two arrays of the PIN and check if both pin matches?
-     *
-     * @param correctPin correct pin.
-     * @param pinToCheck pin entered by the user.
-     * @return true if the both pin matches.
-     */
-    static boolean isPINMatched(int[] correctPin, ArrayList<Integer> pinToCheck) {
-        for (int i = 0; i < correctPin.length; i++)
-            if (correctPin[i] != pinToCheck.get(i)) return false;
-        return correctPin.length == pinToCheck.size();
-    }
-
-    /**
-     * Check if the both pattern matches? It uses {@link PatternPoint#equals(Object)} to match row and
-     * column number of both pattern poins.
-     *
-     * @param correctPattern correct list of {@link PatternPoint}.
-     * @param patternToCheck list of {@link PatternPoint} to check.
-     * @return true if both pattern matches.
-     * @see PatternPoint#equals(Object)
-     */
-    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
-    static boolean isPatternMatched(@NonNull PatternPoint[] correctPattern,
-                                    @NonNull ArrayList<PatternCell> patternToCheck) {
-        for (int i = 0; i < correctPattern.length; i++)
-            if (!correctPattern[i].equals(patternToCheck.get(i).getPoint())) return false;
-
-        return correctPattern.length == patternToCheck.size();
-    }
-
-    /**
      * Get the darker version of the given color.
      *
      * @param color Normal color.
@@ -153,47 +99,6 @@ public final class Utils {
         Color.colorToHSV(color, hsv);
         hsv[2] = 1f - 0.8f * hsv[2]; // value component
         return Color.HSVToColor(hsv);
-    }
-
-    /**
-     * Run the vibrator to give tactile feedback for 50ms when any key is pressed.
-     */
-    static void giveTactileFeedbackForKeyPress(@NonNull Context context) {
-        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-
-        if (v == null) {
-            Log.w("PasscodeView", "Vibrator service not found.");
-            return;
-        }
-
-        if (v.hasVibrator()) v.vibrate(50);
-    }
-
-    /**
-     * Run the vibrator to give tactile feedback for 350ms when user authentication is successful.
-     */
-    static void giveTactileFeedbackForAuthFail(@NonNull Context context) {
-        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        if (v == null) {
-            Log.w("PasscodeView", "Vibrator service not found.");
-            return;
-        }
-
-        if (v.hasVibrator()) v.vibrate(350);
-    }
-
-    /**
-     * Run the vibrator to give tactile feedback for 100ms at difference of 50ms for two times when
-     * user authentication is failed.
-     */
-    static void giveTactileFeedbackForAuthSuccess(@NonNull Context context) {
-        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        if (v == null) {
-            Log.w("PasscodeView", "Vibrator service not found.");
-            return;
-        }
-
-        if (v.hasVibrator()) v.vibrate(new long[]{50, 100, 50, 100}, -1);
     }
 
     @ColorInt

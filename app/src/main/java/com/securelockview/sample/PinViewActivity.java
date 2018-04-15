@@ -1,11 +1,9 @@
 /*
- * Copyright 2017 Keval Patel.
+ * Copyright 2018 Keval Patel.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,16 +18,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.kevalpatel.passcodeview.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.PinView;
+import com.kevalpatel.passcodeview.authenticator.PasscodeViewPinAuthenticator;
 import com.kevalpatel.passcodeview.indicators.CircleIndicator;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
+import com.kevalpatel.passcodeview.keys.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.keys.RoundKey;
 
 /**
  * Created by Keval on 06-Apr-17.
  *
- * @author 'https://github.com/kevalpatel2106'
+ *@author <a href="https://github.com/kevalpatel2106">kevalpatel2106</a>
  */
 public class PinViewActivity extends AppCompatActivity {
     private static final String ARG_CURRENT_PIN = "current_pin";
@@ -41,11 +40,12 @@ public class PinViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pinview);
 
-        mPinView = (PinView) findViewById(R.id.pattern_view);
+        mPinView = findViewById(R.id.pattern_view);
 
         //Set the correct pin code.
         //REQUIRED
-        mPinView.setCorrectPin(new int[]{1, 2, 3, 4});
+        final int[] correctPattern = new int[]{1, 2, 3, 4};
+        mPinView.setPinAuthenticator(new PasscodeViewPinAuthenticator(correctPattern));
 
         //Build the desired key shape and pass the theme parameters.
         //REQUIRED
@@ -54,8 +54,7 @@ public class PinViewActivity extends AppCompatActivity {
                 .setKeyStrokeColorResource(R.color.colorAccent)
                 .setKeyStrokeWidth(R.dimen.key_stroke_width)
                 .setKeyTextColorResource(R.color.colorAccent)
-                .setKeyTextSize(R.dimen.key_text_size)
-                .build());
+                .setKeyTextSize(R.dimen.key_text_size));
 
         //Build the desired indicator shape and pass the theme attributes.
         //REQUIRED
@@ -63,8 +62,9 @@ public class PinViewActivity extends AppCompatActivity {
                 .setIndicatorRadius(R.dimen.indicator_radius)
                 .setIndicatorFilledColorResource(R.color.colorAccent)
                 .setIndicatorStrokeColorResource(R.color.colorAccent)
-                .setIndicatorStrokeWidth(R.dimen.indicator_stroke_width)
-                .build());
+                .setIndicatorStrokeWidth(R.dimen.indicator_stroke_width));
+
+        mPinView.setPinLength(PinView.DYNAMIC_PIN_LENGTH);
 
         //Set the name of the keys based on your locale.
         //OPTIONAL. If not passed key names will be displayed based on english locale.
@@ -79,6 +79,8 @@ public class PinViewActivity extends AppCompatActivity {
                 .setKeyEight(this, R.string.key_8)
                 .setKeyNine(this, R.string.key_9)
                 .setKeyZero(this, R.string.key_0));
+
+        mPinView.setTitle("Enter the PIN");
 
         mPinView.setAuthenticationListener(new AuthenticationListener() {
             @Override

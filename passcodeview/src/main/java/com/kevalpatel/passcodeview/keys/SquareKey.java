@@ -1,11 +1,9 @@
 /*
- * Copyright 2017 Keval Patel.
+ * Copyright 2018 Keval Patel.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +18,8 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
@@ -30,38 +30,83 @@ import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.view.animation.CycleInterpolator;
 
-import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.R;
 import com.kevalpatel.passcodeview.Utils;
+import com.kevalpatel.passcodeview.internal.BasePasscodeView;
 
 /**
  * Created by Keval on 06-Apr-17.
  * This class represents single key.
  *
- * @author 'https://github.com/kevalpatel2106'
+ *@author <a href="https://github.com/kevalpatel2106">kevalpatel2106</a>
  */
 
 public final class SquareKey extends Key {
-    private final Rect mBounds;                         //RoundKey bound.
+    /**
+     * Duration of the error animation in milliseconds.
+     */
+    private static final long ANIMATION_DURATION = 200;
+
+    /**
+     * {@link Builder} of this key.
+     */
+    @NonNull
     private final Builder mBuilder;
+    /**
+     * {@link ValueAnimator} for the authentication error. This animator will shake the view left-right
+     * for two times.
+     */
+    @NonNull
     private final ValueAnimator mErrorAnimator;
+    /**
+     * {@link Paint} of the key.
+     */
+    @NonNull
+    private final Paint mKeyPaint;
+    /**
+     * {@link TextPaint} of the key title text.
+     */
+    @NonNull
+    private final TextPaint mKeyTextPaint;
+    /**
+     * {@link Paint} of the ripple animations.
+     */
+    @NonNull
+    private final Paint mRipplePaint;
+    /**
+     * True if the click animations are running or not.
+     */
     private boolean isClickedAnimationRunning = false;
 
     /**
      * Public constructor.
-     *
-     * @param pinView {@link PinView}
-     * @param digit   title of the key. (-1 for the backspace key)
-     * @param bounds  {@link Rect} bound.
      */
-    private SquareKey(@NonNull PinView pinView,
-                      @NonNull String digit,
-                      @NonNull Rect bounds,
-                      @NonNull SquareKey.Builder builder) {
-        super(pinView, digit, bounds, builder);
+    private SquareKey(@NonNull SquareKey.Builder builder,
+                      @NonNull final String keyTitle,
+                      @NonNull final Rect bound) {
+        super(builder, keyTitle, bound);
 
-        mBounds = bounds;
         mBuilder = builder;
+
+        //Set the keyboard paint
+        mKeyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mKeyPaint.setStyle(Paint.Style.STROKE);
+        mKeyPaint.setColor(builder.mKeyStrokeColor);
+        mKeyPaint.setTextSize(builder.mKeyTextSize);
+        mKeyPaint.setStrokeWidth(builder.mKeyStrokeWidth);
+
+        //Set the keyboard text paint
+        mKeyTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        mKeyTextPaint.setColor(builder.mKeyTextColor);
+        mKeyTextPaint.setTextSize(builder.mKeyTextSize);
+        mKeyTextPaint.setFakeBoldText(true);
+        mKeyTextPaint.setTextAlign(Paint.Align.CENTER);
+
+        //Ripple paint
+        mRipplePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mRipplePaint.setStyle(Paint.Style.STROKE);
+        mRipplePaint.setColor(Utils.makeColorDark(builder.mKeyStrokeColor));
+        mRipplePaint.setStrokeWidth(builder.mKeyStrokeWidth);
 
         //Error animator
         mErrorAnimator = ValueAnimator.ofInt(0, 10);
@@ -69,9 +114,9 @@ public final class SquareKey extends Key {
         mErrorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                mBounds.left += (int) animation.getAnimatedValue();
-                mBounds.right += (int) animation.getAnimatedValue();
-                getPinView().invalidate();
+                getBounds().left += (int) animation.getAnimatedValue();
+                getBounds().right += (int) animation.getAnimatedValue();
+                getPasscodeView().invalidate();
             }
         });
     }
@@ -84,15 +129,15 @@ public final class SquareKey extends Key {
     @Override
     public void playClickAnimation() {
         isClickedAnimationRunning = true;
-        getPinView().invalidate();
+        getPasscodeView().invalidate();
 
         new android.os.Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 isClickedAnimationRunning = false;
-                getPinView().invalidate();
+                getPasscodeView().invalidate();
             }
-        }, 200);
+        }, ANIMATION_DURATION);
     }
 
     /**
@@ -113,32 +158,33 @@ public final class SquareKey extends Key {
     public void drawText(@NonNull Canvas canvas) {
         //Draw key text
         canvas.drawText(getDigit() + "",                //Text to display on key
-                mBounds.exactCenterX(),                 //Set start point at center width of key
-                mBounds.exactCenterY() - (mBuilder.getKeyTextPaint().descent() + mBuilder.getKeyTextPaint().ascent()) / 2,    //center height of key - text height/2
-                mBuilder.getKeyTextPaint());
+                getBounds().exactCenterX(),                 //Set start point at center width of key
+                getBounds().exactCenterY() - (mKeyTextPaint.descent() + mKeyTextPaint.ascent()) / 2,    //center height of key - text height/2
+                mKeyTextPaint);
     }
 
     @Override
     public void drawShape(@NonNull Canvas canvas) {
-        float distanceToCenter = (Math.min(mBounds.height(), mBounds.width()) - mBuilder.getKeyPadding()) / 2;
+        float distanceToCenter = (Math.min(getBounds().height(), getBounds().width()) - mBuilder.mKeyPadding) / 2;
 
         //Draw circle background
-        canvas.drawRect(mBounds.exactCenterX() - distanceToCenter,
-                mBounds.exactCenterY() - distanceToCenter,
-                mBounds.exactCenterX() + distanceToCenter,
-                mBounds.exactCenterY() + distanceToCenter,
-                isClickedAnimationRunning ? mBuilder.getClickPaint() : mBuilder.getKeyPaint());
+        canvas.drawRect(getBounds().exactCenterX() - distanceToCenter,
+                getBounds().exactCenterY() - distanceToCenter,
+                getBounds().exactCenterX() + distanceToCenter,
+                getBounds().exactCenterY() + distanceToCenter,
+                isClickedAnimationRunning ? mRipplePaint : mKeyPaint);
 
     }
 
     @Override
     public void drawBackSpace(@NonNull Canvas canvas, @NonNull Drawable backSpaceIcon) {
-        float distanceToCenter = (Math.min(mBounds.height(), mBounds.width()) - mBuilder.getKeyPadding()) / 3;
+        backSpaceIcon.setColorFilter(new PorterDuffColorFilter(mKeyTextPaint.getColor(), PorterDuff.Mode.SRC_ATOP));
 
-        backSpaceIcon.setBounds((int) (mBounds.exactCenterX() - distanceToCenter),
-                (int) (mBounds.exactCenterY() - distanceToCenter),
-                (int) (mBounds.exactCenterX() + distanceToCenter),
-                (int) (mBounds.exactCenterY() + distanceToCenter));
+        float distanceToCenter = (Math.min(getBounds().height(), getBounds().width()) - mBuilder.mKeyPadding) / 3;
+        backSpaceIcon.setBounds((int) (getBounds().exactCenterX() - distanceToCenter),
+                (int) (getBounds().exactCenterY() - distanceToCenter),
+                (int) (getBounds().exactCenterX() + distanceToCenter),
+                (int) (getBounds().exactCenterY() + distanceToCenter));
         backSpaceIcon.draw(canvas);
     }
 
@@ -153,12 +199,11 @@ public final class SquareKey extends Key {
     public boolean isKeyPressed(float touchX, float touchY) {
 
         //Check if the click is between the width bounds
-        if (touchX > mBounds.left && touchX < mBounds.right) {
+        //noinspection SimplifiableIfStatement
+        if (touchX > getBounds().left && touchX < getBounds().right) {
 
             //Check if the click is between the height bounds
-            if (touchY > mBounds.top && touchY < mBounds.bottom) {
-                return true;
-            }
+            return touchY > getBounds().top && touchY < getBounds().bottom;
         }
         return false;
     }
@@ -170,156 +215,114 @@ public final class SquareKey extends Key {
 
     @SuppressWarnings("NullableProblems")
     public static class Builder extends Key.Builder {
+        /**
+         * Surround padding to each single key.
+         */
         @Dimension
         private float mKeyPadding;
-        @Dimension
-        private float mKeyTextSize;                     //Surround padding to each single key
-        @Dimension
-        private float mKeyStrokeWidth;                   //Surround padding to each single key
-        @ColorInt
-        private int mKeyStrokeColor;                    //RoundKey background stroke color
-        @ColorInt
-        private int mKeyTextColor;                      //RoundKey text color
 
-        @NonNull
-        private Paint mKeyPaint;
-        @NonNull
-        private TextPaint mKeyTextPaint;
-        private Paint mClickPaint;
+        /**
+         * Size of the key title text in pixels.
+         */
+        @Dimension
+        private float mKeyTextSize;
 
-        public Builder(@NonNull PinView pinView) {
-            super(pinView);
+        /**
+         * Size of the width of the key border in pixels.
+         */
+        @Dimension
+        private float mKeyStrokeWidth;
+
+        /**
+         * Key background stroke color.
+         */
+        @ColorInt
+        private int mKeyStrokeColor;
+
+        /**
+         * Key title text color.
+         */
+        @ColorInt
+        private int mKeyTextColor;
+
+        public Builder(@NonNull final BasePasscodeView passcodeView) {
+            super(passcodeView);
+            setDefaults(getContext());
         }
 
-        @Dimension
-        public float getKeyPadding() {
-            return mKeyPadding;
-        }
-
-        public Builder setKeyPadding(@DimenRes int keyPaddingRes) {
+        @NonNull
+        public Builder setKeyPadding(@DimenRes final int keyPaddingRes) {
             mKeyPadding = getContext().getResources().getDimension(keyPaddingRes);
             return this;
         }
 
-        public Builder setKeyPadding(@Dimension float keyPadding) {
+        @NonNull
+        public Builder setKeyPadding(@Dimension final float keyPadding) {
             mKeyPadding = keyPadding;
             return this;
         }
 
-        public float getKeyTextSize() {
-            return mKeyTextSize;
-        }
-
-        public Builder setKeyTextSize(@DimenRes int keyTextSize) {
+        @NonNull
+        public Builder setKeyTextSize(@DimenRes final int keyTextSize) {
             mKeyTextSize = getContext().getResources().getDimension(keyTextSize);
             return this;
         }
 
-        public Builder setKeyTextSize(float keyTextSize) {
+        @NonNull
+        public Builder setKeyTextSize(final float keyTextSize) {
             mKeyTextSize = keyTextSize;
             return this;
         }
 
-        public float getKeyStrokeWidth() {
-            return mKeyStrokeWidth;
-        }
-
-        @Dimension
-        public Builder setKeyStrokeWidth(@DimenRes int keyStrokeWidth) {
+        @NonNull
+        public Builder setKeyStrokeWidth(@DimenRes final int keyStrokeWidth) {
             mKeyStrokeWidth = getContext().getResources().getDimension(keyStrokeWidth);
             return this;
         }
 
-        @Dimension
-        public Builder setKeyStrokeWidth(float keyStrokeWidth) {
+        @NonNull
+        public Builder setKeyStrokeWidth(final float keyStrokeWidth) {
             mKeyStrokeWidth = keyStrokeWidth;
             return this;
         }
 
-        @ColorInt
-        public int getKeyStrokeColor() {
-            return mKeyStrokeColor;
-        }
-
-        public Builder setKeyStrokeColor(@ColorInt int keyStrokeColor) {
+        @NonNull
+        public Builder setKeyStrokeColor(@ColorInt final int keyStrokeColor) {
             mKeyStrokeColor = keyStrokeColor;
             return this;
         }
 
-        public Builder setKeyStrokeColorResource(@ColorRes int keyStrokeColor) {
+        @NonNull
+        public Builder setKeyStrokeColorResource(@ColorRes final int keyStrokeColor) {
             mKeyStrokeColor = getContext().getResources().getColor(keyStrokeColor);
             return this;
         }
 
-        @ColorInt
-        public int getKeyTextColor() {
-            return mKeyTextColor;
-        }
-
-        public Builder setKeyTextColor(@ColorInt int keyTextColor) {
+        @NonNull
+        public Builder setKeyTextColor(@ColorInt final int keyTextColor) {
             mKeyTextColor = keyTextColor;
             return this;
         }
 
-        public Builder setKeyTextColorResource(@ColorRes int keyTextColor) {
+        @NonNull
+        public Builder setKeyTextColorResource(@ColorRes final int keyTextColor) {
             mKeyTextColor = getContext().getResources().getColor(keyTextColor);
             return this;
         }
 
+        @NonNull
         @Override
-        public Builder build() {
-            //Set the keyboard paint
-            mKeyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mKeyPaint.setStyle(Paint.Style.STROKE);
-            mKeyPaint.setColor(mKeyStrokeColor);
-            mKeyPaint.setTextSize(mKeyTextSize);
-            mKeyPaint.setStrokeWidth(mKeyStrokeWidth);
-
-            //Set the keyboard text paint
-            mKeyTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-            mKeyTextPaint.setColor(mKeyTextColor);
-            mKeyTextPaint.setTextSize(mKeyTextSize);
-            mKeyTextPaint.setFakeBoldText(true);
-            mKeyTextPaint.setTextAlign(Paint.Align.CENTER);
-
-            //Ripple paint
-            mClickPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mClickPaint.setStyle(Paint.Style.STROKE);
-            mClickPaint.setColor(Utils.makeColorDark(mKeyStrokeColor));
-            mClickPaint.setStrokeWidth(mKeyStrokeWidth);
-            return this;
+        public SquareKey buildInternal(@NonNull final String keyTitle,
+                                       @NonNull final Rect bound) {
+            return new SquareKey(this, keyTitle, bound);
         }
 
-        @Override
-        protected void setDefaults(@NonNull Context context) {
+        private void setDefaults(@NonNull final Context context) {
             mKeyTextColor = context.getResources().getColor(R.color.lib_key_default_color);
             mKeyStrokeColor = context.getResources().getColor(R.color.lib_key_background_color);
             mKeyTextSize = context.getResources().getDimension(R.dimen.lib_key_text_size);
             mKeyStrokeWidth = context.getResources().getDimension(R.dimen.lib_key_stroke_width);
             mKeyPadding = getContext().getResources().getDimension(R.dimen.lib_key_padding);
-        }
-
-        @NonNull
-        @Override
-        public Paint getKeyPaint() {
-            return mKeyPaint;
-        }
-
-        @NonNull
-        @Override
-        public Paint getKeyTextPaint() {
-            return mKeyTextPaint;
-        }
-
-        @NonNull
-        protected Paint getClickPaint() {
-            return mClickPaint;
-        }
-
-        @NonNull
-        @Override
-        public SquareKey getKey(@NonNull String digit, @NonNull Rect bound) {
-            return new SquareKey(super.getPinView(), digit, bound, this);
         }
     }
 }

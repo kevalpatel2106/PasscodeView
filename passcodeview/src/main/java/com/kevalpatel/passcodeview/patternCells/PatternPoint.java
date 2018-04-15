@@ -1,11 +1,9 @@
 /*
- * Copyright 2017 Keval Patel.
+ * Copyright 2018 Keval Patel.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,14 +20,14 @@ package com.kevalpatel.passcodeview.patternCells;
 
 public final class PatternPoint {
 
-    private final int row;
-    private final int column;
+    private final int mRow;
+    private final int mColumn;
 
-    public PatternPoint(int row, int column) {
-        this.row = row;
-        this.column = column;
+    public PatternPoint(final int row, final int column) {
+        mRow = row;
+        mColumn = column;
 
-        if (row < 0 || column < 0) throw new RuntimeException("Invalid row or column number.");
+        if (row < 0 || column < 0) throw new RuntimeException("Invalid mRow or mColumn number.");
     }
 
     @Override
@@ -38,19 +36,19 @@ public final class PatternPoint {
         if (o == null || getClass() != o.getClass()) return false;
 
         PatternPoint patternPoint = (PatternPoint) o;
-        return row == patternPoint.row && column == patternPoint.column;
+        return mRow == patternPoint.mRow && mColumn == patternPoint.mColumn;
     }
 
     @Override
     public int hashCode() {
-        int result = row;
-        result = 31 * result + column;
+        int result = mRow;
+        result = 31 * result + mColumn;
         return result;
     }
 
     @Override
     public String toString() {
-        return "PatternPoint(" + row + ", " + column + ")";
+        return "PatternPoint(" + mRow + ", " + mColumn + ")";
     }
 
 }
