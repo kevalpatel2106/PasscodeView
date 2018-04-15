@@ -86,8 +86,8 @@ This library provides easy and secure PIN authentication view, which
    ```java    
       //Set the authenticator.
       //REQUIRED
-      final int[] correctPattern = new int[]{1, 2, 3,4}; 
-      pinView.setPinAuthenticator(new PasscodeViewPinAuthenticator(correctPattern));
+      final int[] correctPin = new int[]{1, 2, 3,4}; 
+      pinView.setPinAuthenticator(new PasscodeViewPinAuthenticator(correctPin));
   ```
 
 - ### Set the PIN length. 
