@@ -222,7 +222,7 @@ This library provides easy and secure PIN authentication view, which
 
 - ### Set the authenticator
   - Set the authenticator which will tell if your pattern is correct or not. 
-  - The library provides inbuilt `PasscodeViewPinAuthenticator`. This authenticator will match the pin entered by the user with the correct PIN provided.
+  - The library provides inbuilt `PasscodeViewPatternAuthenticator `. This authenticator will match the pattern entered by the user with the correct pattern provided.
   - You can write your custom authenticator to customize the authentication logic.
   - Here is the example with the inbuilt pattern authenticator. Make sure your `PatternPiont` row or column number is not greater than the number of row and number of columns from the previous step.
    ```java    
