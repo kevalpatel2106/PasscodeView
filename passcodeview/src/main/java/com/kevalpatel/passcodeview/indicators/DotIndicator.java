@@ -1,17 +1,9 @@
 /*
- * Copyright 2017 Keval Patel.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2018. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
+ * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
+ * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
+ * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
 package com.kevalpatel.passcodeview.indicators;
@@ -55,7 +47,7 @@ public final class DotIndicator extends Indicator {
 
         //Set empty dot paint
         mEmptyIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mEmptyIndicatorPaint.setColor(builder.mIndicatorStrokeColor);
+        mEmptyIndicatorPaint.setColor(builder.mEmptyIndicatorColor);
 
         //Set filled dot paint
         mSolidIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -100,7 +92,7 @@ public final class DotIndicator extends Indicator {
 
     public static class Builder extends Indicator.Builder {
         @ColorInt
-        private int mIndicatorStrokeColor;              //Empty indicator stroke color
+        private int mEmptyIndicatorColor;              //Empty indicator stroke color
         @ColorInt
         private int mIndicatorFilledColor;              //Filled indicator stroke color
         @Dimension
@@ -111,18 +103,18 @@ public final class DotIndicator extends Indicator {
 
             mIndicatorRadius = getContext().getResources().getDimension(R.dimen.lib_indicator_radius);
             mIndicatorFilledColor = getContext().getResources().getColor(R.color.lib_indicator_filled_color);
-            mIndicatorStrokeColor = getContext().getResources().getColor(R.color.lib_indicator_stroke_color);
+            mEmptyIndicatorColor = getContext().getResources().getColor(R.color.lib_indicator_stroke_color);
         }
 
         @NonNull
-        public DotIndicator.Builder setIndicatorStrokeColor(@ColorInt final int indicatorStrokeColor) {
-            mIndicatorStrokeColor = indicatorStrokeColor;
+        public DotIndicator.Builder setIndicatorEmptyColor(@ColorInt final int indicatorStrokeColor) {
+            mEmptyIndicatorColor = indicatorStrokeColor;
             return this;
         }
 
         @NonNull
         public DotIndicator.Builder setIndicatorEmptyColorResource(@ColorRes final int indicatorStrokeColor) {
-            mIndicatorStrokeColor = getContext().getResources().getColor(indicatorStrokeColor);
+            mEmptyIndicatorColor = getContext().getResources().getColor(indicatorStrokeColor);
             return this;
         }
 
