@@ -147,7 +147,6 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
      * @param attrs {@link AttributeSet}
      */
     private void init(@Nullable final AttributeSet attrs) {
-        mBoxFingerprint.init();
         init(); //Call init for the concrete class
 
         if (attrs != null) {    //Parse all the params from the arguments.
@@ -173,6 +172,9 @@ public abstract class BasePasscodeView extends View implements PasscodeViewLifeC
             mBoxFingerprint.setDefaults();
             setDefaults();
         }
+        
+        // Initialze BoxFingerprint AFTER setting attrs!!!!
+        mBoxFingerprint.init();
 
         //Prepare paints.
         prepareDividerPaint();
